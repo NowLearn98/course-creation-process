@@ -1309,6 +1309,24 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     }
   };
 
+  const getValidationMessage = () => {
+    switch (currentStep) {
+      case 1:
+        if (!formData.title) return "Course title is required";
+        if (!formData.description) return "Course description is required";
+        if (!formData.level) return "Course level is required";
+        if (!formData.language) return "Language is required";
+        if (!formData.category) return "Category is required";
+        return "";
+      case 2:
+        return "At least one module with a title is required";
+      case 3:
+        return "Please select a course format";
+      default:
+        return "";
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -1338,13 +1356,21 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
           
           <div className="flex gap-2">
             {currentStep < 5 ? (
-              <Button 
-                onClick={nextStep} 
-                disabled={!isStepValid()}
-                className="transition-all duration-200"
-              >
-                Next Step
-              </Button>
+              <div className="relative">
+                <Button 
+                  onClick={nextStep} 
+                  disabled={!isStepValid()}
+                  className="transition-all duration-200"
+                  title={!isStepValid() ? getValidationMessage() : ""}
+                >
+                  Next Step
+                </Button>
+                {!isStepValid() && (
+                  <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-destructive text-destructive-foreground text-xs px-2 py-1 rounded whitespace-nowrap opacity-80">
+                    {getValidationMessage()}
+                  </div>
+                )}
+              </div>
             ) : (
               <Button 
                 onClick={handleSubmit}
