@@ -39,6 +39,7 @@ interface ClassroomSession {
 }
 
 interface OneOnOneSession {
+  startDate: string;
   daysOfWeek: string[];
   startTime: string;
   endTime: string;
@@ -232,6 +233,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
 
   const addOneOnOneSession = () => {
     const newSession: OneOnOneSession = {
+      startDate: '',
       daysOfWeek: [],
       startTime: '',
       endTime: '',
@@ -274,6 +276,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
         }];
       } else if (type === 'oneOnOne') {
         newOneOnOneSessions = [...formData.oneOnOneSessions, {
+          startDate: '',
           daysOfWeek: [],
           startTime: '',
           endTime: '',
@@ -948,49 +951,61 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                         </Button>
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label>Available Days</Label>
-                        <div className="flex flex-wrap gap-2">
-                          {daysOfWeek.map((day) => (
-                            <Badge
-                              key={day}
-                              variant={session.daysOfWeek.includes(day) ? "default" : "outline"}
-                              className="cursor-pointer"
-                              onClick={() => toggleDayOfWeek('oneOnOne', index, day)}
-                            >
-                              {day.slice(0, 3)}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label>Start Time</Label>
+                          <Label>Start Date</Label>
                           <Input
-                            type="time"
-                            value={session.startTime}
-                            onChange={(e) => updateOneOnOneSession(index, 'startTime', e.target.value)}
+                            type="date"
+                            value={session.startDate}
+                            onChange={(e) => updateOneOnOneSession(index, 'startDate', e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label>End Time</Label>
-                          <Input
-                            type="time"
-                            value={session.endTime}
-                            onChange={(e) => updateOneOnOneSession(index, 'endTime', e.target.value)}
-                          />
-                        </div>
-                      </div>
 
-                      {session.startTime && session.endTime && (
-                        <div className="flex items-center gap-2 p-3 bg-accent/50 rounded-lg">
-                          <Clock className="w-4 h-4 text-primary" />
-                          <span className="text-sm font-medium">
-                            Session Duration: {calculateSessionDuration(session.startTime, session.endTime)}
-                          </span>
+                        <div className="space-y-2">
+                          <Label>Available Days</Label>
+                          <div className="flex flex-wrap gap-2">
+                            {daysOfWeek.map((day) => (
+                              <Badge
+                                key={day}
+                                variant={session.daysOfWeek.includes(day) ? "default" : "outline"}
+                                className="cursor-pointer"
+                                onClick={() => toggleDayOfWeek('oneOnOne', index, day)}
+                              >
+                                {day.slice(0, 3)}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
-                      )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Start Time</Label>
+                            <Input
+                              type="time"
+                              value={session.startTime}
+                              onChange={(e) => updateOneOnOneSession(index, 'startTime', e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>End Time</Label>
+                            <Input
+                              type="time"
+                              value={session.endTime}
+                              onChange={(e) => updateOneOnOneSession(index, 'endTime', e.target.value)}
+                            />
+                          </div>
+                        </div>
+
+                        {session.startTime && session.endTime && (
+                          <div className="flex items-center gap-2 p-3 bg-accent/50 rounded-lg">
+                            <Clock className="w-4 h-4 text-primary" />
+                            <span className="text-sm font-medium">
+                              Session Duration: {calculateSessionDuration(session.startTime, session.endTime)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
 
                       <div className="flex items-center space-x-2">
                         <Checkbox
