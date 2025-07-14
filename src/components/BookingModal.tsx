@@ -16,6 +16,17 @@ interface BookingModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+interface SubSection {
+  title: string;
+  description: string;
+  type: 'lecture' | 'quiz' | 'assignment' | 'lab';
+}
+
+interface Module {
+  title: string;
+  subsections: SubSection[];
+}
+
 interface FormData {
   // General Information
   title: string;
@@ -31,7 +42,7 @@ interface FormData {
   durationMinutes: string;
   
   // Course Content
-  modules: string[];
+  modules: Module[];
   
   // Course Format
   format: string;
@@ -75,7 +86,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     subcategory: '',
     durationHours: '',
     durationMinutes: '',
-    modules: [''],
+    modules: [{ title: '', subsections: [] }],
     format: '',
     images: [],
     videos: [],
@@ -95,12 +106,15 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
   };
 
   const addModule = () => {
-    setFormData(prev => ({ ...prev, modules: [...prev.modules, ''] }));
+    setFormData(prev => ({ 
+      ...prev, 
+      modules: [...prev.modules, { title: '', subsections: [] }] 
+    }));
   };
 
-  const updateModule = (index: number, value: string) => {
+  const updateModule = (index: number, field: 'title', value: string) => {
     const newModules = [...formData.modules];
-    newModules[index] = value;
+    newModules[index] = { ...newModules[index], [field]: value };
     setFormData(prev => ({ ...prev, modules: newModules }));
   };
 
@@ -109,6 +123,31 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
       const newModules = formData.modules.filter((_, i) => i !== index);
       setFormData(prev => ({ ...prev, modules: newModules }));
     }
+  };
+
+  const addSubSection = (moduleIndex: number) => {
+    const newModules = [...formData.modules];
+    newModules[moduleIndex].subsections.push({
+      title: '',
+      description: '',
+      type: 'lecture'
+    });
+    setFormData(prev => ({ ...prev, modules: newModules }));
+  };
+
+  const updateSubSection = (moduleIndex: number, subIndex: number, field: keyof SubSection, value: any) => {
+    const newModules = [...formData.modules];
+    newModules[moduleIndex].subsections[subIndex] = {
+      ...newModules[moduleIndex].subsections[subIndex],
+      [field]: value
+    };
+    setFormData(prev => ({ ...prev, modules: newModules }));
+  };
+
+  const removeSubSection = (moduleIndex: number, subIndex: number) => {
+    const newModules = [...formData.modules];
+    newModules[moduleIndex].subsections = newModules[moduleIndex].subsections.filter((_, i) => i !== subIndex);
+    setFormData(prev => ({ ...prev, modules: newModules }));
   };
 
   const handleFileUpload = (type: 'images' | 'videos', files: FileList | null) => {
@@ -137,7 +176,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
       subcategory: '',
       durationHours: '',
       durationMinutes: '',
-      modules: [''],
+      modules: [{ title: '', subsections: [] }],
       format: '',
       images: [],
       videos: [],
@@ -349,29 +388,96 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
               </Button>
             </div>
             
-            <div className="space-y-4">
-              {formData.modules.map((module, index) => (
-                <Card key={index} className="p-4 border border-border hover:shadow-md transition-shadow duration-200">
-                  <div className="flex items-center gap-4">
-                    <Badge variant="secondary" className="text-xs">
-                      Module {index + 1}
-                    </Badge>
-                    <Input
-                      value={module}
-                      onChange={(e) => updateModule(index, e.target.value)}
-                      placeholder={`Enter module ${index + 1} title`}
-                      className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                    />
-                    {formData.modules.length > 1 && (
-                      <Button 
-                        onClick={() => removeModule(index)} 
-                        variant="outline" 
-                        size="sm"
-                        className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
-                      >
-                        Remove
-                      </Button>
-                    )}
+            <div className="space-y-6">
+              {formData.modules.map((module, moduleIndex) => (
+                <Card key={moduleIndex} className="p-6 border border-border hover:shadow-md transition-shadow duration-200">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Badge variant="secondary" className="text-xs">
+                        Module {moduleIndex + 1}
+                      </Badge>
+                      <Input
+                        value={module.title}
+                        onChange={(e) => updateModule(moduleIndex, 'title', e.target.value)}
+                        placeholder={`Enter module ${moduleIndex + 1} title`}
+                        className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      />
+                      {formData.modules.length > 1 && (
+                        <Button 
+                          onClick={() => removeModule(moduleIndex)} 
+                          variant="outline" 
+                          size="sm"
+                          className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-medium text-foreground">Subsections</h4>
+                        <Button 
+                          onClick={() => addSubSection(moduleIndex)} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          Add Subsection
+                        </Button>
+                      </div>
+
+                      {module.subsections.length > 0 && (
+                        <div className="space-y-3">
+                          {module.subsections.map((subsection, subIndex) => (
+                            <Card key={subIndex} className="p-4 bg-accent/30">
+                              <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className="text-xs">
+                                    {subIndex + 1}
+                                  </Badge>
+                                  <Input
+                                    value={subsection.title}
+                                    onChange={(e) => updateSubSection(moduleIndex, subIndex, 'title', e.target.value)}
+                                    placeholder="Subsection title"
+                                    className="flex-1 h-9"
+                                  />
+                                  <Select 
+                                    value={subsection.type} 
+                                    onValueChange={(value) => updateSubSection(moduleIndex, subIndex, 'type', value)}
+                                  >
+                                    <SelectTrigger className="w-32 h-9">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="lecture">Lecture</SelectItem>
+                                      <SelectItem value="quiz">Quiz</SelectItem>
+                                      <SelectItem value="assignment">Assignment</SelectItem>
+                                      <SelectItem value="lab">Lab</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button 
+                                    onClick={() => removeSubSection(moduleIndex, subIndex)} 
+                                    variant="outline" 
+                                    size="sm"
+                                    className="text-destructive hover:text-destructive-foreground hover:bg-destructive h-9 w-9 p-0"
+                                  >
+                                    ×
+                                  </Button>
+                                </div>
+                                <Textarea
+                                  value={subsection.description}
+                                  onChange={(e) => updateSubSection(moduleIndex, subIndex, 'description', e.target.value)}
+                                  placeholder="Subsection description"
+                                  className="text-sm min-h-20"
+                                />
+                              </div>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </Card>
               ))}
@@ -520,10 +626,21 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
               <div>
                 <h4 className="font-medium text-foreground mb-2">Course Content</h4>
                 <div className="text-sm text-muted-foreground">
-                  <p><span className="font-medium">Modules:</span> {formData.modules.filter(m => m.trim()).length}</p>
+                  <p><span className="font-medium">Modules:</span> {formData.modules.filter(m => m.title.trim()).length}</p>
                   <ul className="list-disc list-inside mt-1 space-y-1">
-                    {formData.modules.filter(m => m.trim()).map((module, index) => (
-                      <li key={index}>{module}</li>
+                    {formData.modules.filter(m => m.title.trim()).map((module, index) => (
+                      <li key={index}>
+                        <span className="font-medium">{module.title}</span>
+                        {module.subsections.length > 0 && (
+                          <ul className="list-disc list-inside ml-4 mt-1">
+                            {module.subsections.map((sub, subIndex) => (
+                              <li key={subIndex} className="text-xs">
+                                {sub.title} ({sub.type})
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -553,7 +670,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
       case 1:
         return formData.title && formData.description && formData.level && formData.language && formData.category;
       case 2:
-        return formData.modules.some(module => module.trim());
+        return formData.modules.some(module => module.title.trim());
       case 3:
         return formData.format;
       case 4:
