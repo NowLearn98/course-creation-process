@@ -764,51 +764,83 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                       </div>
 
                       {session.daysOfWeek.length > 0 && (session.startTime || session.endTime) && (
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                           <h5 className="text-sm font-medium text-foreground text-center">Session Preview</h5>
                           <div className="flex justify-center">
-                            <div className="p-8 bg-accent/30 rounded-lg w-full max-w-lg">
-                              <div className="mx-auto transform scale-150 origin-center">
-                                <Calendar
-                                  mode="multiple"
-                                  className="pointer-events-auto"
-                                  modifiers={{
-                                    sessionDay: (date) => {
-                                      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-                                      return session.daysOfWeek.includes(dayName);
-                                    }
-                                  }}
-                                  modifiersClassNames={{
-                                    sessionDay: "bg-primary text-primary-foreground font-bold"
-                                  }}
-                                />
-                              </div>
-                              <div className="mt-6 space-y-2 text-sm text-muted-foreground text-center">
-                                <p><strong>Selected days:</strong> {session.daysOfWeek.join(', ')}</p>
-                                {session.startTime && session.endTime && (
-                                  <p><strong>Time:</strong> {session.startTime} - {session.endTime}</p>
-                                )}
-                                {session.startTime && session.endTime && (
-                                  <p><strong>Duration:</strong> {calculateSessionDuration(session.startTime, session.endTime)}</p>
-                                )}
-                              </div>
-                              
-                              {/* Custom calendar overlay with times */}
-                              <div className="mt-4 p-4 bg-primary/10 rounded-lg">
-                                <h6 className="text-xs font-medium text-center mb-2">Session Times</h6>
-                                <div className="grid grid-cols-7 gap-1 text-center">
-                                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => {
-                                    const fullDayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][index];
-                                    const isSessionDay = session.daysOfWeek.includes(fullDayName);
-                                    return (
-                                      <div key={day} className={`p-2 rounded text-xs ${isSessionDay ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>
-                                        <div className="font-medium">{day}</div>
-                                        {isSessionDay && session.startTime && (
-                                          <div className="text-[8px] mt-1">{session.startTime.slice(0, 5)}</div>
+                            <div className="w-full max-w-4xl p-6 bg-accent/30 rounded-lg">
+                              {/* Weekly Calendar View */}
+                              <div className="grid grid-cols-7 gap-2 h-96">
+                                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((dayName, index) => {
+                                  const isSessionDay = session.daysOfWeek.includes(dayName);
+                                  const today = new Date();
+                                  const currentWeekStart = new Date(today.setDate(today.getDate() - today.getDay()));
+                                  const dayDate = new Date(currentWeekStart);
+                                  dayDate.setDate(currentWeekStart.getDate() + index);
+                                  
+                                  return (
+                                    <div key={dayName} className="flex flex-col">
+                                      {/* Day Header */}
+                                      <div className="text-center p-2 border-b border-border">
+                                        <div className="text-xs text-muted-foreground font-medium">
+                                          {dayName.slice(0, 3)}
+                                        </div>
+                                        <div className="text-lg font-semibold text-foreground">
+                                          {dayDate.getDate()}
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Day Content */}
+                                      <div className="flex-1 p-1 relative">
+                                        {isSessionDay && session.startTime && session.endTime ? (
+                                          <div className="absolute inset-1">
+                                            <div className="bg-primary text-primary-foreground rounded-md p-2 h-full flex flex-col justify-center">
+                                              <div className="text-xs font-medium mb-1">
+                                                Classroom Session
+                                              </div>
+                                              <div className="text-xs opacity-90">
+                                                {session.startTime.slice(0, 5)} - {session.endTime.slice(0, 5)}
+                                              </div>
+                                              <div className="text-xs opacity-75 mt-1">
+                                                {calculateSessionDuration(session.startTime, session.endTime)}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ) : isSessionDay ? (
+                                          <div className="absolute inset-1">
+                                            <div className="bg-accent border-2 border-dashed border-primary rounded-md p-2 h-full flex flex-col justify-center items-center">
+                                              <div className="text-xs text-muted-foreground text-center">
+                                                Set time for session
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <div className="absolute inset-1 bg-muted/30 rounded-md"></div>
                                         )}
                                       </div>
-                                    );
-                                  })}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              
+                              {/* Session Summary */}
+                              <div className="mt-4 p-4 bg-background/50 rounded-lg">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                  <div className="text-center">
+                                    <div className="text-muted-foreground">Selected Days</div>
+                                    <div className="font-medium">{session.daysOfWeek.length} days</div>
+                                  </div>
+                                  {session.startTime && session.endTime && (
+                                    <>
+                                      <div className="text-center">
+                                        <div className="text-muted-foreground">Session Time</div>
+                                        <div className="font-medium">{session.startTime} - {session.endTime}</div>
+                                      </div>
+                                      <div className="text-center">
+                                        <div className="text-muted-foreground">Duration</div>
+                                        <div className="font-medium">{calculateSessionDuration(session.startTime, session.endTime)}</div>
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
