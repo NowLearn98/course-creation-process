@@ -636,7 +636,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                   </Button>
                 </div>
                 
-                {formData.classroomSessions.map((session, index) => (
+                {formData.classroomSessions.length > 0 && formData.classroomSessions.map((session, index) => (
                   <Card key={index} className="p-4">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -710,7 +710,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                   </Button>
                 </div>
                 
-                {formData.oneOnOneSessions.map((session, index) => (
+                {formData.oneOnOneSessions.length > 0 && formData.oneOnOneSessions.map((session, index) => (
                   <Card key={index} className="p-4">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
