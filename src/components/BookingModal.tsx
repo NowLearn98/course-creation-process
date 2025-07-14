@@ -765,30 +765,52 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
 
                       {session.daysOfWeek.length > 0 && (session.startTime || session.endTime) && (
                         <div className="space-y-3">
-                          <h5 className="text-sm font-medium text-foreground">Session Preview</h5>
-                          <div className="p-4 bg-accent/30 rounded-lg">
-                            <Calendar
-                              mode="multiple"
-                              className="pointer-events-auto"
-                              modifiers={{
-                                sessionDay: (date) => {
-                                  const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-                                  return session.daysOfWeek.includes(dayName);
-                                }
-                              }}
-                              modifiersStyles={{
-                                sessionDay: {
-                                  backgroundColor: 'hsl(var(--primary))',
-                                  color: 'hsl(var(--primary-foreground))',
-                                  fontWeight: 'bold'
-                                }
-                              }}
-                            />
-                            <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-                              <p>Selected days: {session.daysOfWeek.join(', ')}</p>
-                              {session.startTime && session.endTime && (
-                                <p>Time: {session.startTime} - {session.endTime}</p>
-                              )}
+                          <h5 className="text-sm font-medium text-foreground text-center">Session Preview</h5>
+                          <div className="flex justify-center">
+                            <div className="p-8 bg-accent/30 rounded-lg w-full max-w-lg">
+                              <div className="mx-auto transform scale-150 origin-center">
+                                <Calendar
+                                  mode="multiple"
+                                  className="pointer-events-auto"
+                                  modifiers={{
+                                    sessionDay: (date) => {
+                                      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                                      return session.daysOfWeek.includes(dayName);
+                                    }
+                                  }}
+                                  modifiersClassNames={{
+                                    sessionDay: "bg-primary text-primary-foreground font-bold"
+                                  }}
+                                />
+                              </div>
+                              <div className="mt-6 space-y-2 text-sm text-muted-foreground text-center">
+                                <p><strong>Selected days:</strong> {session.daysOfWeek.join(', ')}</p>
+                                {session.startTime && session.endTime && (
+                                  <p><strong>Time:</strong> {session.startTime} - {session.endTime}</p>
+                                )}
+                                {session.startTime && session.endTime && (
+                                  <p><strong>Duration:</strong> {calculateSessionDuration(session.startTime, session.endTime)}</p>
+                                )}
+                              </div>
+                              
+                              {/* Custom calendar overlay with times */}
+                              <div className="mt-4 p-4 bg-primary/10 rounded-lg">
+                                <h6 className="text-xs font-medium text-center mb-2">Session Times</h6>
+                                <div className="grid grid-cols-7 gap-1 text-center">
+                                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => {
+                                    const fullDayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][index];
+                                    const isSessionDay = session.daysOfWeek.includes(fullDayName);
+                                    return (
+                                      <div key={day} className={`p-2 rounded text-xs ${isSessionDay ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>
+                                        <div className="font-medium">{day}</div>
+                                        {isSessionDay && session.startTime && (
+                                          <div className="text-[8px] mt-1">{session.startTime.slice(0, 5)}</div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
