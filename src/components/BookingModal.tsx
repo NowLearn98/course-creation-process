@@ -1299,7 +1299,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
       case 2:
         return formData.modules.some(module => module.title.trim());
       case 3:
-        return formData.format;
+        return formData.sessionTypes.length > 0;
       case 4:
         return true; // Optional step
       case 5:
