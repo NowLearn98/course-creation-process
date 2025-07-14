@@ -823,51 +823,52 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                         calendarDay.isNextMonth ? currentMonth + 1 : calendarDay.isCurrentMonth ? currentMonth : currentMonth - 1,
                                         calendarDay.date
                                       );
-                                      const dayName = dayDate.toLocaleDateString('en-US', { weekday: 'long' });
-                                      const isSessionDay = session.daysOfWeek.includes(dayName);
-                                      const isToday = dayDate.toDateString() === new Date().toDateString();
-                                      
-                                      return (
-                                        <div 
-                                          key={index} 
-                                          className={`h-24 border border-border rounded-md relative ${
-                                            !calendarDay.isCurrentMonth ? 'opacity-30' : ''
-                                          }`}
-                                        >
-                                          {/* Day Number */}
-                                          <div className={`absolute top-1 left-2 text-sm font-medium ${
-                                            isToday ? 'text-primary' : calendarDay.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
-                                          }`}>
-                                            {calendarDay.date}
-                                            {isToday && (
-                                              <div className="w-1 h-1 bg-primary rounded-full absolute -bottom-1 left-1/2 transform -translate-x-1/2"></div>
-                                            )}
-                                          </div>
+                                          const dayName = dayDate.toLocaleDateString('en-US', { weekday: 'long' });
+                                          const isSessionDay = session.daysOfWeek.includes(dayName);
+                                          const isToday = dayDate.toDateString() === new Date().toDateString();
+                                          const isPastDate = dayDate < new Date(new Date().setHours(0, 0, 0, 0));
                                           
-                                          {/* Session Block */}
-                                          {isSessionDay && calendarDay.isCurrentMonth && (
-                                            <div className="absolute inset-1 top-6">
-                                              {session.startTime && session.endTime ? (
-                                                <div className="bg-primary text-primary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
-                                                  <div className="text-xs font-medium leading-tight">
-                                                    Session
-                                                  </div>
-                                                  <div className="text-xs opacity-90 leading-tight">
-                                                    {session.startTime.slice(0, 5)}
-                                                  </div>
-                                                  <div className="text-xs opacity-75 leading-tight">
-                                                    {session.endTime.slice(0, 5)}
-                                                  </div>
-                                                </div>
-                                              ) : (
-                                                <div className="bg-accent border border-dashed border-primary rounded-sm p-1 h-full flex items-center justify-center">
-                                                  <div className="text-xs text-muted-foreground text-center leading-tight">
-                                                    Scheduled
-                                                  </div>
+                                          return (
+                                            <div 
+                                              key={index} 
+                                              className={`h-24 border border-border rounded-md relative ${
+                                                !calendarDay.isCurrentMonth ? 'opacity-30' : ''
+                                              }`}
+                                            >
+                                              {/* Day Number */}
+                                              <div className={`absolute top-1 left-2 text-sm font-medium ${
+                                                isToday ? 'text-primary' : calendarDay.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
+                                              }`}>
+                                                {calendarDay.date}
+                                                {isToday && (
+                                                  <div className="w-1 h-1 bg-primary rounded-full absolute -bottom-1 left-1/2 transform -translate-x-1/2"></div>
+                                                )}
+                                              </div>
+                                              
+                                              {/* Session Block - Only show for current and future dates */}
+                                              {isSessionDay && calendarDay.isCurrentMonth && !isPastDate && (
+                                                <div className="absolute inset-1 top-6">
+                                                  {session.startTime && session.endTime ? (
+                                                    <div className="bg-primary text-primary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
+                                                      <div className="text-xs font-medium leading-tight">
+                                                        Session
+                                                      </div>
+                                                      <div className="text-xs opacity-90 leading-tight">
+                                                        {session.startTime.slice(0, 5)}
+                                                      </div>
+                                                      <div className="text-xs opacity-75 leading-tight">
+                                                        {session.endTime.slice(0, 5)}
+                                                      </div>
+                                                    </div>
+                                                  ) : (
+                                                    <div className="bg-accent border border-dashed border-primary rounded-sm p-1 h-full flex items-center justify-center">
+                                                      <div className="text-xs text-muted-foreground text-center leading-tight">
+                                                        Scheduled
+                                                      </div>
+                                                    </div>
+                                                  )}
                                                 </div>
                                               )}
-                                            </div>
-                                          )}
                                         </div>
                                       );
                                     });
