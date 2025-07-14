@@ -31,6 +31,7 @@ interface Module {
 }
 
 interface ClassroomSession {
+  startDate: string;
   startTime: string;
   endTime: string;
   daysOfWeek: string[];
@@ -206,6 +207,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
 
   const addClassroomSession = () => {
     const newSession: ClassroomSession = {
+      startDate: '',
       startTime: '',
       endTime: '',
       daysOfWeek: [],
@@ -264,6 +266,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     if (!formData.sessionTypes.includes(type)) {
       if (type === 'classroom') {
         newClassroomSessions = [...formData.classroomSessions, {
+          startDate: '',
           startTime: '',
           endTime: '',
           daysOfWeek: [],
@@ -706,33 +709,45 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                         </Button>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label>Start Time</Label>
+                          <Label>Start Date</Label>
                           <Input
-                            type="time"
-                            value={session.startTime}
-                            onChange={(e) => updateClassroomSession(index, 'startTime', e.target.value)}
+                            type="date"
+                            value={session.startDate}
+                            onChange={(e) => updateClassroomSession(index, 'startDate', e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label>End Time</Label>
-                          <Input
-                            type="time"
-                            value={session.endTime}
-                            onChange={(e) => updateClassroomSession(index, 'endTime', e.target.value)}
-                          />
-                        </div>
-                      </div>
 
-                      {session.startTime && session.endTime && (
-                        <div className="flex items-center gap-2 p-3 bg-accent/50 rounded-lg">
-                          <Clock className="w-4 h-4 text-primary" />
-                          <span className="text-sm font-medium">
-                            Session Duration: {calculateSessionDuration(session.startTime, session.endTime)}
-                          </span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Start Time</Label>
+                            <Input
+                              type="time"
+                              value={session.startTime}
+                              onChange={(e) => updateClassroomSession(index, 'startTime', e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>End Time</Label>
+                            <Input
+                              type="time"
+                              value={session.endTime}
+                              onChange={(e) => updateClassroomSession(index, 'endTime', e.target.value)}
+                            />
+                          </div>
                         </div>
-                      )}
+
+                        {session.startTime && session.endTime && (
+                          <div className="flex items-center gap-2 p-3 bg-accent/50 rounded-lg">
+                            <Clock className="w-4 h-4 text-primary" />
+                            <span className="text-sm font-medium">
+                              Session Duration: {calculateSessionDuration(session.startTime, session.endTime)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
 
                       <div className="space-y-2">
                         <Label>Days of the Week</Label>
@@ -759,7 +774,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                         <Label htmlFor={`classroom-recurring-${index}`}>Recurring every week</Label>
                       </div>
 
-                      {session.daysOfWeek.length > 0 && (session.startTime || session.endTime) && (
+                      {session.daysOfWeek.length > 0 && session.startDate && (session.startTime || session.endTime) && (
                         <div className="space-y-4">
                           <h5 className="text-sm font-medium text-foreground text-center">Session Preview</h5>
                           <div className="flex justify-center">
@@ -784,18 +799,18 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                 
                                 {/* Calendar Grid */}
                                 <div className="grid grid-cols-7 gap-2">
-                                  {(() => {
-                                    const today = new Date();
-                                    const currentMonth = today.getMonth();
-                                    const currentYear = today.getFullYear();
-                                    const firstDay = new Date(currentYear, currentMonth, 1);
-                                    const lastDay = new Date(currentYear, currentMonth + 1, 0);
-                                    const daysInMonth = lastDay.getDate();
-                                    const startingDayOfWeek = firstDay.getDay();
-                                    
-                                    const calendarDays = [];
-                                    
-                                    // Previous month's trailing days
+                                {(() => {
+                                  const startDate = session.startDate ? new Date(session.startDate) : new Date();
+                                  const currentMonth = startDate.getMonth();
+                                  const currentYear = startDate.getFullYear();
+                                  const firstDay = new Date(currentYear, currentMonth, 1);
+                                  const lastDay = new Date(currentYear, currentMonth + 1, 0);
+                                  const daysInMonth = lastDay.getDate();
+                                  const startingDayOfWeek = firstDay.getDay();
+                                  
+                                  const calendarDays = [];
+                                  
+                                  // Previous month's trailing days
                                     const prevMonth = new Date(currentYear, currentMonth - 1, 0);
                                     for (let i = startingDayOfWeek - 1; i >= 0; i--) {
                                       const dayDate = prevMonth.getDate() - i;
@@ -819,10 +834,11 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                         calendarDay.isNextMonth ? currentMonth + 1 : calendarDay.isCurrentMonth ? currentMonth : currentMonth - 1,
                                         calendarDay.date
                                       );
-                                          const dayName = dayDate.toLocaleDateString('en-US', { weekday: 'long' });
-                                          const isSessionDay = session.daysOfWeek.includes(dayName);
-                                          const isToday = dayDate.toDateString() === new Date().toDateString();
-                                          const isPastDate = dayDate < new Date(new Date().setHours(0, 0, 0, 0));
+                                      const dayName = dayDate.toLocaleDateString('en-US', { weekday: 'long' });
+                                      const isSessionDay = session.daysOfWeek.includes(dayName);
+                                      const isToday = dayDate.toDateString() === new Date().toDateString();
+                                      const isPastDate = dayDate < new Date(new Date().setHours(0, 0, 0, 0));
+                                      const isAfterStartDate = session.startDate ? dayDate >= new Date(session.startDate) : true;
                                           
                                           return (
                                             <div 
@@ -841,8 +857,8 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                                 )}
                                               </div>
                                               
-                                              {/* Session Block - Only show for current and future dates */}
-                                              {isSessionDay && calendarDay.isCurrentMonth && !isPastDate && (
+                                              {/* Session Block - Only show for current and future dates after start date */}
+                                              {isSessionDay && calendarDay.isCurrentMonth && !isPastDate && isAfterStartDate && (
                                                 <div className="absolute inset-1 top-6">
                                                   {session.startTime && session.endTime ? (
                                                     <div className="bg-primary text-primary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
@@ -874,7 +890,11 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                               
                               {/* Session Summary */}
                               <div className="mt-6 p-4 bg-background/50 rounded-lg">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                                  <div className="text-center">
+                                    <div className="text-muted-foreground">Start Date</div>
+                                    <div className="font-medium">{session.startDate || 'Not set'}</div>
+                                  </div>
                                   <div className="text-center">
                                     <div className="text-muted-foreground">Selected Days</div>
                                     <div className="font-medium">{session.daysOfWeek.join(', ')}</div>
