@@ -777,7 +777,9 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                         <Label htmlFor={`classroom-recurring-${index}`}>Recurring every week</Label>
                       </div>
 
-                      {session.daysOfWeek.length > 0 && session.startDate && (session.startTime || session.endTime) && (
+                      {/* Show calendar if any session type has required data */}
+                      {((formData.sessionTypes.includes('classroom') && formData.classroomSessions.length > 0 && formData.classroomSessions[0].daysOfWeek.length > 0) ||
+                        (formData.sessionTypes.includes('oneOnOne') && formData.oneOnOneSessions.length > 0 && formData.oneOnOneSessions[0].daysOfWeek.length > 0)) && (
                         <div className="space-y-4">
                           <h5 className="text-sm font-medium text-foreground text-center">Session Preview</h5>
                           <div className="flex justify-center">
@@ -787,7 +789,12 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                 {/* Month Header */}
                                 <div className="text-center">
                                   <h6 className="text-lg font-semibold text-foreground">
-                                    {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                    {(() => {
+                                      const classroomStartDate = formData.classroomSessions[0]?.startDate;
+                                      const oneOnOneStartDate = formData.oneOnOneSessions[0]?.startDate;
+                                      const startDate = classroomStartDate || oneOnOneStartDate || new Date().toISOString().split('T')[0];
+                                      return new Date(startDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                                    })()}
                                   </h6>
                                 </div>
                                 
@@ -802,18 +809,21 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                 
                                 {/* Calendar Grid */}
                                 <div className="grid grid-cols-7 gap-2">
-                                {(() => {
-                                  const startDate = session.startDate ? new Date(session.startDate) : new Date();
-                                  const currentMonth = startDate.getMonth();
-                                  const currentYear = startDate.getFullYear();
-                                  const firstDay = new Date(currentYear, currentMonth, 1);
-                                  const lastDay = new Date(currentYear, currentMonth + 1, 0);
-                                  const daysInMonth = lastDay.getDate();
-                                  const startingDayOfWeek = firstDay.getDay();
-                                  
-                                  const calendarDays = [];
-                                  
-                                  // Previous month's trailing days
+                                  {(() => {
+                                    const classroomSession = formData.classroomSessions[0];
+                                    const oneOnOneSession = formData.oneOnOneSessions[0];
+                                    const startDate = classroomSession?.startDate || oneOnOneSession?.startDate || new Date().toISOString().split('T')[0];
+                                    const referenceDate = new Date(startDate);
+                                    const currentMonth = referenceDate.getMonth();
+                                    const currentYear = referenceDate.getFullYear();
+                                    const firstDay = new Date(currentYear, currentMonth, 1);
+                                    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+                                    const daysInMonth = lastDay.getDate();
+                                    const startingDayOfWeek = firstDay.getDay();
+                                    
+                                    const calendarDays = [];
+                                    
+                                    // Previous month's trailing days
                                     const prevMonth = new Date(currentYear, currentMonth - 1, 0);
                                     for (let i = startingDayOfWeek - 1; i >= 0; i--) {
                                       const dayDate = prevMonth.getDate() - i;
@@ -838,83 +848,158 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                         calendarDay.date
                                       );
                                       const dayName = dayDate.toLocaleDateString('en-US', { weekday: 'long' });
-                                      const isSessionDay = session.daysOfWeek.includes(dayName);
+                                      
+                                      // Check both session types
+                                      const isClassroomDay = classroomSession?.daysOfWeek.includes(dayName);
+                                      const isOneOnOneDay = oneOnOneSession?.daysOfWeek.includes(dayName);
                                       const isToday = dayDate.toDateString() === new Date().toDateString();
                                       const isPastDate = dayDate < new Date(new Date().setHours(0, 0, 0, 0));
-                                      const isAfterStartDate = session.startDate ? dayDate >= new Date(session.startDate) : true;
+                                      const isAfterClassroomStart = classroomSession?.startDate ? dayDate >= new Date(classroomSession.startDate) : true;
+                                      const isAfterOneOnOneStart = oneOnOneSession?.startDate ? dayDate >= new Date(oneOnOneSession.startDate) : true;
+                                      
+                                      return (
+                                        <div 
+                                          key={index} 
+                                          className={`h-24 border border-border rounded-md relative ${
+                                            !calendarDay.isCurrentMonth ? 'opacity-30' : ''
+                                          }`}
+                                        >
+                                          {/* Day Number */}
+                                          <div className={`absolute top-1 left-2 text-sm font-medium ${
+                                            isToday ? 'text-primary' : calendarDay.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
+                                          }`}>
+                                            {calendarDay.date}
+                                            {isToday && (
+                                              <div className="w-1 h-1 bg-primary rounded-full absolute -bottom-1 left-1/2 transform -translate-x-1/2"></div>
+                                            )}
+                                          </div>
                                           
-                                          return (
-                                            <div 
-                                              key={index} 
-                                              className={`h-24 border border-border rounded-md relative ${
-                                                !calendarDay.isCurrentMonth ? 'opacity-30' : ''
-                                              }`}
-                                            >
-                                              {/* Day Number */}
-                                              <div className={`absolute top-1 left-2 text-sm font-medium ${
-                                                isToday ? 'text-primary' : calendarDay.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
-                                              }`}>
-                                                {calendarDay.date}
-                                                {isToday && (
-                                                  <div className="w-1 h-1 bg-primary rounded-full absolute -bottom-1 left-1/2 transform -translate-x-1/2"></div>
+                                          {/* Session Blocks */}
+                                          <div className="absolute inset-1 top-6 flex flex-col gap-1">
+                                            {/* Classroom Session Block */}
+                                            {isClassroomDay && calendarDay.isCurrentMonth && !isPastDate && isAfterClassroomStart && (
+                                              <div className="flex-1">
+                                                {classroomSession.startTime && classroomSession.endTime ? (
+                                                  <div className="bg-primary text-primary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
+                                                    <div className="text-xs font-medium leading-tight">
+                                                      Classroom
+                                                    </div>
+                                                    <div className="text-xs opacity-90 leading-tight">
+                                                      {classroomSession.startTime.slice(0, 5)}
+                                                    </div>
+                                                  </div>
+                                                ) : (
+                                                  <div className="bg-accent border border-dashed border-primary rounded-sm p-1 h-full flex items-center justify-center">
+                                                    <div className="text-xs text-muted-foreground text-center leading-tight">
+                                                      Classroom
+                                                    </div>
+                                                  </div>
                                                 )}
                                               </div>
-                                              
-                                              {/* Session Block - Only show for current and future dates after start date */}
-                                              {isSessionDay && calendarDay.isCurrentMonth && !isPastDate && isAfterStartDate && (
-                                                <div className="absolute inset-1 top-6">
-                                                  {session.startTime && session.endTime ? (
-                                                    <div className="bg-primary text-primary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
-                                                      <div className="text-xs font-medium leading-tight">
-                                                        Session
-                                                      </div>
-                                                      <div className="text-xs opacity-90 leading-tight">
-                                                        {session.startTime.slice(0, 5)}
-                                                      </div>
-                                                      <div className="text-xs opacity-75 leading-tight">
-                                                        {session.endTime.slice(0, 5)}
-                                                      </div>
+                                            )}
+                                            
+                                            {/* 1-on-1 Session Block */}
+                                            {isOneOnOneDay && calendarDay.isCurrentMonth && !isPastDate && isAfterOneOnOneStart && (
+                                              <div className="flex-1">
+                                                {oneOnOneSession.startTime && oneOnOneSession.endTime ? (
+                                                  <div className="bg-secondary text-secondary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
+                                                    <div className="text-xs font-medium leading-tight">
+                                                      1-on-1
                                                     </div>
-                                                  ) : (
-                                                    <div className="bg-accent border border-dashed border-primary rounded-sm p-1 h-full flex items-center justify-center">
-                                                      <div className="text-xs text-muted-foreground text-center leading-tight">
-                                                        Scheduled
-                                                      </div>
+                                                    <div className="text-xs opacity-90 leading-tight">
+                                                      {oneOnOneSession.startTime.slice(0, 5)}
                                                     </div>
-                                                  )}
-                                                </div>
-                                              )}
+                                                  </div>
+                                                ) : (
+                                                  <div className="bg-accent border border-dashed border-secondary rounded-sm p-1 h-full flex items-center justify-center">
+                                                    <div className="text-xs text-muted-foreground text-center leading-tight">
+                                                      1-on-1
+                                                    </div>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            )}
+                                          </div>
                                         </div>
                                       );
                                     });
                                   })()}
                                 </div>
+                                
+                                {/* Legend */}
+                                <div className="flex justify-center gap-6 pt-4">
+                                  {formData.sessionTypes.includes('classroom') && (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 bg-primary rounded"></div>
+                                      <span className="text-sm text-muted-foreground">Classroom Sessions</span>
+                                    </div>
+                                  )}
+                                  {formData.sessionTypes.includes('oneOnOne') && (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-4 h-4 bg-secondary rounded"></div>
+                                      <span className="text-sm text-muted-foreground">1-on-1 Sessions</span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                               
                               {/* Session Summary */}
-                              <div className="mt-6 p-4 bg-background/50 rounded-lg">
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-                                  <div className="text-center">
-                                    <div className="text-muted-foreground">Start Date</div>
-                                    <div className="font-medium">{session.startDate || 'Not set'}</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-muted-foreground">Selected Days</div>
-                                    <div className="font-medium">{session.daysOfWeek.join(', ')}</div>
-                                  </div>
-                                  {session.startTime && session.endTime && (
-                                    <>
+                              <div className="mt-6 p-4 bg-background/50 rounded-lg space-y-4">
+                                {formData.sessionTypes.includes('classroom') && formData.classroomSessions[0] && (
+                                  <div>
+                                    <h6 className="text-sm font-medium text-foreground mb-2">Classroom Sessions</h6>
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                                       <div className="text-center">
-                                        <div className="text-muted-foreground">Session Time</div>
-                                        <div className="font-medium">{session.startTime} - {session.endTime}</div>
+                                        <div className="text-muted-foreground">Start Date</div>
+                                        <div className="font-medium">{formData.classroomSessions[0].startDate || 'Not set'}</div>
                                       </div>
                                       <div className="text-center">
-                                        <div className="text-muted-foreground">Duration</div>
-                                        <div className="font-medium">{calculateSessionDuration(session.startTime, session.endTime)}</div>
+                                        <div className="text-muted-foreground">Selected Days</div>
+                                        <div className="font-medium">{formData.classroomSessions[0].daysOfWeek.join(', ')}</div>
                                       </div>
-                                    </>
-                                  )}
-                                </div>
+                                      {formData.classroomSessions[0].startTime && formData.classroomSessions[0].endTime && (
+                                        <>
+                                          <div className="text-center">
+                                            <div className="text-muted-foreground">Session Time</div>
+                                            <div className="font-medium">{formData.classroomSessions[0].startTime} - {formData.classroomSessions[0].endTime}</div>
+                                          </div>
+                                          <div className="text-center">
+                                            <div className="text-muted-foreground">Duration</div>
+                                            <div className="font-medium">{calculateSessionDuration(formData.classroomSessions[0].startTime, formData.classroomSessions[0].endTime)}</div>
+                                          </div>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {formData.sessionTypes.includes('oneOnOne') && formData.oneOnOneSessions[0] && (
+                                  <div>
+                                    <h6 className="text-sm font-medium text-foreground mb-2">1-on-1 Sessions</h6>
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                                      <div className="text-center">
+                                        <div className="text-muted-foreground">Start Date</div>
+                                        <div className="font-medium">{formData.oneOnOneSessions[0].startDate || 'Not set'}</div>
+                                      </div>
+                                      <div className="text-center">
+                                        <div className="text-muted-foreground">Available Days</div>
+                                        <div className="font-medium">{formData.oneOnOneSessions[0].daysOfWeek.join(', ')}</div>
+                                      </div>
+                                      {formData.oneOnOneSessions[0].startTime && formData.oneOnOneSessions[0].endTime && (
+                                        <>
+                                          <div className="text-center">
+                                            <div className="text-muted-foreground">Session Time</div>
+                                            <div className="font-medium">{formData.oneOnOneSessions[0].startTime} - {formData.oneOnOneSessions[0].endTime}</div>
+                                          </div>
+                                          <div className="text-center">
+                                            <div className="text-muted-foreground">Duration</div>
+                                            <div className="font-medium">{calculateSessionDuration(formData.oneOnOneSessions[0].startTime, formData.oneOnOneSessions[0].endTime)}</div>
+                                          </div>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
