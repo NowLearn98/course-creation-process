@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Upload, Play, Image, FileText, Settings, BookOpen, Eye, Plus, X, Clock } from 'lucide-react';
+import { CheckCircle, Upload, Play, Image, FileText, Settings, BookOpen, Eye, Plus, X, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
@@ -119,6 +119,7 @@ const calculateSessionDuration = (startTime: string, endTime: string): string =>
 
 export function BookingModal({ open, onOpenChange }: BookingModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [calendarDate, setCalendarDate] = useState(new Date());
   const [formData, setFormData] = useState<FormData>({
     title: '',
     subtitle: '',
@@ -886,16 +887,27 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                   <div className="w-full max-w-6xl p-6 bg-accent/30 rounded-lg">
                     {/* Monthly Calendar View */}
                     <div className="space-y-4">
-                      {/* Month Header */}
-                      <div className="text-center">
+                      {/* Month Header with Navigation */}
+                      <div className="flex items-center justify-between">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, 1))}
+                          className="h-8 w-8 p-0"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
                         <h6 className="text-lg font-semibold text-foreground">
-                          {(() => {
-                            const classroomStartDate = formData.classroomSessions[0]?.startDate;
-                            const oneOnOneStartDate = formData.oneOnOneSessions[0]?.startDate;
-                            const startDate = classroomStartDate || oneOnOneStartDate || new Date().toISOString().split('T')[0];
-                            return new Date(startDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                          })()}
+                          {calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                         </h6>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 1))}
+                          className="h-8 w-8 p-0"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
                       </div>
                       
                       {/* Days of Week Header */}
@@ -912,10 +924,8 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                         {(() => {
                           const classroomSession = formData.classroomSessions[0];
                           const oneOnOneSession = formData.oneOnOneSessions[0];
-                          const startDate = classroomSession?.startDate || oneOnOneSession?.startDate || new Date().toISOString().split('T')[0];
-                          const referenceDate = new Date(startDate);
-                          const currentMonth = referenceDate.getMonth();
-                          const currentYear = referenceDate.getFullYear();
+                          const currentMonth = calendarDate.getMonth();
+                          const currentYear = calendarDate.getFullYear();
                           const firstDay = new Date(currentYear, currentMonth, 1);
                           const lastDay = new Date(currentYear, currentMonth + 1, 0);
                           const daysInMonth = lastDay.getDate();
@@ -985,7 +995,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                             Classroom
                                           </div>
                                           <div className="text-xs opacity-90 leading-tight">
-                                            {classroomSession.startTime.slice(0, 5)}
+                                            {classroomSession.startTime.slice(0, 5)} - {classroomSession.endTime.slice(0, 5)}
                                           </div>
                                         </div>
                                       ) : (
@@ -1007,7 +1017,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                             1-on-1
                                           </div>
                                           <div className="text-xs opacity-90 leading-tight">
-                                            {oneOnOneSession.startTime.slice(0, 5)}
+                                            {oneOnOneSession.startTime.slice(0, 5)} - {oneOnOneSession.endTime.slice(0, 5)}
                                           </div>
                                         </div>
                                       ) : (
