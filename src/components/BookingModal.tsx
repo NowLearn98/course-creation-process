@@ -767,67 +767,120 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                         <div className="space-y-4">
                           <h5 className="text-sm font-medium text-foreground text-center">Session Preview</h5>
                           <div className="flex justify-center">
-                            <div className="w-full max-w-4xl p-6 bg-accent/30 rounded-lg">
-                              {/* Weekly Calendar View */}
-                              <div className="grid grid-cols-7 gap-2 h-96">
-                                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((dayName, index) => {
-                                  const isSessionDay = session.daysOfWeek.includes(dayName);
-                                  const today = new Date();
-                                  const currentWeekStart = new Date(today.setDate(today.getDate() - today.getDay()));
-                                  const dayDate = new Date(currentWeekStart);
-                                  dayDate.setDate(currentWeekStart.getDate() + index);
-                                  
-                                  return (
-                                    <div key={dayName} className="flex flex-col">
-                                      {/* Day Header */}
-                                      <div className="text-center p-2 border-b border-border">
-                                        <div className="text-xs text-muted-foreground font-medium">
-                                          {dayName.slice(0, 3)}
-                                        </div>
-                                        <div className="text-lg font-semibold text-foreground">
-                                          {dayDate.getDate()}
-                                        </div>
-                                      </div>
-                                      
-                                      {/* Day Content */}
-                                      <div className="flex-1 p-1 relative">
-                                        {isSessionDay && session.startTime && session.endTime ? (
-                                          <div className="absolute inset-1">
-                                            <div className="bg-primary text-primary-foreground rounded-md p-2 h-full flex flex-col justify-center">
-                                              <div className="text-xs font-medium mb-1">
-                                                Classroom Session
-                                              </div>
-                                              <div className="text-xs opacity-90">
-                                                {session.startTime.slice(0, 5)} - {session.endTime.slice(0, 5)}
-                                              </div>
-                                              <div className="text-xs opacity-75 mt-1">
-                                                {calculateSessionDuration(session.startTime, session.endTime)}
-                                              </div>
-                                            </div>
-                                          </div>
-                                        ) : isSessionDay ? (
-                                          <div className="absolute inset-1">
-                                            <div className="bg-accent border-2 border-dashed border-primary rounded-md p-2 h-full flex flex-col justify-center items-center">
-                                              <div className="text-xs text-muted-foreground text-center">
-                                                Set time for session
-                                              </div>
-                                            </div>
-                                          </div>
-                                        ) : (
-                                          <div className="absolute inset-1 bg-muted/30 rounded-md"></div>
-                                        )}
-                                      </div>
+                            <div className="w-full max-w-6xl p-6 bg-accent/30 rounded-lg">
+                              {/* Monthly Calendar View */}
+                              <div className="space-y-4">
+                                {/* Month Header */}
+                                <div className="text-center">
+                                  <h6 className="text-lg font-semibold text-foreground">
+                                    {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                  </h6>
+                                </div>
+                                
+                                {/* Days of Week Header */}
+                                <div className="grid grid-cols-7 gap-2">
+                                  {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((dayName) => (
+                                    <div key={dayName} className="text-center p-2 font-medium text-sm text-muted-foreground border-b border-border">
+                                      {dayName.slice(0, 3)}
                                     </div>
-                                  );
-                                })}
+                                  ))}
+                                </div>
+                                
+                                {/* Calendar Grid */}
+                                <div className="grid grid-cols-7 gap-2">
+                                  {(() => {
+                                    const today = new Date();
+                                    const currentMonth = today.getMonth();
+                                    const currentYear = today.getFullYear();
+                                    const firstDay = new Date(currentYear, currentMonth, 1);
+                                    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+                                    const daysInMonth = lastDay.getDate();
+                                    const startingDayOfWeek = firstDay.getDay();
+                                    
+                                    const calendarDays = [];
+                                    
+                                    // Previous month's trailing days
+                                    const prevMonth = new Date(currentYear, currentMonth - 1, 0);
+                                    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+                                      const dayDate = prevMonth.getDate() - i;
+                                      calendarDays.push({ date: dayDate, isCurrentMonth: false, isNextMonth: false });
+                                    }
+                                    
+                                    // Current month days
+                                    for (let day = 1; day <= daysInMonth; day++) {
+                                      calendarDays.push({ date: day, isCurrentMonth: true, isNextMonth: false });
+                                    }
+                                    
+                                    // Next month's leading days
+                                    const remainingDays = 42 - calendarDays.length; // 6 weeks * 7 days
+                                    for (let day = 1; day <= remainingDays; day++) {
+                                      calendarDays.push({ date: day, isCurrentMonth: false, isNextMonth: true });
+                                    }
+                                    
+                                    return calendarDays.map((calendarDay, index) => {
+                                      const dayDate = new Date(
+                                        calendarDay.isNextMonth ? currentYear : calendarDay.isCurrentMonth ? currentYear : currentYear,
+                                        calendarDay.isNextMonth ? currentMonth + 1 : calendarDay.isCurrentMonth ? currentMonth : currentMonth - 1,
+                                        calendarDay.date
+                                      );
+                                      const dayName = dayDate.toLocaleDateString('en-US', { weekday: 'long' });
+                                      const isSessionDay = session.daysOfWeek.includes(dayName);
+                                      const isToday = dayDate.toDateString() === new Date().toDateString();
+                                      
+                                      return (
+                                        <div 
+                                          key={index} 
+                                          className={`h-24 border border-border rounded-md relative ${
+                                            !calendarDay.isCurrentMonth ? 'opacity-30' : ''
+                                          }`}
+                                        >
+                                          {/* Day Number */}
+                                          <div className={`absolute top-1 left-2 text-sm font-medium ${
+                                            isToday ? 'text-primary' : calendarDay.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
+                                          }`}>
+                                            {calendarDay.date}
+                                            {isToday && (
+                                              <div className="w-1 h-1 bg-primary rounded-full absolute -bottom-1 left-1/2 transform -translate-x-1/2"></div>
+                                            )}
+                                          </div>
+                                          
+                                          {/* Session Block */}
+                                          {isSessionDay && calendarDay.isCurrentMonth && (
+                                            <div className="absolute inset-1 top-6">
+                                              {session.startTime && session.endTime ? (
+                                                <div className="bg-primary text-primary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
+                                                  <div className="text-xs font-medium leading-tight">
+                                                    Session
+                                                  </div>
+                                                  <div className="text-xs opacity-90 leading-tight">
+                                                    {session.startTime.slice(0, 5)}
+                                                  </div>
+                                                  <div className="text-xs opacity-75 leading-tight">
+                                                    {session.endTime.slice(0, 5)}
+                                                  </div>
+                                                </div>
+                                              ) : (
+                                                <div className="bg-accent border border-dashed border-primary rounded-sm p-1 h-full flex items-center justify-center">
+                                                  <div className="text-xs text-muted-foreground text-center leading-tight">
+                                                    Scheduled
+                                                  </div>
+                                                </div>
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    });
+                                  })()}
+                                </div>
                               </div>
                               
                               {/* Session Summary */}
-                              <div className="mt-4 p-4 bg-background/50 rounded-lg">
+                              <div className="mt-6 p-4 bg-background/50 rounded-lg">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                   <div className="text-center">
                                     <div className="text-muted-foreground">Selected Days</div>
-                                    <div className="font-medium">{session.daysOfWeek.length} days</div>
+                                    <div className="font-medium">{session.daysOfWeek.join(', ')}</div>
                                   </div>
                                   {session.startTime && session.endTime && (
                                     <>
