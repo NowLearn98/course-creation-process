@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Upload, Play, Image, FileText, Settings, BookOpen, Eye, Plus, X } from 'lucide-react';
+import { CheckCircle, Upload, Play, Image, FileText, Settings, BookOpen, Eye, Plus, X, Clock } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
 
 interface BookingModalProps {
@@ -90,6 +91,28 @@ const subcategories = {
   'Marketing': ['Digital Marketing', 'Content Marketing', 'Social Media', 'SEO', 'Email Marketing'],
   'Personal Development': ['Leadership', 'Communication', 'Productivity', 'Mindfulness', 'Career Development'],
   'Health & Fitness': ['Nutrition', 'Workout', 'Mental Health', 'Yoga', 'Sports'],
+};
+
+// Helper function to calculate session duration
+const calculateSessionDuration = (startTime: string, endTime: string): string => {
+  if (!startTime || !endTime) return '';
+  
+  const start = new Date(`2000-01-01T${startTime}:00`);
+  const end = new Date(`2000-01-01T${endTime}:00`);
+  
+  if (end <= start) return '';
+  
+  const diffMs = end.getTime() - start.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+  if (diffHours === 0) {
+    return `${diffMinutes} min`;
+  } else if (diffMinutes === 0) {
+    return `${diffHours} hr`;
+  } else {
+    return `${diffHours} hr ${diffMinutes} min`;
+  }
 };
 
 export function BookingModal({ open, onOpenChange }: BookingModalProps) {
@@ -240,14 +263,14 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     // Auto-add default session when session type is selected
     if (!formData.sessionTypes.includes(type)) {
       if (type === 'classroom') {
-        newClassroomSessions = [{
+        newClassroomSessions = [...formData.classroomSessions, {
           startTime: '',
           endTime: '',
           daysOfWeek: [],
           recurring: false
         }];
       } else if (type === 'oneOnOne') {
-        newOneOnOneSessions = [{
+        newOneOnOneSessions = [...formData.oneOnOneSessions, {
           daysOfWeek: [],
           startTime: '',
           endTime: '',
@@ -706,6 +729,15 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                         </div>
                       </div>
 
+                      {session.startTime && session.endTime && (
+                        <div className="flex items-center gap-2 p-3 bg-accent/50 rounded-lg">
+                          <Clock className="w-4 h-4 text-primary" />
+                          <span className="text-sm font-medium">
+                            Session Duration: {calculateSessionDuration(session.startTime, session.endTime)}
+                          </span>
+                        </div>
+                      )}
+
                       <div className="space-y-2">
                         <Label>Days of the Week</Label>
                         <div className="flex flex-wrap gap-2">
@@ -730,6 +762,37 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                         />
                         <Label htmlFor={`classroom-recurring-${index}`}>Recurring every week</Label>
                       </div>
+
+                      {session.daysOfWeek.length > 0 && (session.startTime || session.endTime) && (
+                        <div className="space-y-3">
+                          <h5 className="text-sm font-medium text-foreground">Session Preview</h5>
+                          <div className="p-4 bg-accent/30 rounded-lg">
+                            <Calendar
+                              mode="multiple"
+                              className="pointer-events-auto"
+                              modifiers={{
+                                sessionDay: (date) => {
+                                  const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                                  return session.daysOfWeek.includes(dayName);
+                                }
+                              }}
+                              modifiersStyles={{
+                                sessionDay: {
+                                  backgroundColor: 'hsl(var(--primary))',
+                                  color: 'hsl(var(--primary-foreground))',
+                                  fontWeight: 'bold'
+                                }
+                              }}
+                            />
+                            <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                              <p>Selected days: {session.daysOfWeek.join(', ')}</p>
+                              {session.startTime && session.endTime && (
+                                <p>Time: {session.startTime} - {session.endTime}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </Card>
                 ))}
@@ -795,6 +858,15 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                           />
                         </div>
                       </div>
+
+                      {session.startTime && session.endTime && (
+                        <div className="flex items-center gap-2 p-3 bg-accent/50 rounded-lg">
+                          <Clock className="w-4 h-4 text-primary" />
+                          <span className="text-sm font-medium">
+                            Session Duration: {calculateSessionDuration(session.startTime, session.endTime)}
+                          </span>
+                        </div>
+                      )}
 
                       <div className="flex items-center space-x-2">
                         <Checkbox
