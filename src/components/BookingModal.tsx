@@ -20,6 +20,7 @@ interface SubSection {
   title: string;
   description: string;
   type: 'lecture' | 'quiz' | 'assignment' | 'lab';
+  timeMinutes: string;
 }
 
 interface Module {
@@ -130,7 +131,8 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     newModules[moduleIndex].subsections.push({
       title: '',
       description: '',
-      type: 'lecture'
+      type: 'lecture',
+      timeMinutes: ''
     });
     setFormData(prev => ({ ...prev, modules: newModules }));
   };
@@ -443,6 +445,14 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                     placeholder="Subsection title"
                                     className="flex-1 h-9"
                                   />
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    value={subsection.timeMinutes}
+                                    onChange={(e) => updateSubSection(moduleIndex, subIndex, 'timeMinutes', e.target.value)}
+                                    placeholder="Min"
+                                    className="w-20 h-9"
+                                  />
                                   <Select 
                                     value={subsection.type} 
                                     onValueChange={(value) => updateSubSection(moduleIndex, subIndex, 'type', value)}
@@ -636,6 +646,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                             {module.subsections.map((sub, subIndex) => (
                               <li key={subIndex} className="text-xs">
                                 {sub.title} ({sub.type})
+                                {sub.timeMinutes && <span className="text-muted-foreground"> - {sub.timeMinutes} min</span>}
                               </li>
                             ))}
                           </ul>
