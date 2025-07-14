@@ -598,10 +598,8 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
-                { value: 'video', title: 'Video Course', description: 'Pre-recorded video lessons', icon: Play },
-                { value: 'live', title: 'Live Sessions', description: 'Real-time interactive sessions', icon: Settings },
-                { value: 'mixed', title: 'Mixed Format', description: 'Combination of video and live', icon: BookOpen },
-                { value: 'text', title: 'Text-based', description: 'Written content and exercises', icon: FileText },
+                { value: 'classroom', title: 'Classroom Sessions', description: 'Group learning sessions', icon: Settings },
+                { value: 'oneOnOne', title: '1-on-1 Sessions', description: 'Individual tutoring sessions', icon: BookOpen },
               ].map((format) => {
                 const FormatIcon = format.icon;
                 return (
@@ -628,181 +626,151 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
               })}
             </div>
 
-            {(formData.format === 'live' || formData.format === 'mixed') && (
-              <div className="space-y-6 mt-8">
-                <Separator />
-                
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-foreground">Session Types</h4>
-                  <p className="text-sm text-muted-foreground">Choose the types of sessions you want to offer</p>
-                  
-                  <div className="flex gap-4">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="classroom"
-                        checked={formData.sessionTypes.includes('classroom')}
-                        onCheckedChange={() => toggleSessionType('classroom')}
-                      />
-                      <Label htmlFor="classroom">Classroom Sessions</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="oneOnOne"
-                        checked={formData.sessionTypes.includes('oneOnOne')}
-                        onCheckedChange={() => toggleSessionType('oneOnOne')}
-                      />
-                      <Label htmlFor="oneOnOne">1-on-1 Sessions</Label>
-                    </div>
-                  </div>
+            {formData.format === 'classroom' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-lg font-semibold text-foreground">Classroom Sessions</h4>
+                  <Button onClick={addClassroomSession} variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Session
+                  </Button>
                 </div>
-
-                {formData.sessionTypes.includes('classroom') && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-lg font-semibold text-foreground">Classroom Sessions</h4>
-                      <Button onClick={addClassroomSession} variant="outline" size="sm">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Session
-                      </Button>
-                    </div>
-                    
-                    {formData.classroomSessions.map((session, index) => (
-                      <Card key={index} className="p-4">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <Badge variant="secondary">Session {index + 1}</Badge>
-                            <Button
-                              onClick={() => removeClassroomSession(index)}
-                              variant="outline"
-                              size="sm"
-                              className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label>Start Time</Label>
-                              <Input
-                                type="time"
-                                value={session.startTime}
-                                onChange={(e) => updateClassroomSession(index, 'startTime', e.target.value)}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>End Time</Label>
-                              <Input
-                                type="time"
-                                value={session.endTime}
-                                onChange={(e) => updateClassroomSession(index, 'endTime', e.target.value)}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>Days of the Week</Label>
-                            <div className="flex flex-wrap gap-2">
-                              {daysOfWeek.map((day) => (
-                                <Badge
-                                  key={day}
-                                  variant={session.daysOfWeek.includes(day) ? "default" : "outline"}
-                                  className="cursor-pointer"
-                                  onClick={() => toggleDayOfWeek('classroom', index, day)}
-                                >
-                                  {day.slice(0, 3)}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id={`classroom-recurring-${index}`}
-                              checked={session.recurring}
-                              onCheckedChange={(checked) => updateClassroomSession(index, 'recurring', checked)}
-                            />
-                            <Label htmlFor={`classroom-recurring-${index}`}>Recurring every week</Label>
-                          </div>
+                
+                {formData.classroomSessions.map((session, index) => (
+                  <Card key={index} className="p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="secondary">Session {index + 1}</Badge>
+                        <Button
+                          onClick={() => removeClassroomSession(index)}
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Start Time</Label>
+                          <Input
+                            type="time"
+                            value={session.startTime}
+                            onChange={(e) => updateClassroomSession(index, 'startTime', e.target.value)}
+                          />
                         </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-
-                {formData.sessionTypes.includes('oneOnOne') && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-lg font-semibold text-foreground">1-on-1 Sessions</h4>
-                      <Button onClick={addOneOnOneSession} variant="outline" size="sm">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Session
-                      </Button>
-                    </div>
-                    
-                    {formData.oneOnOneSessions.map((session, index) => (
-                      <Card key={index} className="p-4">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <Badge variant="secondary">Session {index + 1}</Badge>
-                            <Button
-                              onClick={() => removeOneOnOneSession(index)}
-                              variant="outline"
-                              size="sm"
-                              className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label>Available Days</Label>
-                            <div className="flex flex-wrap gap-2">
-                              {daysOfWeek.map((day) => (
-                                <Badge
-                                  key={day}
-                                  variant={session.daysOfWeek.includes(day) ? "default" : "outline"}
-                                  className="cursor-pointer"
-                                  onClick={() => toggleDayOfWeek('oneOnOne', index, day)}
-                                >
-                                  {day.slice(0, 3)}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label>Start Time</Label>
-                              <Input
-                                type="time"
-                                value={session.startTime}
-                                onChange={(e) => updateOneOnOneSession(index, 'startTime', e.target.value)}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>End Time</Label>
-                              <Input
-                                type="time"
-                                value={session.endTime}
-                                onChange={(e) => updateOneOnOneSession(index, 'endTime', e.target.value)}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id={`oneOnOne-recurring-${index}`}
-                              checked={session.recurring}
-                              onCheckedChange={(checked) => updateOneOnOneSession(index, 'recurring', checked)}
-                            />
-                            <Label htmlFor={`oneOnOne-recurring-${index}`}>Recurring</Label>
-                          </div>
+                        <div className="space-y-2">
+                          <Label>End Time</Label>
+                          <Input
+                            type="time"
+                            value={session.endTime}
+                            onChange={(e) => updateClassroomSession(index, 'endTime', e.target.value)}
+                          />
                         </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Days of the Week</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {daysOfWeek.map((day) => (
+                            <Badge
+                              key={day}
+                              variant={session.daysOfWeek.includes(day) ? "default" : "outline"}
+                              className="cursor-pointer"
+                              onClick={() => toggleDayOfWeek('classroom', index, day)}
+                            >
+                              {day.slice(0, 3)}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`classroom-recurring-${index}`}
+                          checked={session.recurring}
+                          onCheckedChange={(checked) => updateClassroomSession(index, 'recurring', checked)}
+                        />
+                        <Label htmlFor={`classroom-recurring-${index}`}>Recurring every week</Label>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {formData.format === 'oneOnOne' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-lg font-semibold text-foreground">1-on-1 Sessions</h4>
+                  <Button onClick={addOneOnOneSession} variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Session
+                  </Button>
+                </div>
+                
+                {formData.oneOnOneSessions.map((session, index) => (
+                  <Card key={index} className="p-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="secondary">Session {index + 1}</Badge>
+                        <Button
+                          onClick={() => removeOneOnOneSession(index)}
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label>Available Days</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {daysOfWeek.map((day) => (
+                            <Badge
+                              key={day}
+                              variant={session.daysOfWeek.includes(day) ? "default" : "outline"}
+                              className="cursor-pointer"
+                              onClick={() => toggleDayOfWeek('oneOnOne', index, day)}
+                            >
+                              {day.slice(0, 3)}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Start Time</Label>
+                          <Input
+                            type="time"
+                            value={session.startTime}
+                            onChange={(e) => updateOneOnOneSession(index, 'startTime', e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>End Time</Label>
+                          <Input
+                            type="time"
+                            value={session.endTime}
+                            onChange={(e) => updateOneOnOneSession(index, 'endTime', e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`oneOnOne-recurring-${index}`}
+                          checked={session.recurring}
+                          onCheckedChange={(checked) => updateOneOnOneSession(index, 'recurring', checked)}
+                        />
+                        <Label htmlFor={`oneOnOne-recurring-${index}`}>Recurring</Label>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
               </div>
             )}
           </div>
