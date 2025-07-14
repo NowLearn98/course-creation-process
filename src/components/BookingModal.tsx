@@ -233,7 +233,42 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     const newTypes = formData.sessionTypes.includes(type)
       ? formData.sessionTypes.filter(t => t !== type)
       : [...formData.sessionTypes, type];
-    setFormData(prev => ({ ...prev, sessionTypes: newTypes }));
+    
+    let newClassroomSessions = formData.classroomSessions;
+    let newOneOnOneSessions = formData.oneOnOneSessions;
+    
+    // Auto-add default session when session type is selected
+    if (!formData.sessionTypes.includes(type)) {
+      if (type === 'classroom') {
+        newClassroomSessions = [{
+          startTime: '',
+          endTime: '',
+          daysOfWeek: [],
+          recurring: false
+        }];
+      } else if (type === 'oneOnOne') {
+        newOneOnOneSessions = [{
+          daysOfWeek: [],
+          startTime: '',
+          endTime: '',
+          recurring: false
+        }];
+      }
+    } else {
+      // Remove sessions when session type is deselected
+      if (type === 'classroom') {
+        newClassroomSessions = [];
+      } else if (type === 'oneOnOne') {
+        newOneOnOneSessions = [];
+      }
+    }
+    
+    setFormData(prev => ({ 
+      ...prev, 
+      sessionTypes: newTypes,
+      classroomSessions: newClassroomSessions,
+      oneOnOneSessions: newOneOnOneSessions
+    }));
   };
 
   const toggleDayOfWeek = (sessionType: 'classroom' | 'oneOnOne', sessionIndex: number, day: string) => {
@@ -602,17 +637,18 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                 { value: 'oneOnOne', title: '1-on-1 Sessions', description: 'Individual tutoring sessions', icon: BookOpen },
               ].map((format) => {
                 const FormatIcon = format.icon;
+                const isSelected = formData.sessionTypes.includes(format.value);
                 return (
                   <Card 
                     key={format.value}
                     className={`p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                      formData.format === format.value ? 'ring-2 ring-primary bg-accent' : ''
+                      isSelected ? 'ring-2 ring-primary bg-accent' : ''
                     }`}
-                    onClick={() => updateFormData('format', format.value)}
+                    onClick={() => toggleSessionType(format.value)}
                   >
                     <div className="flex items-start gap-4">
                       <div className={`p-2 rounded-lg ${
-                        formData.format === format.value ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                        isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'
                       }`}>
                         <FormatIcon className="w-5 h-5" />
                       </div>
@@ -626,7 +662,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
               })}
             </div>
 
-            {formData.format === 'classroom' && (
+            {formData.sessionTypes.includes('classroom') && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-lg font-semibold text-foreground">Classroom Sessions</h4>
@@ -700,7 +736,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
               </div>
             )}
 
-            {formData.format === 'oneOnOne' && (
+            {formData.sessionTypes.includes('oneOnOne') && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-lg font-semibold text-foreground">1-on-1 Sessions</h4>
