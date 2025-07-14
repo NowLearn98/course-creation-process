@@ -959,13 +959,41 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                             );
                             const dayName = dayDate.toLocaleDateString('en-US', { weekday: 'long' });
                             
-                            // Check both session types
+                            // Check both session types with recurring logic
                             const isClassroomDay = classroomSession?.daysOfWeek.includes(dayName);
                             const isOneOnOneDay = oneOnOneSession?.daysOfWeek.includes(dayName);
                             const isToday = dayDate.toDateString() === new Date().toDateString();
                             const isPastDate = dayDate < new Date(new Date().setHours(0, 0, 0, 0));
-                            const isAfterClassroomStart = classroomSession?.startDate ? dayDate >= new Date(classroomSession.startDate) : true;
-                            const isAfterOneOnOneStart = oneOnOneSession?.startDate ? dayDate >= new Date(oneOnOneSession.startDate) : true;
+                            
+                            // Handle recurring sessions - if recurring is enabled, show sessions even after the calendar month
+                            let isAfterClassroomStart = true;
+                            let isAfterOneOnOneStart = true;
+                            
+                            if (classroomSession?.startDate) {
+                              const startDate = new Date(classroomSession.startDate);
+                              if (classroomSession.recurring) {
+                                // For recurring sessions, only check if the day is after the start date
+                                isAfterClassroomStart = dayDate >= startDate;
+                              } else {
+                                // For non-recurring sessions, only show in the start month
+                                isAfterClassroomStart = dayDate >= startDate && 
+                                  dayDate.getMonth() === startDate.getMonth() && 
+                                  dayDate.getFullYear() === startDate.getFullYear();
+                              }
+                            }
+                            
+                            if (oneOnOneSession?.startDate) {
+                              const startDate = new Date(oneOnOneSession.startDate);
+                              if (oneOnOneSession.recurring) {
+                                // For recurring sessions, only check if the day is after the start date
+                                isAfterOneOnOneStart = dayDate >= startDate;
+                              } else {
+                                // For non-recurring sessions, only show in the start month
+                                isAfterOneOnOneStart = dayDate >= startDate && 
+                                  dayDate.getMonth() === startDate.getMonth() && 
+                                  dayDate.getFullYear() === startDate.getFullYear();
+                              }
+                            }
                             
                             return (
                               <div 
@@ -992,7 +1020,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                       {classroomSession.startTime && classroomSession.endTime ? (
                                         <div className="bg-primary text-primary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
                                           <div className="text-xs font-medium leading-tight">
-                                            Classroom
+                                            Classroom{classroomSession.recurring ? ' ♻' : ''}
                                           </div>
                                           <div className="text-xs opacity-90 leading-tight">
                                             {classroomSession.startTime.slice(0, 5)} - {classroomSession.endTime.slice(0, 5)}
@@ -1001,7 +1029,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                       ) : (
                                         <div className="bg-accent border border-dashed border-primary rounded-sm p-1 h-full flex items-center justify-center">
                                           <div className="text-xs text-muted-foreground text-center leading-tight">
-                                            Classroom
+                                            Classroom{classroomSession.recurring ? ' ♻' : ''}
                                           </div>
                                         </div>
                                       )}
@@ -1014,7 +1042,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                       {oneOnOneSession.startTime && oneOnOneSession.endTime ? (
                                         <div className="bg-emerald-500 text-white rounded-sm p-1 h-full flex flex-col justify-center text-center">
                                           <div className="text-xs font-medium leading-tight">
-                                            1-on-1
+                                            1-on-1{oneOnOneSession.recurring ? ' ♻' : ''}
                                           </div>
                                           <div className="text-xs opacity-90 leading-tight">
                                             {oneOnOneSession.startTime.slice(0, 5)} - {oneOnOneSession.endTime.slice(0, 5)}
@@ -1023,7 +1051,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                                       ) : (
                                         <div className="bg-accent border border-dashed border-emerald-500 rounded-sm p-1 h-full flex items-center justify-center">
                                           <div className="text-xs text-muted-foreground text-center leading-tight">
-                                            1-on-1
+                                            1-on-1{oneOnOneSession.recurring ? ' ♻' : ''}
                                           </div>
                                         </div>
                                       )}
@@ -1057,7 +1085,9 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                     <div className="mt-6 p-4 bg-background/50 rounded-lg space-y-4">
                       {formData.sessionTypes.includes('classroom') && formData.classroomSessions[0] && (
                         <div>
-                          <h6 className="text-sm font-medium text-foreground mb-2">Classroom Sessions</h6>
+                          <h6 className="text-sm font-medium text-foreground mb-2">
+                            Classroom Sessions {formData.classroomSessions[0].recurring && <span className="text-primary">♻ Recurring</span>}
+                          </h6>
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                             <div className="text-center">
                               <div className="text-muted-foreground">Start Date</div>
@@ -1085,7 +1115,9 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                       
                       {formData.sessionTypes.includes('oneOnOne') && formData.oneOnOneSessions[0] && (
                         <div>
-                          <h6 className="text-sm font-medium text-foreground mb-2">1-on-1 Sessions</h6>
+                          <h6 className="text-sm font-medium text-foreground mb-2">
+                            1-on-1 Sessions {formData.oneOnOneSessions[0].recurring && <span className="text-emerald-500">♻ Recurring</span>}
+                          </h6>
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                             <div className="text-center">
                               <div className="text-muted-foreground">Start Date</div>
