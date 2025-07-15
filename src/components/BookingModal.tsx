@@ -1668,7 +1668,15 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
             Previous
           </Button>
           
-          <div className="flex gap-2">
+          <div className="flex gap-3">
+            <Button 
+              onClick={handleSaveAsDraft}
+              variant="outline"
+              className="transition-all duration-200"
+            >
+              {isEditingDraft ? 'Update Draft' : 'Save as Draft'}
+            </Button>
+            
             {currentStep < 5 ? (
               <Button 
                 onClick={nextStep} 
@@ -1678,21 +1686,12 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
                 Next Step
               </Button>
             ) : (
-              <div className="flex gap-3">
-                <Button 
-                  onClick={handleSaveAsDraft}
-                  variant="outline"
-                  className="transition-all duration-200"
-                >
-                  {isEditingDraft ? 'Update Draft' : 'Save as Draft'}
-                </Button>
-                <Button 
-                  onClick={handleSubmit}
-                  className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90 transition-all duration-200"
-                >
-                  {isEditingDraft ? 'Publish Course' : 'Create Course'}
-                </Button>
-              </div>
+              <Button 
+                onClick={handleSubmit}
+                className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90 transition-all duration-200"
+              >
+                {isEditingDraft ? 'Publish Course' : 'Create Course'}
+              </Button>
             )}
           </div>
         </div>
