@@ -1461,7 +1461,13 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
               <div>
                 <h4 className="font-medium text-foreground mb-2">Format & Media</h4>
                 <div className="text-sm text-muted-foreground space-y-1">
-                  <p><span className="font-medium">Format:</span> {formData.format || 'Not specified'}</p>
+                  <p><span className="font-medium">Format:</span> {
+                    formData.sessionTypes.length > 0 
+                      ? formData.sessionTypes.map(type => 
+                          type === 'classroom' ? 'Classroom Sessions' : '1-on-1 Sessions'
+                        ).join(', ')
+                      : 'Not specified'
+                  }</p>
                   <p><span className="font-medium">Images:</span> {formData.images.length} uploaded</p>
                   <p><span className="font-medium">Videos:</span> {formData.videos.length} uploaded</p>
                 </div>
