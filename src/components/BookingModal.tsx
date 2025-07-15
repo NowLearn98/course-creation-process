@@ -896,7 +896,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                           </div>
                         </div>
 
-                        {session.startTime && session.endTime && (
+                        {(session.startTime && session.endTime) && (
                           <div className="flex items-center gap-2 p-3 bg-accent/50 rounded-lg">
                             <Clock className="w-4 h-4 text-primary" />
                             <span className="text-sm font-medium">
@@ -1007,7 +1007,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                           </div>
                         </div>
 
-                        {session.startTime && session.endTime && (
+                        {(session.startTime && session.endTime) && (
                           <div className="flex items-center gap-2 p-3 bg-accent/50 rounded-lg">
                             <Clock className="w-4 h-4 text-primary" />
                             <span className="text-sm font-medium">
