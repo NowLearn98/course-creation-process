@@ -564,6 +564,10 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
         setIsEditingDraft(true);
         setCurrentDraftId(newDraft.id);
       }
+      
+      // Close the modal after saving
+      onOpenChange(false);
+      resetForm();
     } catch (error) {
       toast({
         title: "Error Saving Draft",
