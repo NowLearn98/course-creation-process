@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookingModal } from '@/components/BookingModal';
+import BookingModal from '@/components/BookingModal';
 import { Plus, BookOpen, Users, TrendingUp, Star } from 'lucide-react';
 
 const Index = () => {
