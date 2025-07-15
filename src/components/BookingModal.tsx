@@ -499,6 +499,35 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     });
   };
 
+  const handleSaveAsDraft = () => {
+    toast({
+      title: "Course Saved as Draft",
+      description: "Your course has been saved and you can continue editing it later.",
+    });
+    onOpenChange(false);
+    setCurrentStep(1);
+    setFormData({
+      title: '',
+      subtitle: '',
+      description: '',
+      objectives: '',
+      requirements: '',
+      level: '',
+      language: '',
+      category: '',
+      subcategory: '',
+      durationHours: '',
+      durationMinutes: '',
+      modules: [{ title: '', subsections: [] }],
+      format: '',
+      sessionTypes: [],
+      classroomSessions: [],
+      oneOnOneSessions: [],
+      images: [],
+      videos: [],
+    });
+  };
+
   const StepIndicator = () => (
     <div className="flex items-center justify-center mb-8">
       {steps.map((step, index) => {
@@ -1604,12 +1633,21 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                 Next Step
               </Button>
             ) : (
-              <Button 
-                onClick={handleSubmit}
-                className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90 transition-all duration-200"
-              >
-                Create Course
-              </Button>
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handleSaveAsDraft}
+                  variant="outline"
+                  className="transition-all duration-200"
+                >
+                  Save as Draft
+                </Button>
+                <Button 
+                  onClick={handleSubmit}
+                  className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90 transition-all duration-200"
+                >
+                  Create Course
+                </Button>
+              </div>
             )}
           </div>
         </div>
