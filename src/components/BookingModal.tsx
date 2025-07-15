@@ -1490,8 +1490,8 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
               <Separator />
 
               <div>
-                <h4 className="font-medium text-foreground mb-2">Format & Media</h4>
-                <div className="text-sm text-muted-foreground space-y-1">
+                <h4 className="font-medium text-foreground mb-2">Format & Sessions</h4>
+                <div className="text-sm text-muted-foreground space-y-3">
                   <p><span className="font-medium">Format:</span> {
                     formData.sessionTypes.length > 0 
                       ? formData.sessionTypes.map(type => 
@@ -1499,6 +1499,44 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                         ).join(', ')
                       : 'Not specified'
                   }</p>
+                  
+                  {/* Classroom Session Details */}
+                  {formData.sessionTypes.includes('classroom') && formData.classroomSessions[0] && (
+                    <div className="pl-4 border-l-2 border-primary/20">
+                      <p className="font-medium text-primary mb-1">Classroom Session Details:</p>
+                      <div className="space-y-1">
+                        <p><span className="font-medium">Start Date:</span> {formData.classroomSessions[0].startDate || 'Not set'}</p>
+                        <p><span className="font-medium">Days:</span> {formData.classroomSessions[0].daysOfWeek.join(', ') || 'None selected'}</p>
+                        {formData.classroomSessions[0].startTime && formData.classroomSessions[0].endTime && (
+                          <p><span className="font-medium">Time:</span> {formData.classroomSessions[0].startTime} - {formData.classroomSessions[0].endTime}</p>
+                        )}
+                        <p><span className="font-medium">Recurring:</span> {formData.classroomSessions[0].recurring ? 'Yes' : 'No'}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* 1-on-1 Session Details */}
+                  {formData.sessionTypes.includes('oneOnOne') && formData.oneOnOneSessions[0] && (
+                    <div className="pl-4 border-l-2 border-emerald-500/20">
+                      <p className="font-medium text-emerald-600 mb-1">1-on-1 Session Details:</p>
+                      <div className="space-y-1">
+                        <p><span className="font-medium">Start Date:</span> {formData.oneOnOneSessions[0].startDate || 'Not set'}</p>
+                        <p><span className="font-medium">Available Days:</span> {formData.oneOnOneSessions[0].daysOfWeek.join(', ') || 'None selected'}</p>
+                        {formData.oneOnOneSessions[0].startTime && formData.oneOnOneSessions[0].endTime && (
+                          <p><span className="font-medium">Time:</span> {formData.oneOnOneSessions[0].startTime} - {formData.oneOnOneSessions[0].endTime}</p>
+                        )}
+                        <p><span className="font-medium">Recurring:</span> {formData.oneOnOneSessions[0].recurring ? 'Yes' : 'No'}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <h4 className="font-medium text-foreground mb-2">Media</h4>
+                <div className="text-sm text-muted-foreground space-y-1">
                   <p><span className="font-medium">Images:</span> {formData.images.length} uploaded</p>
                   <p><span className="font-medium">Videos:</span> {formData.videos.length} uploaded</p>
                 </div>
