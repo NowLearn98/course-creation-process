@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, Upload, Play, Image, FileText, Settings, BookOpen, Eye, Plus, X, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle, Upload, Play, Image, FileText, Settings, BookOpen, Eye, Plus, X, Clock, ChevronLeft, ChevronRight, Trash2, GripVertical, Crop } from 'lucide-react';
+import ReactCrop, { Crop as CropType, PixelCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
@@ -16,6 +18,14 @@ import { useToast } from '@/hooks/use-toast';
 interface BookingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+interface ProcessedImage {
+  id: string;
+  file: File;
+  preview: string;
+  croppedPreview?: string;
+  crop?: CropType;
 }
 
 interface SubSection {
@@ -70,7 +80,7 @@ interface FormData {
   oneOnOneSessions: OneOnOneSession[];
   
   // Media
-  images: File[];
+  images: ProcessedImage[];
   videos: File[];
 }
 
@@ -120,6 +130,10 @@ const calculateSessionDuration = (startTime: string, endTime: string): string =>
 export function BookingModal({ open, onOpenChange }: BookingModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [currentImageToCrop, setCurrentImageToCrop] = useState<string | null>(null);
+  const [crop, setCrop] = useState<CropType>();
+  const [imgRef, setImgRef] = useState<HTMLImageElement | null>(null);
   const [formData, setFormData] = useState<FormData>({
     title: '',
     subtitle: '',
@@ -202,8 +216,105 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
 
   const handleFileUpload = (type: 'images' | 'videos', files: FileList | null) => {
     if (files) {
-      const fileArray = Array.from(files);
-      setFormData(prev => ({ ...prev, [type]: [...prev[type], ...fileArray] }));
+      if (type === 'images') {
+        Array.from(files).forEach(file => {
+          const id = Math.random().toString(36).substr(2, 9);
+          const preview = URL.createObjectURL(file);
+          const processedImage: ProcessedImage = {
+            id,
+            file,
+            preview,
+          };
+          setFormData(prev => ({ 
+            ...prev, 
+            images: [...prev.images, processedImage] 
+          }));
+        });
+      } else {
+        const fileArray = Array.from(files);
+        setFormData(prev => ({ ...prev, [type]: [...prev[type], ...fileArray] }));
+      }
+    }
+  };
+
+  const removeImage = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter(img => img.id !== id)
+    }));
+  };
+
+  const reorderImages = (fromIndex: number, toIndex: number) => {
+    setFormData(prev => {
+      const newImages = [...prev.images];
+      const [movedImage] = newImages.splice(fromIndex, 1);
+      newImages.splice(toIndex, 0, movedImage);
+      return { ...prev, images: newImages };
+    });
+  };
+
+  const openCropModal = (imageId: string) => {
+    setCurrentImageToCrop(imageId);
+    setCropModalOpen(true);
+    setCrop(undefined);
+  };
+
+  const getCroppedImg = (image: HTMLImageElement, crop: PixelCrop): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        reject(new Error('No 2d context'));
+        return;
+      }
+
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
+
+      canvas.width = crop.width;
+      canvas.height = crop.height;
+
+      ctx.drawImage(
+        image,
+        crop.x * scaleX,
+        crop.y * scaleY,
+        crop.width * scaleX,
+        crop.height * scaleY,
+        0,
+        0,
+        crop.width,
+        crop.height
+      );
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Canvas is empty'));
+          return;
+        }
+        const croppedImageUrl = URL.createObjectURL(blob);
+        resolve(croppedImageUrl);
+      }, 'image/jpeg', 0.95);
+    });
+  };
+
+  const applyCrop = async () => {
+    if (imgRef && crop && currentImageToCrop && crop.width && crop.height) {
+      try {
+        const croppedImageUrl = await getCroppedImg(imgRef, crop as PixelCrop);
+        setFormData(prev => ({
+          ...prev,
+          images: prev.images.map(img => 
+            img.id === currentImageToCrop 
+              ? { ...img, croppedPreview: croppedImageUrl, crop }
+              : img
+          )
+        }));
+        setCropModalOpen(false);
+        setCurrentImageToCrop(null);
+      } catch (e) {
+        console.error('Error cropping image:', e);
+      }
     }
   };
 
@@ -1155,36 +1266,98 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-foreground">Upload Course Media</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-6">
               <Card className="p-6">
-                <div className="text-center space-y-4">
-                  <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto">
-                    <Image className="w-6 h-6 text-primary" />
+                <div className="space-y-4">
+                  <div className="text-center space-y-4">
+                    <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mx-auto">
+                      <Image className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-foreground">Course Images</h4>
+                      <p className="text-sm text-muted-foreground">Upload promotional images</p>
+                    </div>
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => handleFileUpload('images', e.target.files)}
+                        className="hidden"
+                        id="image-upload"
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer"
+                      >
+                        Choose Images
+                      </label>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-medium text-foreground">Course Images</h4>
-                    <p className="text-sm text-muted-foreground">Upload promotional images</p>
-                  </div>
-                  <div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => handleFileUpload('images', e.target.files)}
-                      className="hidden"
-                      id="image-upload"
-                    />
-                    <label
-                      htmlFor="image-upload"
-                      className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer"
-                    >
-                      Choose Images
-                    </label>
-                  </div>
+
                   {formData.images.length > 0 && (
-                    <p className="text-xs text-muted-foreground">
-                      {formData.images.length} image(s) selected
-                    </p>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-foreground">
+                          Selected Images ({formData.images.length})
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Drag to reorder
+                        </p>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {formData.images.map((image, index) => (
+                          <div
+                            key={image.id}
+                            className="relative group bg-muted rounded-lg overflow-hidden aspect-square"
+                            draggable
+                            onDragStart={(e) => {
+                              e.dataTransfer.setData('text/plain', index.toString());
+                            }}
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                              reorderImages(fromIndex, index);
+                            }}
+                          >
+                            <img
+                              src={image.croppedPreview || image.preview}
+                              alt={`Upload ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => openCropModal(image.id)}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Crop className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => removeImage(image.id)}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            
+                            <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
+                              {index + 1}
+                            </div>
+                            
+                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <GripVertical className="h-4 w-4 text-white" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               </Card>
@@ -1356,6 +1529,54 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
           </div>
         </div>
       </DialogContent>
+
+      {/* Crop Modal */}
+      <Dialog open={cropModalOpen} onOpenChange={setCropModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>Crop Image</DialogTitle>
+          </DialogHeader>
+          
+          {currentImageToCrop && (
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <ReactCrop
+                  crop={crop}
+                  onChange={(c) => setCrop(c)}
+                  aspect={16 / 9}
+                  minWidth={100}
+                  minHeight={100}
+                >
+                  <img
+                    ref={setImgRef}
+                    src={formData.images.find(img => img.id === currentImageToCrop)?.preview}
+                    alt="Crop preview"
+                    className="max-w-full max-h-[400px] object-contain"
+                  />
+                </ReactCrop>
+              </div>
+              
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setCropModalOpen(false);
+                    setCurrentImageToCrop(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={applyCrop}
+                  disabled={!crop?.width || !crop?.height}
+                >
+                  Apply Crop
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
