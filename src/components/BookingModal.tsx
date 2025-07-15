@@ -229,7 +229,16 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
             ...prev, 
             images: [...prev.images, processedImage] 
           }));
+          
+          // Immediately open crop modal for the uploaded image
+          setCurrentImageToCrop(id);
+          setCropModalOpen(true);
+          setCrop(undefined);
         });
+        
+        // Clear the input so the same file can be uploaded again
+        const input = document.getElementById('image-upload') as HTMLInputElement;
+        if (input) input.value = '';
       } else {
         const fileArray = Array.from(files);
         setFormData(prev => ({ ...prev, [type]: [...prev[type], ...fileArray] }));
@@ -1281,7 +1290,6 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                       <input
                         type="file"
                         accept="image/*"
-                        multiple
                         onChange={(e) => handleFileUpload('images', e.target.files)}
                         className="hidden"
                         id="image-upload"
@@ -1560,11 +1568,15 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                 <Button
                   variant="outline"
                   onClick={() => {
+                    // If no crop was applied, remove the image
+                    if (currentImageToCrop && !crop?.width) {
+                      removeImage(currentImageToCrop);
+                    }
                     setCropModalOpen(false);
                     setCurrentImageToCrop(null);
                   }}
                 >
-                  Cancel
+                  {crop?.width ? 'Cancel' : 'Remove Image'}
                 </Button>
                 <Button
                   onClick={applyCrop}
