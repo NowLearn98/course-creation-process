@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -134,7 +135,9 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
   const [currentImageToCrop, setCurrentImageToCrop] = useState<string | null>(null);
   const [crop, setCrop] = useState<CropType>();
   const [imgRef, setImgRef] = useState<HTMLImageElement | null>(null);
-  const [formData, setFormData] = useState<FormData>({
+  const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
+  
+  const initialFormData: FormData = {
     title: '',
     subtitle: '',
     description: '',
@@ -153,8 +156,36 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
     oneOnOneSessions: [],
     images: [],
     videos: [],
-  });
+  };
+  
+  const [formData, setFormData] = useState<FormData>(initialFormData);
   const { toast } = useToast();
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setCurrentStep(1);
+    setCrop(undefined);
+    setCurrentImageToCrop(null);
+  };
+
+  const handleCloseModal = () => {
+    // Check if there's any form data that would be lost
+    const hasFormData = formData.title || formData.description || formData.modules.some(m => m.title) || 
+                       formData.images.length > 0 || formData.videos.length > 0 || formData.sessionTypes.length > 0;
+    
+    if (hasFormData) {
+      setShowCloseConfirmation(true);
+    } else {
+      resetForm();
+      onOpenChange(false);
+    }
+  };
+
+  const confirmClose = () => {
+    resetForm();
+    setShowCloseConfirmation(false);
+    onOpenChange(false);
+  };
 
   const updateFormData = (field: keyof FormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -1499,7 +1530,7 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleCloseModal}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-6">
           <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
@@ -1604,6 +1635,24 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Close Confirmation Dialog */}
+      <AlertDialog open={showCloseConfirmation} onOpenChange={setShowCloseConfirmation}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to close?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. If you close now, all your progress will be lost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continue editing</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmClose}>
+              Close without saving
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
