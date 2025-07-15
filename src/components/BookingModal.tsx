@@ -263,9 +263,11 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
   };
 
   const openCropModal = (imageId: string) => {
+    const image = formData.images.find(img => img.id === imageId);
     setCurrentImageToCrop(imageId);
     setCropModalOpen(true);
-    setCrop(undefined);
+    // Restore previous crop settings if they exist
+    setCrop(image?.crop || undefined);
   };
 
   const getCroppedImg = (image: HTMLImageElement, crop: PixelCrop): Promise<string> => {
@@ -1557,7 +1559,8 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                 >
                   <img
                     ref={setImgRef}
-                    src={formData.images.find(img => img.id === currentImageToCrop)?.preview}
+                    src={formData.images.find(img => img.id === currentImageToCrop)?.croppedPreview || 
+                         formData.images.find(img => img.id === currentImageToCrop)?.preview}
                     alt="Crop preview"
                     className="max-w-full max-h-[400px] object-contain"
                   />
