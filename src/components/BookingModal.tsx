@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -15,10 +15,13 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
+import { saveDraft, updateDraft } from '@/utils/draftStorage';
+import { DraftCourse } from '@/types/draft';
 
 interface BookingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editingDraft?: DraftCourse | null;
 }
 
 interface ProcessedImage {
@@ -128,7 +131,7 @@ const calculateSessionDuration = (startTime: string, endTime: string): string =>
   }
 };
 
-export function BookingModal({ open, onOpenChange }: BookingModalProps) {
+export function BookingModal({ open, onOpenChange, editingDraft = null }: BookingModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [cropModalOpen, setCropModalOpen] = useState(false);
@@ -159,13 +162,31 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
   };
   
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [isEditingDraft, setIsEditingDraft] = useState(false);
+  const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Load draft data when editing
+  useEffect(() => {
+    if (editingDraft && open) {
+      setFormData(editingDraft);
+      setIsEditingDraft(true);
+      setCurrentDraftId(editingDraft.id);
+      setCurrentStep(1);
+    } else if (open && !editingDraft) {
+      // Reset when creating new course
+      setIsEditingDraft(false);
+      setCurrentDraftId(null);
+    }
+  }, [editingDraft, open]);
 
   const resetForm = () => {
     setFormData(initialFormData);
     setCurrentStep(1);
     setCrop(undefined);
     setCurrentImageToCrop(null);
+    setIsEditingDraft(false);
+    setCurrentDraftId(null);
   };
 
   const handleCloseModal = () => {
@@ -472,8 +493,8 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
 
   const handleSubmit = () => {
     toast({
-      title: "Course Created Successfully!",
-      description: "Your course has been submitted for review.",
+      title: isEditingDraft ? "Course Published Successfully!" : "Course Created Successfully!",
+      description: isEditingDraft ? "Your course has been published for review." : "Your course has been submitted for review.",
     });
     onOpenChange(false);
     setCurrentStep(1);
@@ -497,35 +518,59 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
       images: [],
       videos: [],
     });
+    setIsEditingDraft(false);
+    setCurrentDraftId(null);
   };
 
   const handleSaveAsDraft = () => {
-    toast({
-      title: "Course Saved as Draft",
-      description: "Your course has been saved and you can continue editing it later.",
-    });
-    onOpenChange(false);
-    setCurrentStep(1);
-    setFormData({
-      title: '',
-      subtitle: '',
-      description: '',
-      objectives: '',
-      requirements: '',
-      level: '',
-      language: '',
-      category: '',
-      subcategory: '',
-      durationHours: '',
-      durationMinutes: '',
-      modules: [{ title: '', subsections: [] }],
-      format: '',
-      sessionTypes: [],
-      classroomSessions: [],
-      oneOnOneSessions: [],
-      images: [],
-      videos: [],
-    });
+    try {
+      const draftData = {
+        title: formData.title,
+        subtitle: formData.subtitle,
+        description: formData.description,
+        objectives: formData.objectives,
+        requirements: formData.requirements,
+        level: formData.level,
+        language: formData.language,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        durationHours: formData.durationHours,
+        durationMinutes: formData.durationMinutes,
+        modules: formData.modules,
+        format: formData.format,
+        sessionTypes: formData.sessionTypes,
+        classroomSessions: formData.classroomSessions,
+        oneOnOneSessions: formData.oneOnOneSessions,
+        images: formData.images,
+        videos: formData.videos,
+      };
+
+      if (isEditingDraft && currentDraftId) {
+        // Update existing draft
+        const updatedDraft = updateDraft(currentDraftId, draftData);
+        if (updatedDraft) {
+          toast({
+            title: "Draft Updated",
+            description: "Your course draft has been updated successfully.",
+          });
+        }
+      } else {
+        // Create new draft
+        const newDraft = saveDraft(draftData);
+        toast({
+          title: "Course Saved as Draft",
+          description: "Your course has been saved and you can continue editing it later.",
+        });
+        setIsEditingDraft(true);
+        setCurrentDraftId(newDraft.id);
+      }
+    } catch (error) {
+      toast({
+        title: "Error Saving Draft",
+        description: "There was an error saving your draft. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const StepIndicator = () => (
@@ -1639,13 +1684,13 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                   variant="outline"
                   className="transition-all duration-200"
                 >
-                  Save as Draft
+                  {isEditingDraft ? 'Update Draft' : 'Save as Draft'}
                 </Button>
                 <Button 
                   onClick={handleSubmit}
                   className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90 transition-all duration-200"
                 >
-                  Create Course
+                  {isEditingDraft ? 'Publish Course' : 'Create Course'}
                 </Button>
               </div>
             )}
