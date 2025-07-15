@@ -1571,15 +1571,21 @@ export function BookingModal({ open, onOpenChange }: BookingModalProps) {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    // If no crop was applied, remove the image
-                    if (currentImageToCrop && !crop?.width) {
-                      removeImage(currentImageToCrop);
-                    }
                     setCropModalOpen(false);
                     setCurrentImageToCrop(null);
                   }}
                 >
-                  {crop?.width ? 'Cancel' : 'Remove Image'}
+                  Cancel
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    // Save without cropping - just close the modal
+                    setCropModalOpen(false);
+                    setCurrentImageToCrop(null);
+                  }}
+                >
+                  Save without cropping
                 </Button>
                 <Button
                   onClick={applyCrop}
