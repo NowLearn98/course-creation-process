@@ -1648,16 +1648,15 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
   return (
     <Dialog open={open} onOpenChange={handleCloseModal}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="pb-6">
+        <DialogHeader className="pb-6 sticky top-0 bg-background z-10 border-b border-border">
           <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
             Create New Course
           </DialogTitle>
+          <StepIndicator />
         </DialogHeader>
 
         <div className="flex-1 overflow-auto">
-          <StepIndicator />
-          
-          <div className="px-2">
+          <div className="px-2 pt-6">
             {renderStepContent()}
           </div>
         </div>
