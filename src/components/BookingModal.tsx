@@ -171,6 +171,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
   const [isGeneratingModuleTitle, setIsGeneratingModuleTitle] = useState(false);
   const [isGeneratingSubsectionTitle, setIsGeneratingSubsectionTitle] = useState(false);
   const [isGeneratingSubsectionDescription, setIsGeneratingSubsectionDescription] = useState(false);
+  const [isGeneratingModuleSubsections, setIsGeneratingModuleSubsections] = useState(false);
   const { toast } = useToast();
 
   // Load draft data when editing
@@ -511,6 +512,96 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
       });
     } finally {
       setIsGeneratingSubsectionDescription(false);
+    }
+  };
+
+  const generateModuleSubsections = async (moduleIndex: number) => {
+    if (!formData.title.trim()) {
+      toast({
+        title: "Course title required",
+        description: "Please enter a course title first to generate subsections.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingModuleSubsections(true);
+    try {
+      // Simulate AI generation - in a real app, this would call an AI API
+      await new Promise(resolve => setTimeout(resolve, 2500));
+      
+      const moduleTitle = formData.modules[moduleIndex]?.title || `Module ${moduleIndex + 1}`;
+      const courseTitle = formData.title;
+      
+      // Generate 4-6 subsections for the module
+      const subsectionTemplates = [
+        {
+          title: `Introduction to ${moduleTitle}`,
+          description: `Overview of ${moduleTitle} concepts and how they relate to ${courseTitle}. Students will understand the fundamental principles.`,
+          type: 'lecture' as const,
+          timeMinutes: '15'
+        },
+        {
+          title: `Core Concepts and Theory`,
+          description: `Detailed exploration of the key theoretical foundations and concepts that underpin ${moduleTitle}.`,
+          type: 'lecture' as const,
+          timeMinutes: '25'
+        },
+        {
+          title: `Practical Examples and Use Cases`,
+          description: `Real-world examples demonstrating how ${moduleTitle} is applied in professional settings.`,
+          type: 'lecture' as const,
+          timeMinutes: '20'
+        },
+        {
+          title: `Hands-on Lab Exercise`,
+          description: `Interactive lab exercise where students practice implementing ${moduleTitle} concepts through guided activities.`,
+          type: 'lab' as const,
+          timeMinutes: '30'
+        },
+        {
+          title: `Assignment: Practical Application`,
+          description: `Assignment where students apply ${moduleTitle} concepts to solve real-world problems independently.`,
+          type: 'assignment' as const,
+          timeMinutes: '45'
+        },
+        {
+          title: `Common Challenges and Solutions`,
+          description: `Discussion of typical problems encountered with ${moduleTitle} and proven strategies to overcome them.`,
+          type: 'lecture' as const,
+          timeMinutes: '20'
+        },
+        {
+          title: `Module Assessment Quiz`,
+          description: `Assessment quiz to evaluate understanding of ${moduleTitle} concepts and learning objectives.`,
+          type: 'quiz' as const,
+          timeMinutes: '15'
+        }
+      ];
+
+      // Select 4-5 random subsections
+      const numberOfSubsections = 4 + Math.floor(Math.random() * 2); // 4 or 5 subsections
+      const selectedSubsections = subsectionTemplates
+        .sort(() => 0.5 - Math.random())
+        .slice(0, numberOfSubsections);
+
+      // Clear existing subsections and add generated ones
+      const newModules = [...formData.modules];
+      newModules[moduleIndex].subsections = selectedSubsections;
+      setFormData(prev => ({ ...prev, modules: newModules }));
+      
+      toast({
+        title: "Subsections generated!",
+        description: `AI has generated ${numberOfSubsections} subsections for ${moduleTitle}. Feel free to edit them as needed.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Failed to generate subsections. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingModuleSubsections(false);
     }
   };
 
@@ -1235,13 +1326,37 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <h4 className="text-sm font-medium text-foreground">Subsections</h4>
-                        <Button 
-                          onClick={() => addSubSection(moduleIndex)} 
-                          variant="outline" 
-                          size="sm"
-                        >
-                          Add Subsection
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => generateModuleSubsections(moduleIndex)}
+                            disabled={!formData.title.trim() || isGeneratingModuleSubsections}
+                            className="text-xs"
+                          >
+                            {isGeneratingModuleSubsections ? (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
+                                Generating...
+                              </>
+                            ) : (
+                              <>
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                AI Generate Subsections
+                              </>
+                            )}
+                          </Button>
+                          <Button 
+                            onClick={() => addSubSection(moduleIndex)} 
+                            variant="outline" 
+                            size="sm"
+                          >
+                            Add Subsection
+                          </Button>
+                        </div>
                       </div>
 
                       {module.subsections.length > 0 && (
