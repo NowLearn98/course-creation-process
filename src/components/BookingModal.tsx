@@ -165,6 +165,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
   const [isEditingDraft, setIsEditingDraft] = useState(false);
   const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+  const [isGeneratingSubtitle, setIsGeneratingSubtitle] = useState(false);
   const { toast } = useToast();
 
   // Load draft data when editing
@@ -250,6 +251,48 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
       });
     } finally {
       setIsGeneratingDescription(false);
+    }
+  };
+
+  const generateSubtitle = async () => {
+    if (!formData.title.trim()) {
+      toast({
+        title: "Course title required",
+        description: "Please enter a course title first to generate a subtitle.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingSubtitle(true);
+    try {
+      // Simulate AI generation - in a real app, this would call an AI API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const suggestions = [
+        `Learn ${formData.title} from scratch to advanced level`,
+        `Master ${formData.title} with hands-on projects and expert guidance`,
+        `Complete guide to ${formData.title} for beginners and professionals`,
+        `Practical ${formData.title} skills for real-world applications`,
+        `Step-by-step ${formData.title} training with industry best practices`,
+        `Professional ${formData.title} course with certification preparation`
+      ];
+      
+      const randomSubtitle = suggestions[Math.floor(Math.random() * suggestions.length)];
+      updateFormData('subtitle', randomSubtitle);
+      
+      toast({
+        title: "Subtitle generated!",
+        description: "AI has generated a course subtitle based on your title. Feel free to edit it as needed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Failed to generate subtitle. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingSubtitle(false);
     }
   };
 
@@ -670,7 +713,31 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="subtitle">Course Subtitle</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="subtitle">Course Subtitle</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={generateSubtitle}
+                    disabled={!formData.title.trim() || isGeneratingSubtitle}
+                    className="text-xs"
+                  >
+                    {isGeneratingSubtitle ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        AI Generate
+                      </>
+                    )}
+                  </Button>
+                </div>
                 <Input
                   id="subtitle"
                   value={formData.subtitle}
