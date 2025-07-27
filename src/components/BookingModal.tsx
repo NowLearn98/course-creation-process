@@ -168,6 +168,9 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
   const [isGeneratingSubtitle, setIsGeneratingSubtitle] = useState(false);
   const [isGeneratingObjectives, setIsGeneratingObjectives] = useState(false);
   const [isGeneratingRequirements, setIsGeneratingRequirements] = useState(false);
+  const [isGeneratingModuleTitle, setIsGeneratingModuleTitle] = useState(false);
+  const [isGeneratingSubsectionTitle, setIsGeneratingSubsectionTitle] = useState(false);
+  const [isGeneratingSubsectionDescription, setIsGeneratingSubsectionDescription] = useState(false);
   const { toast } = useToast();
 
   // Load draft data when editing
@@ -373,6 +376,141 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
       });
     } finally {
       setIsGeneratingRequirements(false);
+    }
+  };
+
+  const generateModuleTitle = async (moduleIndex: number) => {
+    if (!formData.title.trim()) {
+      toast({
+        title: "Course title required",
+        description: "Please enter a course title first to generate module titles.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingModuleTitle(true);
+    try {
+      // Simulate AI generation - in a real app, this would call an AI API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const suggestions = [
+        `Introduction to ${formData.title}`,
+        `Getting Started with ${formData.title}`,
+        `Fundamentals of ${formData.title}`,
+        `Core Concepts in ${formData.title}`,
+        `Advanced ${formData.title} Techniques`,
+        `Practical ${formData.title} Applications`,
+        `Best Practices in ${formData.title}`,
+        `Real-world ${formData.title} Projects`,
+        `Mastering ${formData.title} Skills`,
+        `Professional ${formData.title} Development`
+      ];
+      
+      const randomTitle = suggestions[Math.floor(Math.random() * suggestions.length)];
+      updateModule(moduleIndex, 'title', randomTitle);
+      
+      toast({
+        title: "Module title generated!",
+        description: "AI has generated a module title. Feel free to edit it as needed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Failed to generate module title. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingModuleTitle(false);
+    }
+  };
+
+  const generateSubsectionTitle = async (moduleIndex: number, subIndex: number) => {
+    if (!formData.title.trim()) {
+      toast({
+        title: "Course title required",
+        description: "Please enter a course title first to generate subsection titles.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingSubsectionTitle(true);
+    try {
+      // Simulate AI generation - in a real app, this would call an AI API
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      const moduleTitle = formData.modules[moduleIndex]?.title || formData.title;
+      const suggestions = [
+        `Overview of ${moduleTitle}`,
+        `Understanding ${moduleTitle}`,
+        `Key Concepts in ${moduleTitle}`,
+        `Practical Examples`,
+        `Hands-on Exercise`,
+        `Implementation Guide`,
+        `Common Challenges`,
+        `Best Practices`,
+        `Case Study`,
+        `Summary and Review`
+      ];
+      
+      const randomTitle = suggestions[Math.floor(Math.random() * suggestions.length)];
+      updateSubSection(moduleIndex, subIndex, 'title', randomTitle);
+      
+      toast({
+        title: "Subsection title generated!",
+        description: "AI has generated a subsection title. Feel free to edit it as needed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Failed to generate subsection title. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingSubsectionTitle(false);
+    }
+  };
+
+  const generateSubsectionDescription = async (moduleIndex: number, subIndex: number) => {
+    if (!formData.title.trim()) {
+      toast({
+        title: "Course title required",
+        description: "Please enter a course title first to generate subsection descriptions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingSubsectionDescription(true);
+    try {
+      // Simulate AI generation - in a real app, this would call an AI API
+      await new Promise(resolve => setTimeout(resolve, 1400));
+      
+      const subsectionTitle = formData.modules[moduleIndex]?.subsections[subIndex]?.title || "this topic";
+      const suggestions = [
+        `In this section, we'll explore ${subsectionTitle} and learn how to apply it effectively in real-world scenarios.`,
+        `This lesson covers the essential aspects of ${subsectionTitle}, providing practical examples and hands-on exercises.`,
+        `Students will dive deep into ${subsectionTitle}, understanding its importance and implementation strategies.`,
+        `A comprehensive overview of ${subsectionTitle} with step-by-step guidance and practical applications.`,
+        `Learn the fundamentals of ${subsectionTitle} through interactive examples and expert insights.`
+      ];
+      
+      const randomDescription = suggestions[Math.floor(Math.random() * suggestions.length)];
+      updateSubSection(moduleIndex, subIndex, 'description', randomDescription);
+      
+      toast({
+        title: "Subsection description generated!",
+        description: "AI has generated a subsection description. Feel free to edit it as needed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Failed to generate subsection description. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingSubsectionDescription(false);
     }
   };
 
@@ -1050,12 +1188,36 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
                       <Badge variant="secondary" className="text-xs">
                         Module {moduleIndex + 1}
                       </Badge>
-                      <Input
-                        value={module.title}
-                        onChange={(e) => updateModule(moduleIndex, 'title', e.target.value)}
-                        placeholder={`Enter module ${moduleIndex + 1} title`}
-                        className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                      />
+                      <div className="flex-1 flex items-center gap-2">
+                        <Input
+                          value={module.title}
+                          onChange={(e) => updateModule(moduleIndex, 'title', e.target.value)}
+                          placeholder={`Enter module ${moduleIndex + 1} title`}
+                          className="flex-1 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => generateModuleTitle(moduleIndex)}
+                          disabled={!formData.title.trim() || isGeneratingModuleTitle}
+                          className="text-xs whitespace-nowrap"
+                        >
+                          {isGeneratingModuleTitle ? (
+                            <>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
+                              Generating...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                              </svg>
+                              AI Generate
+                            </>
+                          )}
+                        </Button>
+                      </div>
                       {formData.modules.length > 1 && (
                         <Button 
                           onClick={() => removeModule(moduleIndex)} 
@@ -1091,12 +1253,36 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
                                   <Badge variant="outline" className="text-xs">
                                     {subIndex + 1}
                                   </Badge>
-                                  <Input
-                                    value={subsection.title}
-                                    onChange={(e) => updateSubSection(moduleIndex, subIndex, 'title', e.target.value)}
-                                    placeholder="Subsection title"
-                                    className="flex-1 h-9"
-                                  />
+                                  <div className="flex-1 flex items-center gap-2">
+                                    <Input
+                                      value={subsection.title}
+                                      onChange={(e) => updateSubSection(moduleIndex, subIndex, 'title', e.target.value)}
+                                      placeholder="Subsection title"
+                                      className="flex-1 h-9"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => generateSubsectionTitle(moduleIndex, subIndex)}
+                                      disabled={!formData.title.trim() || isGeneratingSubsectionTitle}
+                                      className="text-xs whitespace-nowrap h-9"
+                                    >
+                                      {isGeneratingSubsectionTitle ? (
+                                        <>
+                                          <div className="animate-spin rounded-full h-2 w-2 border-b-2 border-primary mr-1"></div>
+                                          AI
+                                        </>
+                                      ) : (
+                                        <>
+                                          <svg className="w-2 h-2 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                          </svg>
+                                          AI
+                                        </>
+                                      )}
+                                    </Button>
+                                  </div>
                                   <Input
                                     type="number"
                                     min="0"
@@ -1128,12 +1314,39 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
                                     ×
                                   </Button>
                                 </div>
-                                <Textarea
-                                  value={subsection.description}
-                                  onChange={(e) => updateSubSection(moduleIndex, subIndex, 'description', e.target.value)}
-                                  placeholder="Subsection description"
-                                  className="text-sm min-h-20"
-                                />
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-muted-foreground">Description</span>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => generateSubsectionDescription(moduleIndex, subIndex)}
+                                      disabled={!formData.title.trim() || isGeneratingSubsectionDescription}
+                                      className="text-xs h-6"
+                                    >
+                                      {isGeneratingSubsectionDescription ? (
+                                        <>
+                                          <div className="animate-spin rounded-full h-2 w-2 border-b-2 border-primary mr-1"></div>
+                                          AI
+                                        </>
+                                      ) : (
+                                        <>
+                                          <svg className="w-2 h-2 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                          </svg>
+                                          AI
+                                        </>
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <Textarea
+                                    value={subsection.description}
+                                    onChange={(e) => updateSubSection(moduleIndex, subIndex, 'description', e.target.value)}
+                                    placeholder="Subsection description"
+                                    className="text-sm min-h-20"
+                                  />
+                                </div>
                               </div>
                             </Card>
                           ))}
