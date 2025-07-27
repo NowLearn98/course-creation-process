@@ -164,6 +164,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isEditingDraft, setIsEditingDraft] = useState(false);
   const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const { toast } = useToast();
 
   // Load draft data when editing
@@ -210,6 +211,46 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
 
   const updateFormData = (field: keyof FormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const generateDescription = async () => {
+    if (!formData.title.trim()) {
+      toast({
+        title: "Course title required",
+        description: "Please enter a course title first to generate a description.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingDescription(true);
+    try {
+      // Simulate AI generation - in a real app, this would call an AI API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const suggestions = [
+        `Master the fundamentals of ${formData.title} with this comprehensive course designed for learners at all levels. You'll gain practical skills and theoretical knowledge through hands-on projects and real-world applications.`,
+        `Dive deep into ${formData.title} and unlock your potential with expert-led instruction. This course combines theoretical concepts with practical exercises to ensure you develop both understanding and application skills.`,
+        `Transform your career with our intensive ${formData.title} course. Learn from industry experts and build a strong foundation through interactive lessons, projects, and personalized feedback.`,
+        `Discover the power of ${formData.title} in this engaging and comprehensive course. Whether you're a beginner or looking to advance your skills, you'll find valuable insights and practical knowledge to achieve your goals.`
+      ];
+      
+      const randomDescription = suggestions[Math.floor(Math.random() * suggestions.length)];
+      updateFormData('description', randomDescription);
+      
+      toast({
+        title: "Description generated!",
+        description: "AI has generated a course description based on your title. Feel free to edit it as needed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Failed to generate description. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingDescription(false);
+    }
   };
 
   const nextStep = () => {
@@ -641,7 +682,31 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="description">Course Description *</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="description">Course Description *</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={generateDescription}
+                  disabled={!formData.title.trim() || isGeneratingDescription}
+                  className="text-xs"
+                >
+                  {isGeneratingDescription ? (
+                    <>
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      AI Generate
+                    </>
+                  )}
+                </Button>
+              </div>
               <Textarea
                 id="description"
                 value={formData.description}
