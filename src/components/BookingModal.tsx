@@ -166,6 +166,8 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
   const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [isGeneratingSubtitle, setIsGeneratingSubtitle] = useState(false);
+  const [isGeneratingObjectives, setIsGeneratingObjectives] = useState(false);
+  const [isGeneratingRequirements, setIsGeneratingRequirements] = useState(false);
   const { toast } = useToast();
 
   // Load draft data when editing
@@ -293,6 +295,84 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
       });
     } finally {
       setIsGeneratingSubtitle(false);
+    }
+  };
+
+  const generateObjectives = async () => {
+    if (!formData.title.trim()) {
+      toast({
+        title: "Course title required",
+        description: "Please enter a course title first to generate objectives.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingObjectives(true);
+    try {
+      // Simulate AI generation - in a real app, this would call an AI API
+      await new Promise(resolve => setTimeout(resolve, 1800));
+      
+      const suggestions = [
+        `By the end of this ${formData.title} course, students will be able to:\n• Understand the fundamental concepts and principles\n• Apply practical skills in real-world scenarios\n• Build projects using industry best practices\n• Solve complex problems independently\n• Demonstrate mastery through hands-on exercises`,
+        `Upon completion of this ${formData.title} course, learners will:\n• Master the core concepts and methodologies\n• Develop practical skills through hands-on projects\n• Analyze and solve problems using professional techniques\n• Create original work demonstrating their understanding\n• Confidently apply knowledge in professional settings`,
+        `This ${formData.title} course will enable students to:\n• Gain comprehensive understanding of key principles\n• Implement solutions using modern tools and techniques\n• Design and develop professional-quality projects\n• Evaluate and optimize their work for best results\n• Prepare for advanced studies or career opportunities`
+      ];
+      
+      const randomObjectives = suggestions[Math.floor(Math.random() * suggestions.length)];
+      updateFormData('objectives', randomObjectives);
+      
+      toast({
+        title: "Objectives generated!",
+        description: "AI has generated course objectives based on your title. Feel free to edit them as needed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Failed to generate objectives. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingObjectives(false);
+    }
+  };
+
+  const generateRequirements = async () => {
+    if (!formData.title.trim()) {
+      toast({
+        title: "Course title required",
+        description: "Please enter a course title first to generate requirements.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingRequirements(true);
+    try {
+      // Simulate AI generation - in a real app, this would call an AI API
+      await new Promise(resolve => setTimeout(resolve, 1600));
+      
+      const suggestions = [
+        `To succeed in this ${formData.title} course, students should have:\n• Basic computer literacy and internet access\n• Willingness to learn and practice regularly\n• No prior experience required - we'll start from the basics\n• Access to a computer or laptop for hands-on exercises\n• Commitment to complete assignments and projects`,
+        `Prerequisites for this ${formData.title} course:\n• Fundamental computer skills and web browsing\n• Enthusiasm for learning new skills\n• Access to necessary software (guidance provided)\n• Time commitment of 3-5 hours per week\n• Open mindset and willingness to ask questions`,
+        `Before starting this ${formData.title} course, ensure you have:\n• Basic familiarity with technology and computers\n• Reliable internet connection for online content\n• Dedication to practice and apply what you learn\n• Access to recommended tools and resources\n• Beginner-friendly approach - suitable for all levels`
+      ];
+      
+      const randomRequirements = suggestions[Math.floor(Math.random() * suggestions.length)];
+      updateFormData('requirements', randomRequirements);
+      
+      toast({
+        title: "Requirements generated!",
+        description: "AI has generated course requirements based on your title. Feel free to edit them as needed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Failed to generate requirements. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingRequirements(false);
     }
   };
 
@@ -784,7 +864,31 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="objectives">Course Objectives</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="objectives">Course Objectives</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={generateObjectives}
+                  disabled={!formData.title.trim() || isGeneratingObjectives}
+                  className="text-xs"
+                >
+                  {isGeneratingObjectives ? (
+                    <>
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      AI Generate
+                    </>
+                  )}
+                </Button>
+              </div>
               <Textarea
                 id="objectives"
                 value={formData.objectives}
@@ -795,7 +899,31 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="requirements">Requirements</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="requirements">Requirements</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={generateRequirements}
+                  disabled={!formData.title.trim() || isGeneratingRequirements}
+                  className="text-xs"
+                >
+                  {isGeneratingRequirements ? (
+                    <>
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      AI Generate
+                    </>
+                  )}
+                </Button>
+              </div>
               <Textarea
                 id="requirements"
                 value={formData.requirements}
