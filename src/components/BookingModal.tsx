@@ -16,12 +16,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
 import { saveDraft, updateDraft } from '@/utils/draftStorage';
+import { publishCourse, updatePublishedCourse } from '@/utils/publishedStorage';
 import { DraftCourse } from '@/types/draft';
+import { PublishedCourse } from '@/types/published';
 
 interface BookingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingDraft?: DraftCourse | null;
+  editingPublished?: PublishedCourse | null;
 }
 
 interface ProcessedImage {
@@ -131,7 +134,7 @@ const calculateSessionDuration = (startTime: string, endTime: string): string =>
   }
 };
 
-export function BookingModal({ open, onOpenChange, editingDraft = null }: BookingModalProps) {
+export function BookingModal({ open, onOpenChange, editingDraft = null, editingPublished = null }: BookingModalProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [cropModalOpen, setCropModalOpen] = useState(false);
@@ -163,7 +166,9 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
   
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isEditingDraft, setIsEditingDraft] = useState(false);
+  const [isEditingPublished, setIsEditingPublished] = useState(false);
   const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
+  const [currentPublishedId, setCurrentPublishedId] = useState<string | null>(null);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [isGeneratingSubtitle, setIsGeneratingSubtitle] = useState(false);
   const [isGeneratingObjectives, setIsGeneratingObjectives] = useState(false);
@@ -174,19 +179,35 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
   const [isGeneratingModuleSubsections, setIsGeneratingModuleSubsections] = useState(false);
   const { toast } = useToast();
 
-  // Load draft data when editing
+  // Load draft or published course data when editing
   useEffect(() => {
     if (editingDraft && open) {
       setFormData(editingDraft);
       setIsEditingDraft(true);
+      setIsEditingPublished(false);
       setCurrentDraftId(editingDraft.id);
+      setCurrentPublishedId(null);
       setCurrentStep(1);
-    } else if (open && !editingDraft) {
+    } else if (editingPublished && open) {
+      // Convert published course to form data format
+      const publishedAsFormData = {
+        ...editingPublished,
+        // Remove published-specific fields that aren't in FormData
+      };
+      setFormData(publishedAsFormData);
+      setIsEditingDraft(false);
+      setIsEditingPublished(true);
+      setCurrentDraftId(null);
+      setCurrentPublishedId(editingPublished.id);
+      setCurrentStep(1);
+    } else if (open && !editingDraft && !editingPublished) {
       // Reset when creating new course
       setIsEditingDraft(false);
+      setIsEditingPublished(false);
       setCurrentDraftId(null);
+      setCurrentPublishedId(null);
     }
-  }, [editingDraft, open]);
+  }, [editingDraft, editingPublished, open]);
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -194,7 +215,9 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
     setCrop(undefined);
     setCurrentImageToCrop(null);
     setIsEditingDraft(false);
+    setIsEditingPublished(false);
     setCurrentDraftId(null);
+    setCurrentPublishedId(null);
   };
 
   const handleCloseModal = () => {
@@ -885,34 +908,8 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
   };
 
   const handleSubmit = () => {
-    toast({
-      title: isEditingDraft ? "Course Published Successfully!" : "Course Created Successfully!",
-      description: isEditingDraft ? "Your course has been published for review." : "Your course has been submitted for review.",
-    });
-    onOpenChange(false);
-    setCurrentStep(1);
-    setFormData({
-      title: '',
-      subtitle: '',
-      description: '',
-      objectives: '',
-      requirements: '',
-      level: '',
-      language: '',
-      category: '',
-      subcategory: '',
-      durationHours: '',
-      durationMinutes: '',
-      modules: [{ title: '', subsections: [] }],
-      format: '',
-      sessionTypes: [],
-      classroomSessions: [],
-      oneOnOneSessions: [],
-      images: [],
-      videos: [],
-    });
-    setIsEditingDraft(false);
-    setCurrentDraftId(null);
+    // Use the publish course function instead of just showing a toast
+    handlePublishCourse();
   };
 
   const handleSaveAsDraft = () => {
@@ -965,6 +962,59 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
       toast({
         title: "Error Saving Draft",
         description: "There was an error saving your draft. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePublishCourse = () => {
+    try {
+      const courseData = {
+        title: formData.title,
+        subtitle: formData.subtitle,
+        description: formData.description,
+        objectives: formData.objectives,
+        requirements: formData.requirements,
+        level: formData.level,
+        language: formData.language,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        durationHours: formData.durationHours,
+        durationMinutes: formData.durationMinutes,
+        modules: formData.modules,
+        format: formData.format,
+        sessionTypes: formData.sessionTypes,
+        classroomSessions: formData.classroomSessions,
+        oneOnOneSessions: formData.oneOnOneSessions,
+        images: formData.images,
+        videos: formData.videos,
+      };
+
+      if (isEditingPublished && currentPublishedId) {
+        // Update existing published course
+        const updatedCourse = updatePublishedCourse(currentPublishedId, courseData);
+        if (updatedCourse) {
+          toast({
+            title: "Course Updated",
+            description: "Your published course has been updated successfully.",
+          });
+        }
+      } else {
+        // Publish new course
+        const publishedCourse = publishCourse(courseData);
+        toast({
+          title: "Course Published",
+          description: "Your course has been published successfully and is now live!",
+        });
+      }
+      
+      // Close the modal after publishing
+      onOpenChange(false);
+      resetForm();
+    } catch (error) {
+      toast({
+        title: "Error Publishing Course",
+        description: "There was an error publishing your course. Please try again.",
         variant: "destructive",
       });
     }
@@ -2260,13 +2310,15 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
           </Button>
           
           <div className="flex gap-3">
-            <Button 
-              onClick={handleSaveAsDraft}
-              variant="outline"
-              className="transition-all duration-200"
-            >
-              {isEditingDraft ? 'Update Draft' : 'Save as Draft'}
-            </Button>
+            {!isEditingPublished && (
+              <Button 
+                onClick={handleSaveAsDraft}
+                variant="outline"
+                className="transition-all duration-200"
+              >
+                {isEditingDraft ? 'Update Draft' : 'Save as Draft'}
+              </Button>
+            )}
             
             {currentStep < 5 ? (
               <Button 
@@ -2281,7 +2333,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null }: Bookin
                 onClick={handleSubmit}
                 className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90 transition-all duration-200"
               >
-                {isEditingDraft ? 'Publish Course' : 'Create Course'}
+                {isEditingPublished ? 'Update Course' : isEditingDraft ? 'Publish Course' : 'Publish Course'}
               </Button>
             )}
           </div>

@@ -1,18 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, BookOpen, Users, TrendingUp, Star } from "lucide-react";
 import { BookingModal } from "@/components/BookingModal";
 import { DraftsList } from "@/components/DraftsList";
+import PublishedCoursesList from "@/components/PublishedCoursesList";
 import { DraftCourse } from "@/types/draft";
+import { PublishedCourse } from "@/types/published";
+import { createSamplePublishedCourses } from "@/utils/sampleData";
 
 const Index = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDraft, setEditingDraft] = useState<DraftCourse | null>(null);
+  const [editingPublished, setEditingPublished] = useState<PublishedCourse | null>(null);
+
+  // Create sample published courses on first load
+  useEffect(() => {
+    createSamplePublishedCourses();
+  }, []);
 
   const handleEditDraft = (draft: DraftCourse) => {
     setEditingDraft(draft);
+    setEditingPublished(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditPublished = (course: PublishedCourse) => {
+    setEditingPublished(course);
+    setEditingDraft(null);
     setIsModalOpen(true);
   };
 
@@ -20,11 +36,13 @@ const Index = () => {
     setIsModalOpen(open);
     if (!open) {
       setEditingDraft(null);
+      setEditingPublished(null);
     }
   };
 
   const handleCreateNew = () => {
     setEditingDraft(null);
+    setEditingPublished(null);
     setIsModalOpen(true);
   };
 
@@ -156,17 +174,7 @@ const Index = () => {
                 New Course
               </Button>
             </div>
-            <Card className="p-8 text-center">
-              <div className="flex flex-col items-center gap-4">
-                <Star className="w-12 h-12 text-muted-foreground" />
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">No Published Courses Yet</h3>
-                  <p className="text-muted-foreground">
-                    Create and publish your first course to see it here.
-                  </p>
-                </div>
-              </div>
-            </Card>
+            <PublishedCoursesList onEditCourse={handleEditPublished} />
           </TabsContent>
         </Tabs>
 
@@ -175,6 +183,7 @@ const Index = () => {
           open={isModalOpen} 
           onOpenChange={handleModalClose}
           editingDraft={editingDraft}
+          editingPublished={editingPublished}
         />
       </div>
     </div>
