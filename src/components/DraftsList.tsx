@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Edit, Trash2, Clock, BookOpen, Users } from 'lucide-react';
+import { 
+  Edit, 
+  Trash2, 
+  Clock, 
+  BookOpen, 
+  Users, 
+  MoreHorizontal,
+  Eye
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getDrafts, deleteDraft } from '@/utils/draftStorage';
 import { DraftCourse } from '@/types/draft';
 import { useToast } from '@/hooks/use-toast';
@@ -61,11 +74,15 @@ export function DraftsList({ onEditDraft }: DraftsListProps) {
   const getTotalDuration = (draft: DraftCourse) => {
     const hours = parseInt(draft.durationHours) || 0;
     const minutes = parseInt(draft.durationMinutes) || 0;
+    const totalMinutes = hours * 60 + minutes;
     
-    if (hours === 0 && minutes === 0) return 'Duration not set';
-    if (hours === 0) return `${minutes} min`;
-    if (minutes === 0) return `${hours} hr`;
-    return `${hours} hr ${minutes} min`;
+    if (totalMinutes === 0) return 'Duration not set';
+    if (totalMinutes >= 60) {
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      return m > 0 ? `${h}h ${m}m` : `${h}h`;
+    }
+    return `${totalMinutes}m`;
   };
 
   if (drafts.length === 0) {
@@ -85,94 +102,76 @@ export function DraftsList({ onEditDraft }: DraftsListProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-foreground">My Course Drafts</h2>
-        <Badge variant="secondary">{drafts.length} draft{drafts.length !== 1 ? 's' : ''}</Badge>
-      </div>
-      
-      <div className="grid gap-4">
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {drafts.map((draft) => (
-          <Card key={draft.id} className="hover:shadow-md transition-shadow duration-200">
-            <CardHeader>
+          <Card key={draft.id} className="hover:shadow-lg transition-shadow duration-200">
+            <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <CardTitle className="text-lg mb-2">
+                  <CardTitle className="text-lg font-semibold line-clamp-2 mb-1">
                     {draft.title || 'Untitled Course'}
                   </CardTitle>
-                  {draft.subtitle && (
-                    <p className="text-sm text-muted-foreground mb-2">{draft.subtitle}</p>
-                  )}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {draft.level && (
-                      <Badge variant="outline">{draft.level}</Badge>
-                    )}
-                    {draft.category && (
-                      <Badge variant="outline">{draft.category}</Badge>
-                    )}
-                    {draft.language && (
-                      <Badge variant="outline">{draft.language}</Badge>
-                    )}
-                  </div>
+                  <CardDescription className="line-clamp-2">
+                    {draft.subtitle || 'No subtitle provided'}
+                  </CardDescription>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => onEditDraft(draft)}
-                    size="sm"
-                    variant="outline"
-                    className="shrink-0"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteDraft(draft.id)}
-                    size="sm"
-                    variant="outline"
-                    className="shrink-0 text-destructive hover:text-destructive-foreground hover:bg-destructive"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onEditDraft(draft)}>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Details
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleDeleteDraft(draft.id)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+                  Draft
+                </Badge>
+                {draft.level && (
+                  <Badge variant="outline">
+                    {draft.level}
+                  </Badge>
+                )}
               </div>
             </CardHeader>
-            
-            <CardContent>
+            <CardContent className="pt-0">
               <div className="space-y-3">
-                {draft.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {draft.description}
-                  </p>
-                )}
-                
-                <Separator />
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-muted-foreground" />
-                    <span>{getTotalDuration(draft)}</span>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {getTotalDuration(draft)}
                   </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-muted-foreground" />
-                    <span>{draft.modules.length} module{draft.modules.length !== 1 ? 's' : ''}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                    <span>
-                      {draft.sessionTypes.length === 0 
-                        ? 'No sessions' 
-                        : draft.sessionTypes.join(', ')}
-                    </span>
+                  <div className="flex items-center gap-1">
+                    <BookOpen className="w-4 h-4" />
+                    {draft.modules.length} modules
                   </div>
                 </div>
                 
-                <Separator />
-                
-                <div className="flex justify-between items-center text-xs text-muted-foreground">
-                  <span>Created: {formatDate(draft.createdAt)}</span>
-                  <span>Updated: {formatDate(draft.updatedAt)}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    {draft.category || 'No category'}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    Updated: {formatDate(draft.updatedAt)}
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -197,6 +196,6 @@ export function DraftsList({ onEditDraft }: DraftsListProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }
