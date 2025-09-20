@@ -2295,7 +2295,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
           <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
             Create New Course
           </DialogTitle>
-          <StepIndicator />
+          
         </DialogHeader>
 
         <div className="flex-1 overflow-auto">
