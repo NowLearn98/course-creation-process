@@ -1029,21 +1029,26 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
         
         return (
           <React.Fragment key={step.id}>
-            <div className="flex flex-col items-center">
+            <button
+              onClick={() => setCurrentStep(step.id)}
+              className="flex flex-col items-center group transition-transform hover:scale-105"
+            >
               <div
                 className={`
-                  w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300
-                  ${isCompleted ? 'bg-primary text-primary-foreground shadow-lg' : 
+                  w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer
+                  ${isCompleted ? 'bg-primary text-primary-foreground shadow-lg group-hover:shadow-xl' : 
                     isCurrent ? 'bg-primary text-primary-foreground shadow-lg scale-110' : 
-                    'bg-muted text-muted-foreground'}
+                    'bg-muted text-muted-foreground group-hover:bg-muted/80'}
                 `}
               >
                 {isCompleted ? <CheckCircle className="w-5 h-5" /> : <StepIcon className="w-5 h-5" />}
               </div>
-              <p className={`text-xs mt-2 font-medium ${isCurrent ? 'text-primary' : 'text-muted-foreground'}`}>
+              <p className={`text-xs mt-2 font-medium transition-colors ${
+                isCurrent ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
+              }`}>
                 {step.title}
               </p>
-            </div>
+            </button>
             {index < steps.length - 1 && (
               <div className={`w-16 h-px mx-4 transition-colors duration-300 ${
                 step.id < currentStep ? 'bg-primary' : 'bg-border'
