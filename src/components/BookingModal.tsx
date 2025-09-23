@@ -52,7 +52,6 @@ interface ClassroomSession {
   endDate: string;
   startTime: string;
   endTime: string;
-  recurring: boolean;
   price?: number;
 }
 
@@ -806,7 +805,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       endDate: '',
       startTime: '',
       endTime: '',
-      recurring: false,
       price: undefined
     };
     setFormData(prev => ({ 
@@ -869,7 +867,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
           endDate: '',
           startTime: '',
           endTime: '',
-          recurring: false
         }];
       } else if (type === 'oneOnOne') {
         newOneOnOneSessions = [...formData.oneOnOneSessions, {
@@ -1649,15 +1646,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                           step="0.01"
                         />
                       </div>
-
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`classroom-recurring-${index}`}
-                          checked={session.recurring}
-                          onCheckedChange={(checked) => updateClassroomSession(index, 'recurring', checked)}
-                        />
-                        <Label htmlFor={`classroom-recurring-${index}`}>Recurring every week</Label>
-                      </div>
                     </div>
                   </Card>
                 ))}
@@ -1883,15 +1871,9 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                             
                             if (classroomSession?.startDate) {
                               const startDate = new Date(classroomSession.startDate);
-                              if (classroomSession.recurring) {
-                                // For recurring sessions, only check if the day is after the start date
-                                isAfterClassroomStart = dayDate >= startDate;
-                              } else {
-                                // For non-recurring sessions, only show in the start month
-                                isAfterClassroomStart = dayDate >= startDate && 
-                                  dayDate.getMonth() === startDate.getMonth() && 
-                                  dayDate.getFullYear() === startDate.getFullYear();
-                              }
+                              const endDate = classroomSession.endDate ? new Date(classroomSession.endDate) : startDate;
+                              // Show sessions only within the course date range
+                              isAfterClassroomStart = dayDate >= startDate && dayDate <= endDate;
                             }
                             
                             if (oneOnOneSession?.startDate) {
@@ -1976,7 +1958,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                       {formData.sessionTypes.includes('classroom') && formData.classroomSessions[0] && (
                         <div>
                           <h6 className="text-sm font-medium text-foreground mb-2">
-                            Classroom Sessions {formData.classroomSessions[0].recurring && <span className="text-primary">♻ Recurring</span>}
+                            Classroom Sessions
                           </h6>
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                             <div className="text-center">
@@ -2247,7 +2229,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                         {formData.classroomSessions[0].startTime && formData.classroomSessions[0].endTime && (
                           <p><span className="font-medium">Time:</span> {formData.classroomSessions[0].startTime} - {formData.classroomSessions[0].endTime}</p>
                         )}
-                        <p><span className="font-medium">Recurring:</span> {formData.classroomSessions[0].recurring ? 'Yes' : 'No'}</p>
                       </div>
                     </div>
                   )}

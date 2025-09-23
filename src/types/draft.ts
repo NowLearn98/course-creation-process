@@ -39,7 +39,6 @@ export interface ClassroomSession {
   endDate: string;
   startTime: string;
   endTime: string;
-  recurring: boolean;
   price?: number; // Total price for the entire course
 }
 
