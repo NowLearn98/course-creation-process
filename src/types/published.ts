@@ -44,6 +44,7 @@ export interface ClassroomSession {
   endTime: string;
   daysOfWeek: string[];
   recurring: boolean;
+  price?: number; // Total price for the entire course
 }
 
 export interface OneOnOneSession {
@@ -52,6 +53,8 @@ export interface OneOnOneSession {
   startTime: string;
   endTime: string;
   recurring: boolean;
+  pricePerInterval?: number; // Price per time interval
+  intervalMinutes?: number; // 30, 60, 90, 120 minutes etc.
 }
 
 export interface ProcessedImage {

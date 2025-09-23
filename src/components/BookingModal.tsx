@@ -53,6 +53,7 @@ interface ClassroomSession {
   endTime: string;
   daysOfWeek: string[];
   recurring: boolean;
+  price?: number;
 }
 
 interface OneOnOneSession {
@@ -61,6 +62,8 @@ interface OneOnOneSession {
   startTime: string;
   endTime: string;
   recurring: boolean;
+  pricePerInterval?: number;
+  intervalMinutes?: number;
 }
 
 interface FormData {
@@ -803,7 +806,8 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       startTime: '',
       endTime: '',
       daysOfWeek: [],
-      recurring: false
+      recurring: false,
+      price: undefined
     };
     setFormData(prev => ({ 
       ...prev, 
@@ -828,7 +832,9 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       daysOfWeek: [],
       startTime: '',
       endTime: '',
-      recurring: false
+      recurring: false,
+      pricePerInterval: undefined,
+      intervalMinutes: 60
     };
     setFormData(prev => ({ 
       ...prev, 
@@ -1643,6 +1649,18 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                         </div>
                       </div>
 
+                      <div className="space-y-2">
+                        <Label>Course Price (Total for entire course period)</Label>
+                        <Input
+                          type="number"
+                          value={session.price || ''}
+                          onChange={(e) => updateClassroomSession(index, 'price', e.target.value ? parseFloat(e.target.value) : undefined)}
+                          placeholder="Enter total course price"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           id={`classroom-recurring-${index}`}
@@ -1736,6 +1754,39 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                             </span>
                           </div>
                         )}
+                       </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Time Interval</Label>
+                          <Select
+                            value={session.intervalMinutes?.toString() || '60'}
+                            onValueChange={(value) => updateOneOnOneSession(index, 'intervalMinutes', parseInt(value))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select interval" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="30">30 minutes</SelectItem>
+                              <SelectItem value="60">1 hour</SelectItem>
+                              <SelectItem value="90">1 hour 30 minutes</SelectItem>
+                              <SelectItem value="120">2 hours</SelectItem>
+                              <SelectItem value="150">2 hours 30 minutes</SelectItem>
+                              <SelectItem value="180">3 hours</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Price per {session.intervalMinutes ? `${session.intervalMinutes} minute${session.intervalMinutes > 1 ? 's' : ''}` : 'interval'}</Label>
+                          <Input
+                            type="number"
+                            value={session.pricePerInterval || ''}
+                            onChange={(e) => updateOneOnOneSession(index, 'pricePerInterval', e.target.value ? parseFloat(e.target.value) : undefined)}
+                            placeholder="Enter price per interval"
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
                       </div>
 
                       <div className="flex items-center space-x-2">
