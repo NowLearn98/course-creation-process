@@ -72,9 +72,9 @@ export const createSamplePublishedCourses = () => {
       classroomSessions: [
         {
           startDate: "2024-12-01",
+          endDate: "2024-12-15",
           startTime: "10:00",
           endTime: "12:00",
-          daysOfWeek: ["Monday", "Wednesday"],
           recurring: true
         }
       ],

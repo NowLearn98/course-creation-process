@@ -36,9 +36,9 @@ export interface SubSection {
 
 export interface ClassroomSession {
   startDate: string;
+  endDate: string;
   startTime: string;
   endTime: string;
-  daysOfWeek: string[];
   recurring: boolean;
   price?: number; // Total price for the entire course
 }

@@ -49,9 +49,9 @@ interface Module {
 
 interface ClassroomSession {
   startDate: string;
+  endDate: string;
   startTime: string;
   endTime: string;
-  daysOfWeek: string[];
   recurring: boolean;
   price?: number;
 }
@@ -803,9 +803,9 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
   const addClassroomSession = () => {
     const newSession: ClassroomSession = {
       startDate: '',
+      endDate: '',
       startTime: '',
       endTime: '',
-      daysOfWeek: [],
       recurring: false,
       price: undefined
     };
@@ -866,9 +866,9 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       if (type === 'classroom') {
         newClassroomSessions = [...formData.classroomSessions, {
           startDate: '',
+          endDate: '',
           startTime: '',
           endTime: '',
-          daysOfWeek: [],
           recurring: false
         }];
       } else if (type === 'oneOnOne') {
@@ -898,13 +898,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
   };
 
   const toggleDayOfWeek = (sessionType: 'classroom' | 'oneOnOne', sessionIndex: number, day: string) => {
-    if (sessionType === 'classroom') {
-      const session = formData.classroomSessions[sessionIndex];
-      const newDays = session.daysOfWeek.includes(day)
-        ? session.daysOfWeek.filter(d => d !== day)
-        : [...session.daysOfWeek, day];
-      updateClassroomSession(sessionIndex, 'daysOfWeek', newDays);
-    } else {
+    if (sessionType === 'oneOnOne') {
       const session = formData.oneOnOneSessions[sessionIndex];
       const newDays = session.daysOfWeek.includes(day)
         ? session.daysOfWeek.filter(d => d !== day)
@@ -1594,14 +1588,25 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                       </div>
                       
                       <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label>Start Date</Label>
-                          <Input
-                            type="date"
-                            value={session.startDate}
-                            onChange={(e) => updateClassroomSession(index, 'startDate', e.target.value)}
-                            min={new Date().toISOString().split('T')[0]}
-                          />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Start Date</Label>
+                            <Input
+                              type="date"
+                              value={session.startDate}
+                              onChange={(e) => updateClassroomSession(index, 'startDate', e.target.value)}
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>End Date</Label>
+                            <Input
+                              type="date"
+                              value={session.endDate}
+                              onChange={(e) => updateClassroomSession(index, 'endDate', e.target.value)}
+                              min={session.startDate || new Date().toISOString().split('T')[0]}
+                            />
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1631,22 +1636,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                             </span>
                           </div>
                         )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Days of the Week</Label>
-                        <div className="flex flex-wrap gap-2">
-                          {daysOfWeek.map((day) => (
-                            <Badge
-                              key={day}
-                              variant={session.daysOfWeek.includes(day) ? "default" : "outline"}
-                              className="cursor-pointer"
-                              onClick={() => toggleDayOfWeek('classroom', index, day)}
-                            >
-                              {day.slice(0, 3)}
-                            </Badge>
-                          ))}
-                        </div>
                       </div>
 
                       <div className="space-y-2">
@@ -1804,8 +1793,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
             )}
 
             {/* Calendar Preview - Always at the bottom */}
-            {((formData.sessionTypes.includes('classroom') && formData.classroomSessions.length > 0 && formData.classroomSessions[0].daysOfWeek.length > 0) ||
-              (formData.sessionTypes.includes('oneOnOne') && formData.oneOnOneSessions.length > 0 && formData.oneOnOneSessions[0].daysOfWeek.length > 0)) && (
+            {(formData.sessionTypes.includes('oneOnOne') && formData.oneOnOneSessions.length > 0 && formData.oneOnOneSessions[0].daysOfWeek.length > 0) && (
               <div className="space-y-4 mt-8">
                 <h5 className="text-sm font-medium text-foreground text-center">Session Preview</h5>
                 <div className="flex justify-center">
@@ -1884,8 +1872,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                             );
                             const dayName = dayDate.toLocaleDateString('en-US', { weekday: 'long' });
                             
-                            // Check both session types with recurring logic
-                            const isClassroomDay = classroomSession?.daysOfWeek.includes(dayName);
+                            // Check one-on-one session days
                             const isOneOnOneDay = oneOnOneSession?.daysOfWeek.includes(dayName);
                             const isToday = dayDate.toDateString() === new Date().toDateString();
                             const isPastDate = dayDate < new Date(new Date().setHours(0, 0, 0, 0));
@@ -1939,28 +1926,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                                 
                                 {/* Session Blocks */}
                                 <div className="absolute inset-1 top-6 flex flex-col gap-1">
-                                  {/* Classroom Session Block */}
-                                  {isClassroomDay && calendarDay.isCurrentMonth && !isPastDate && isAfterClassroomStart && (
-                                    <div className="flex-1">
-                                      {classroomSession.startTime && classroomSession.endTime ? (
-                                        <div className="bg-primary text-primary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
-                                          <div className="text-xs font-medium leading-tight">
-                                            Classroom{classroomSession.recurring ? ' ♻' : ''}
-                                          </div>
-                                          <div className="text-xs opacity-90 leading-tight">
-                                            {classroomSession.startTime.slice(0, 5)} - {classroomSession.endTime.slice(0, 5)}
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <div className="bg-accent border border-dashed border-primary rounded-sm p-1 h-full flex items-center justify-center">
-                                          <div className="text-xs text-muted-foreground text-center leading-tight">
-                                            Classroom{classroomSession.recurring ? ' ♻' : ''}
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                  
                                   {/* 1-on-1 Session Block */}
                                   {isOneOnOneDay && calendarDay.isCurrentMonth && !isPastDate && isAfterOneOnOneStart && (
                                     <div className="flex-1">
@@ -2019,8 +1984,8 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                               <div className="font-medium">{formData.classroomSessions[0].startDate || 'Not set'}</div>
                             </div>
                             <div className="text-center">
-                              <div className="text-muted-foreground">Selected Days</div>
-                              <div className="font-medium">{formData.classroomSessions[0].daysOfWeek.join(', ')}</div>
+                              <div className="text-muted-foreground">Session Period</div>
+                              <div className="font-medium">{formData.classroomSessions[0].startDate} - {formData.classroomSessions[0].endDate}</div>
                             </div>
                             {formData.classroomSessions[0].startTime && formData.classroomSessions[0].endTime && (
                               <>
@@ -2278,7 +2243,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                       <p className="font-medium text-primary mb-1">Classroom Session Details:</p>
                       <div className="space-y-1">
                         <p><span className="font-medium">Start Date:</span> {formData.classroomSessions[0].startDate || 'Not set'}</p>
-                        <p><span className="font-medium">Days:</span> {formData.classroomSessions[0].daysOfWeek.join(', ') || 'None selected'}</p>
+                        <p><span className="font-medium">End Date:</span> {formData.classroomSessions[0].endDate || 'Not set'}</p>
                         {formData.classroomSessions[0].startTime && formData.classroomSessions[0].endTime && (
                           <p><span className="font-medium">Time:</span> {formData.classroomSessions[0].startTime} - {formData.classroomSessions[0].endTime}</p>
                         )}
