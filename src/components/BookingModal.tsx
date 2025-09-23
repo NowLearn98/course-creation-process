@@ -52,6 +52,8 @@ interface ClassroomSession {
   endDate: string;
   startTime: string;
   endTime: string;
+  timezone: string;
+  seatCapacity: number;
   price?: number;
 }
 
@@ -805,6 +807,8 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       endDate: '',
       startTime: '',
       endTime: '',
+      timezone: 'UTC',
+      seatCapacity: 20,
       price: undefined
     };
     setFormData(prev => ({ 
@@ -867,6 +871,8 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
           endDate: '',
           startTime: '',
           endTime: '',
+          timezone: 'UTC',
+          seatCapacity: 20,
         }];
       } else if (type === 'oneOnOne') {
         newOneOnOneSessions = [...formData.oneOnOneSessions, {
@@ -1635,6 +1641,44 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                         )}
                       </div>
 
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Timezone</Label>
+                          <Select
+                            value={session.timezone}
+                            onValueChange={(value) => updateClassroomSession(index, 'timezone', value)}
+                          >
+                            <SelectTrigger className="bg-background">
+                              <SelectValue placeholder="Select timezone" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-popover border shadow-md z-50">
+                              <SelectItem value="UTC">UTC (Coordinated Universal Time)</SelectItem>
+                              <SelectItem value="America/New_York">EST (Eastern Time)</SelectItem>
+                              <SelectItem value="America/Chicago">CST (Central Time)</SelectItem>
+                              <SelectItem value="America/Denver">MST (Mountain Time)</SelectItem>
+                              <SelectItem value="America/Los_Angeles">PST (Pacific Time)</SelectItem>
+                              <SelectItem value="Europe/London">GMT (Greenwich Mean Time)</SelectItem>
+                              <SelectItem value="Europe/Paris">CET (Central European Time)</SelectItem>
+                              <SelectItem value="Asia/Tokyo">JST (Japan Standard Time)</SelectItem>
+                              <SelectItem value="Asia/Shanghai">CST (China Standard Time)</SelectItem>
+                              <SelectItem value="Asia/Kolkata">IST (India Standard Time)</SelectItem>
+                              <SelectItem value="Australia/Sydney">AEST (Australian Eastern Time)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Seat Capacity</Label>
+                          <Input
+                            type="number"
+                            value={session.seatCapacity}
+                            onChange={(e) => updateClassroomSession(index, 'seatCapacity', parseInt(e.target.value) || 1)}
+                            placeholder="Enter seat capacity"
+                            min="1"
+                            max="500"
+                          />
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
                         <Label>Course Price (Total for entire course period)</Label>
                         <Input
@@ -1969,6 +2013,14 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                               <div className="text-muted-foreground">Session Period</div>
                               <div className="font-medium">{formData.classroomSessions[0].startDate} - {formData.classroomSessions[0].endDate}</div>
                             </div>
+                            <div className="text-center">
+                              <div className="text-muted-foreground">Timezone</div>
+                              <div className="font-medium">{formData.classroomSessions[0].timezone || 'Not set'}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-muted-foreground">Seat Capacity</div>
+                              <div className="font-medium">{formData.classroomSessions[0].seatCapacity || 'Not set'} seats</div>
+                            </div>
                             {formData.classroomSessions[0].startTime && formData.classroomSessions[0].endTime && (
                               <>
                                 <div className="text-center">
@@ -2226,6 +2278,8 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                       <div className="space-y-1">
                         <p><span className="font-medium">Start Date:</span> {formData.classroomSessions[0].startDate || 'Not set'}</p>
                         <p><span className="font-medium">End Date:</span> {formData.classroomSessions[0].endDate || 'Not set'}</p>
+                        <p><span className="font-medium">Timezone:</span> {formData.classroomSessions[0].timezone || 'Not set'}</p>
+                        <p><span className="font-medium">Seat Capacity:</span> {formData.classroomSessions[0].seatCapacity || 'Not set'} seats</p>
                         {formData.classroomSessions[0].startTime && formData.classroomSessions[0].endTime && (
                           <p><span className="font-medium">Time:</span> {formData.classroomSessions[0].startTime} - {formData.classroomSessions[0].endTime}</p>
                         )}

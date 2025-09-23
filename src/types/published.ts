@@ -43,6 +43,8 @@ export interface ClassroomSession {
   endDate: string;
   startTime: string;
   endTime: string;
+  timezone: string;
+  seatCapacity: number;
   price?: number; // Total price for the entire course
 }
 
