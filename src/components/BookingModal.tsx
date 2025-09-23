@@ -59,6 +59,7 @@ interface ClassroomSession {
 
 interface OneOnOneSession {
   startDate: string;
+  endDate: string;
   daysOfWeek: string[];
   startTime: string;
   endTime: string;
@@ -830,6 +831,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
   const addOneOnOneSession = () => {
     const newSession: OneOnOneSession = {
       startDate: '',
+      endDate: '',
       daysOfWeek: [],
       startTime: '',
       endTime: '',
@@ -875,6 +877,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       } else if (type === 'oneOnOne') {
         newOneOnOneSessions = [...formData.oneOnOneSessions, {
           startDate: '',
+          endDate: '',
           daysOfWeek: [],
           startTime: '',
           endTime: ''
@@ -1723,14 +1726,25 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                       </div>
                       
                       <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label>Start Date</Label>
-                          <Input
-                            type="date"
-                            value={session.startDate}
-                            onChange={(e) => updateOneOnOneSession(index, 'startDate', e.target.value)}
-                            min={new Date().toISOString().split('T')[0]}
-                          />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Start Date</Label>
+                            <Input
+                              type="date"
+                              value={session.startDate}
+                              onChange={(e) => updateOneOnOneSession(index, 'startDate', e.target.value)}
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>End Date</Label>
+                            <Input
+                              type="date"
+                              value={session.endDate}
+                              onChange={(e) => updateOneOnOneSession(index, 'endDate', e.target.value)}
+                              min={session.startDate || new Date().toISOString().split('T')[0]}
+                            />
+                          </div>
                         </div>
 
                         <div className="space-y-2">
@@ -1915,10 +1929,9 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                             
                             if (oneOnOneSession?.startDate) {
                               const startDate = new Date(oneOnOneSession.startDate);
-                              // Only show in the start month
-                              isAfterOneOnOneStart = dayDate >= startDate && 
-                                dayDate.getMonth() === startDate.getMonth() && 
-                                dayDate.getFullYear() === startDate.getFullYear();
+                              const endDate = oneOnOneSession.endDate ? new Date(oneOnOneSession.endDate) : startDate;
+                              // Show sessions only within the course date range
+                              isAfterOneOnOneStart = dayDate >= startDate && dayDate <= endDate;
                             }
                             
                             return (
@@ -2281,6 +2294,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                       <p className="font-medium text-emerald-600 mb-1">1-on-1 Session Details:</p>
                       <div className="space-y-1">
                         <p><span className="font-medium">Start Date:</span> {formData.oneOnOneSessions[0].startDate || 'Not set'}</p>
+                        <p><span className="font-medium">End Date:</span> {formData.oneOnOneSessions[0].endDate || 'Not set'}</p>
                         <p><span className="font-medium">Available Days:</span> {formData.oneOnOneSessions[0].daysOfWeek.join(', ') || 'None selected'}</p>
                         {formData.oneOnOneSessions[0].startTime && formData.oneOnOneSessions[0].endTime && (
                           <p><span className="font-medium">Time:</span> {formData.oneOnOneSessions[0].startTime} - {formData.oneOnOneSessions[0].endTime}</p>

@@ -46,6 +46,7 @@ export interface ClassroomSession {
 
 export interface OneOnOneSession {
   startDate: string;
+  endDate: string;
   daysOfWeek: string[];
   startTime: string;
   endTime: string;
