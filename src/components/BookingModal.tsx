@@ -1573,6 +1573,10 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-lg font-semibold text-foreground">Classroom Sessions</h4>
+                  <Button onClick={addClassroomSession} variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Session
+                  </Button>
                 </div>
                 
                 {formData.classroomSessions.length > 0 && formData.classroomSessions.map((session, index) => (
