@@ -62,7 +62,6 @@ interface OneOnOneSession {
   daysOfWeek: string[];
   startTime: string;
   endTime: string;
-  recurring: boolean;
   pricePerInterval?: number;
   intervalMinutes?: number;
 }
@@ -834,7 +833,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       daysOfWeek: [],
       startTime: '',
       endTime: '',
-      recurring: false,
       pricePerInterval: undefined,
       intervalMinutes: 60
     };
@@ -879,8 +877,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
           startDate: '',
           daysOfWeek: [],
           startTime: '',
-          endTime: '',
-          recurring: false
+          endTime: ''
         }];
       }
     } else {
@@ -1814,14 +1811,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`oneOnOne-recurring-${index}`}
-                          checked={session.recurring}
-                          onCheckedChange={(checked) => updateOneOnOneSession(index, 'recurring', checked)}
-                        />
-                        <Label htmlFor={`oneOnOne-recurring-${index}`}>Recurring</Label>
-                      </div>
                     </div>
                   </Card>
                 ))}
@@ -1913,7 +1902,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                             const isToday = dayDate.toDateString() === new Date().toDateString();
                             const isPastDate = dayDate < new Date(new Date().setHours(0, 0, 0, 0));
                             
-                            // Handle recurring sessions - if recurring is enabled, show sessions even after the calendar month
+                            // Handle sessions - show sessions even after the calendar month
                             let isAfterClassroomStart = true;
                             let isAfterOneOnOneStart = true;
                             
@@ -1926,15 +1915,10 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                             
                             if (oneOnOneSession?.startDate) {
                               const startDate = new Date(oneOnOneSession.startDate);
-                              if (oneOnOneSession.recurring) {
-                                // For recurring sessions, only check if the day is after the start date
-                                isAfterOneOnOneStart = dayDate >= startDate;
-                              } else {
-                                // For non-recurring sessions, only show in the start month
-                                isAfterOneOnOneStart = dayDate >= startDate && 
-                                  dayDate.getMonth() === startDate.getMonth() && 
-                                  dayDate.getFullYear() === startDate.getFullYear();
-                              }
+                              // Only show in the start month
+                              isAfterOneOnOneStart = dayDate >= startDate && 
+                                dayDate.getMonth() === startDate.getMonth() && 
+                                dayDate.getFullYear() === startDate.getFullYear();
                             }
                             
                             return (
@@ -1962,7 +1946,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                                       {oneOnOneSession.startTime && oneOnOneSession.endTime ? (
                                         <div className="bg-emerald-500 text-white rounded-sm p-1 h-full flex flex-col justify-center text-center">
                                           <div className="text-xs font-medium leading-tight">
-                                            1-on-1{oneOnOneSession.recurring ? ' ♻' : ''}
+                                            1-on-1
                                           </div>
                                           <div className="text-xs opacity-90 leading-tight">
                                             {oneOnOneSession.startTime.slice(0, 5)} - {oneOnOneSession.endTime.slice(0, 5)}
@@ -1971,7 +1955,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                                       ) : (
                                         <div className="bg-accent border border-dashed border-emerald-500 rounded-sm p-1 h-full flex items-center justify-center">
                                           <div className="text-xs text-muted-foreground text-center leading-tight">
-                                            1-on-1{oneOnOneSession.recurring ? ' ♻' : ''}
+                                            1-on-1
                                           </div>
                                         </div>
                                       )}
@@ -2044,7 +2028,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                       {formData.sessionTypes.includes('oneOnOne') && formData.oneOnOneSessions[0] && (
                         <div>
                           <h6 className="text-sm font-medium text-foreground mb-2">
-                            1-on-1 Sessions {formData.oneOnOneSessions[0].recurring && <span className="text-emerald-500">♻ Recurring</span>}
+                            1-on-1 Sessions
                           </h6>
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                             <div className="text-center">
@@ -2301,7 +2285,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                         {formData.oneOnOneSessions[0].startTime && formData.oneOnOneSessions[0].endTime && (
                           <p><span className="font-medium">Time:</span> {formData.oneOnOneSessions[0].startTime} - {formData.oneOnOneSessions[0].endTime}</p>
                         )}
-                        <p><span className="font-medium">Recurring:</span> {formData.oneOnOneSessions[0].recurring ? 'Yes' : 'No'}</p>
                       </div>
                     </div>
                   )}

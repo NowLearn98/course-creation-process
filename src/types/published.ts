@@ -53,7 +53,6 @@ export interface OneOnOneSession {
   daysOfWeek: string[];
   startTime: string;
   endTime: string;
-  recurring: boolean;
   pricePerInterval?: number; // Price per time interval
   intervalMinutes?: number; // 30, 60, 90, 120 minutes etc.
 }
