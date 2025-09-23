@@ -1680,7 +1680,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Course Price (Total for entire course period)</Label>
+                        <Label>Course Price</Label>
                         <Input
                           type="number"
                           value={session.price || ''}
