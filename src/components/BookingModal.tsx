@@ -78,8 +78,6 @@ interface FormData {
   language: string;
   category: string;
   subcategory: string;
-  durationHours: string;
-  durationMinutes: string;
   
   // Course Content
   modules: Module[];
@@ -157,8 +155,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
     language: '',
     category: '',
     subcategory: '',
-    durationHours: '',
-    durationMinutes: '',
     modules: [{ title: '', subsections: [] }],
     format: '',
     sessionTypes: [],
@@ -927,8 +923,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
         language: formData.language,
         category: formData.category,
         subcategory: formData.subcategory,
-        durationHours: formData.durationHours,
-        durationMinutes: formData.durationMinutes,
         modules: formData.modules,
         format: formData.format,
         sessionTypes: formData.sessionTypes,
@@ -982,8 +976,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
         language: formData.language,
         category: formData.category,
         subcategory: formData.subcategory,
-        durationHours: formData.durationHours,
-        durationMinutes: formData.durationMinutes,
         modules: formData.modules,
         format: formData.format,
         sessionTypes: formData.sessionTypes,
@@ -1247,36 +1239,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Course Duration</Label>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      type="number"
-                      min="0"
-                      max="999"
-                      value={formData.durationHours}
-                      onChange={(e) => updateFormData('durationHours', e.target.value)}
-                      placeholder="Hours"
-                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                    />
-                    <Label className="text-xs text-muted-foreground mt-1">Hours</Label>
-                  </div>
-                  <div className="flex-1">
-                    <Input
-                      type="number"
-                      min="0"
-                      max="59"
-                      value={formData.durationMinutes}
-                      onChange={(e) => updateFormData('durationMinutes', e.target.value)}
-                      placeholder="Minutes"
-                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                    />
-                    <Label className="text-xs text-muted-foreground mt-1">Minutes</Label>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -2225,11 +2187,6 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                   <p><span className="font-medium">Level:</span> {formData.level || 'Not specified'}</p>
                   <p><span className="font-medium">Language:</span> {formData.language || 'Not specified'}</p>
                   <p><span className="font-medium">Category:</span> {formData.category || 'Not specified'}</p>
-                  <p><span className="font-medium">Duration:</span> {
-                    formData.durationHours || formData.durationMinutes 
-                      ? `${formData.durationHours || '0'} hours ${formData.durationMinutes || '0'} minutes`
-                      : 'Not specified'
-                  }</p>
                 </div>
               </div>
 

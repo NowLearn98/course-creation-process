@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { 
   Star, 
   Users, 
-  Clock, 
   PlayCircle, 
   PauseCircle, 
   Archive, 
@@ -67,19 +66,6 @@ const PublishedCoursesList: React.FC<PublishedCoursesListProps> = ({ onEditCours
       default:
         return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
     }
-  };
-
-  const getTotalDuration = (course: PublishedCourse) => {
-    const hours = parseInt(course.durationHours) || 0;
-    const minutes = parseInt(course.durationMinutes) || 0;
-    const totalMinutes = hours * 60 + minutes;
-    
-    if (totalMinutes >= 60) {
-      const h = Math.floor(totalMinutes / 60);
-      const m = totalMinutes % 60;
-      return m > 0 ? `${h}h ${m}m` : `${h}h`;
-    }
-    return `${totalMinutes}m`;
   };
 
   if (courses.length === 0) {
@@ -168,12 +154,8 @@ const PublishedCoursesList: React.FC<PublishedCoursesListProps> = ({ onEditCours
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {getTotalDuration(course)}
-                </div>
-                <div className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
-                  {course.enrollments}
+                  {course.enrollments} students
                 </div>
               </div>
               

@@ -6,7 +6,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { 
   Edit, 
   Trash2, 
-  Clock, 
   BookOpen, 
   Users, 
   MoreHorizontal,
@@ -69,20 +68,6 @@ export function DraftsList({ onEditDraft }: DraftsListProps) {
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
-
-  const getTotalDuration = (draft: DraftCourse) => {
-    const hours = parseInt(draft.durationHours) || 0;
-    const minutes = parseInt(draft.durationMinutes) || 0;
-    const totalMinutes = hours * 60 + minutes;
-    
-    if (totalMinutes === 0) return 'Duration not set';
-    if (totalMinutes >= 60) {
-      const h = Math.floor(totalMinutes / 60);
-      const m = totalMinutes % 60;
-      return m > 0 ? `${h}h ${m}m` : `${h}h`;
-    }
-    return `${totalMinutes}m`;
   };
 
   if (drafts.length === 0) {
@@ -155,10 +140,6 @@ export function DraftsList({ onEditDraft }: DraftsListProps) {
             <CardContent className="pt-0">
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {getTotalDuration(draft)}
-                  </div>
                   <div className="flex items-center gap-1">
                     <BookOpen className="w-4 h-4" />
                     {draft.modules.length} modules

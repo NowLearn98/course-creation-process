@@ -9,8 +9,6 @@ export interface PublishedCourse {
   language: string;
   category: string;
   subcategory: string;
-  durationHours: string;
-  durationMinutes: string;
   modules: Module[];
   format: string;
   sessionTypes: string[];
