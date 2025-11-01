@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, BookOpen, Users, TrendingUp, Star } from "lucide-react";
 import { BookingModal } from "@/components/BookingModal";
 import { DraftsList } from "@/components/DraftsList";
-import PublishedCoursesList from "@/components/PublishedCoursesList";
+import CourseMetricsOverview from "@/components/CourseMetricsOverview";
 import { DraftCourse } from "@/types/draft";
 import { PublishedCourse } from "@/types/published";
 import { createSamplePublishedCourses } from "@/utils/sampleData";
@@ -155,19 +155,11 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-foreground">Published Courses</h2>
-                  <p className="text-sm text-muted-foreground mt-1">Your active courses and their performance</p>
+                  <p className="text-sm text-muted-foreground mt-1">Track performance metrics for each course</p>
                 </div>
-                <Button 
-                  onClick={handleCreateNew}
-                  size="lg" 
-                  className="shadow-md hover:shadow-lg transition-all duration-300"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  New Course
-                </Button>
               </div>
               
-              <PublishedCoursesList onEditCourse={handleEditPublished} />
+              <CourseMetricsOverview onEditCourse={handleEditPublished} />
             </div>
           </TabsContent>
 

@@ -89,7 +89,21 @@ export const createSamplePublishedCourses = () => {
   const existingCourses = JSON.parse(localStorage.getItem('published_courses') || '[]');
   if (existingCourses.length === 0) {
     sampleCourses.forEach(course => {
-      publishCourse(course);
+      const published = publishCourse(course);
+      // Update sample courses with realistic metrics
+      const updatedCourses = JSON.parse(localStorage.getItem('published_courses') || '[]');
+      const courseIndex = updatedCourses.findIndex((c: any) => c.id === published.id);
+      if (courseIndex !== -1) {
+        updatedCourses[courseIndex] = {
+          ...updatedCourses[courseIndex],
+          enrollments: Math.floor(Math.random() * 500) + 100,
+          clicks: Math.floor(Math.random() * 2000) + 500,
+          rating: parseFloat((Math.random() * 2 + 3).toFixed(1)),
+          reviews: Math.floor(Math.random() * 100) + 20,
+          price: course.title.includes('React') ? 149 : 99
+        };
+        localStorage.setItem('published_courses', JSON.stringify(updatedCourses));
+      }
     });
   }
 };

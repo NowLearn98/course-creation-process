@@ -21,6 +21,7 @@ export interface PublishedCourse {
   rating: number;
   reviews: number;
   price: number;
+  clicks: number;
   status: 'active' | 'paused' | 'archived';
 }
 

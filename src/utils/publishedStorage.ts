@@ -2,7 +2,7 @@ import { PublishedCourse } from '@/types/published';
 
 const PUBLISHED_STORAGE_KEY = 'published_courses';
 
-export const publishCourse = (course: Omit<PublishedCourse, 'id' | 'publishedAt' | 'enrollments' | 'rating' | 'reviews' | 'price' | 'status'>): PublishedCourse => {
+export const publishCourse = (course: Omit<PublishedCourse, 'id' | 'publishedAt' | 'enrollments' | 'rating' | 'reviews' | 'price' | 'clicks' | 'status'>): PublishedCourse => {
   const courses = getPublishedCourses();
   const now = new Date().toISOString();
   
@@ -14,6 +14,7 @@ export const publishCourse = (course: Omit<PublishedCourse, 'id' | 'publishedAt'
     rating: 0,
     reviews: 0,
     price: 99, // Default price
+    clicks: 0,
     status: 'active',
   };
 
