@@ -242,18 +242,18 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                         <Line 
                           type="monotone" 
                           dataKey="clicks" 
-                          stroke="hsl(var(--accent))" 
+                          stroke="hsl(var(--chart-1))" 
                           strokeWidth={2}
                           name="Clicks"
-                          dot={{ fill: 'hsl(var(--accent))' }}
+                          dot={{ fill: 'hsl(var(--chart-1))' }}
                         />
                         <Line 
                           type="monotone" 
                           dataKey="bookings" 
-                          stroke="hsl(var(--primary))" 
+                          stroke="hsl(var(--chart-2))" 
                           strokeWidth={2}
                           name="Bookings"
-                          dot={{ fill: 'hsl(var(--primary))' }}
+                          dot={{ fill: 'hsl(var(--chart-2))' }}
                         />
                       </LineChart>
                     </ResponsiveContainer>
