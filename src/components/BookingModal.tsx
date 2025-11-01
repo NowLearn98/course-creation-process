@@ -1016,42 +1016,50 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
   };
 
   const StepIndicator = () => (
-    <div className="flex items-center justify-center mb-8">
-      {steps.map((step, index) => {
-        const isCompleted = step.id < currentStep;
-        const isCurrent = step.id === currentStep;
-        const StepIcon = step.icon;
-        
-        return (
-          <React.Fragment key={step.id}>
+    <div className="space-y-4">
+      {/* Progress Bar */}
+      <div className="relative">
+        <div className="h-1 bg-muted rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-500 ease-out"
+            style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
+          />
+        </div>
+      </div>
+      
+      {/* Step Icons */}
+      <div className="flex items-center justify-between px-1">
+        {steps.map((step, index) => {
+          const isCompleted = step.id < currentStep;
+          const isCurrent = step.id === currentStep;
+          const StepIcon = step.icon;
+          
+          return (
             <button
+              key={step.id}
               onClick={() => setCurrentStep(step.id)}
-              className="flex flex-col items-center group transition-transform hover:scale-105"
+              className="flex flex-col items-center group transition-transform hover:scale-105 min-w-[60px]"
             >
               <div
                 className={`
-                  w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer
-                  ${isCompleted ? 'bg-primary text-primary-foreground shadow-lg group-hover:shadow-xl' : 
-                    isCurrent ? 'bg-primary text-primary-foreground shadow-lg scale-110' : 
-                    'bg-muted text-muted-foreground group-hover:bg-muted/80'}
+                  w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer mb-2
+                  ${isCompleted ? 'bg-primary/10 text-primary ring-2 ring-primary/20' : 
+                    isCurrent ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-110' : 
+                    'bg-muted/50 text-muted-foreground group-hover:bg-muted'}
                 `}
               >
-                {isCompleted ? <CheckCircle className="w-5 h-5" /> : <StepIcon className="w-5 h-5" />}
+                {isCompleted ? <CheckCircle className="w-5 h-5" /> : <StepIcon className="w-4 h-4" />}
               </div>
-              <p className={`text-xs mt-2 font-medium transition-colors ${
+              <p className={`text-xs font-medium transition-colors text-center leading-tight ${
                 isCurrent ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
               }`}>
-                {step.title}
+                <span className="hidden sm:inline">{step.title}</span>
+                <span className="sm:hidden">Step {step.id}</span>
               </p>
             </button>
-            {index < steps.length - 1 && (
-              <div className={`w-16 h-px mx-4 transition-colors duration-300 ${
-                step.id < currentStep ? 'bg-primary' : 'bg-border'
-              }`} />
-            )}
-          </React.Fragment>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 
@@ -2299,38 +2307,39 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
 
   return (
     <Dialog open={open} onOpenChange={handleCloseModal}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="pb-6 sticky top-0 bg-background z-10 border-b border-border">
-          <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-            Create New Course
+      <DialogContent className="max-w-5xl max-h-[92vh] overflow-hidden flex flex-col p-0 gap-0 border-0 shadow-2xl">
+        <DialogHeader className="px-6 pt-6 pb-4 sticky top-0 bg-gradient-to-b from-background via-background to-background/95 z-10 backdrop-blur-sm border-b">
+          <DialogTitle className="text-2xl md:text-3xl font-bold text-center mb-4">
+            <span className="bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+              {isEditingPublished ? 'Edit Course' : isEditingDraft ? 'Edit Draft' : 'Create New Course'}
+            </span>
           </DialogTitle>
           <StepIndicator />
         </DialogHeader>
 
-        <div className="flex-1 overflow-auto">
-          <div className="px-2 pt-6">
-            {renderStepContent()}
-          </div>
+        <div className="flex-1 overflow-auto px-6 py-6">
+          {renderStepContent()}
         </div>
 
-        <div className="flex justify-between items-center pt-6 border-t border-border">
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 p-6 border-t bg-gradient-to-t from-muted/20 to-transparent">
           <Button 
             onClick={prevStep} 
             variant="outline" 
             disabled={currentStep === 1}
-            className="transition-all duration-200"
+            className="transition-all duration-300 hover:scale-105 disabled:hover:scale-100 shadow-sm order-2 sm:order-1"
           >
+            <ChevronLeft className="w-4 h-4 mr-1" />
             Previous
           </Button>
           
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3 order-1 sm:order-2">
             {!isEditingPublished && (
               <Button 
                 onClick={handleSaveAsDraft}
                 variant="outline"
-                className="transition-all duration-200"
+                className="transition-all duration-300 hover:scale-105 shadow-sm flex-1 sm:flex-initial"
               >
-                {isEditingDraft ? 'Update Draft' : 'Save as Draft'}
+                {isEditingDraft ? 'Update Draft' : 'Save Draft'}
               </Button>
             )}
             
@@ -2338,16 +2347,17 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
               <Button 
                 onClick={nextStep} 
                 disabled={!isStepValid()}
-                className="transition-all duration-200"
+                className="transition-all duration-300 hover:scale-105 disabled:hover:scale-100 shadow-md hover:shadow-lg flex-1 sm:flex-initial"
               >
                 Next Step
+                <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             ) : (
               <Button 
                 onClick={handleSubmit}
-                className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90 transition-all duration-200"
+                className="shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 flex-1 sm:flex-initial"
               >
-                {isEditingPublished ? 'Update Course' : isEditingDraft ? 'Publish Course' : 'Publish Course'}
+                {isEditingPublished ? 'Update Course' : 'Publish Course'}
               </Button>
             )}
           </div>
