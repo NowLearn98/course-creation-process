@@ -2,15 +2,21 @@ import { PublishedCourse, Student, MetricData } from '@/types/published';
 import { publishCourse } from './publishedStorage';
 
 const generateStudents = (count: number): Student[] => {
-  const names = ['Sarah Johnson', 'Mike Chen', 'Emma Williams', 'James Brown', 'Lisa Garcia', 'David Miller', 'Sofia Rodriguez', 'Chris Lee', 'Anna Taylor', 'Ryan Martinez'];
-  return Array.from({ length: count }, (_, i) => ({
-    id: `student-${i + 1}`,
-    name: names[i % names.length],
-    email: `${names[i % names.length].toLowerCase().replace(' ', '.')}@example.com`,
-    enrolledDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-    progress: Math.floor(Math.random() * 100),
-    lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
-  }));
+  const firstNames = ['Sarah', 'Mike', 'Emma', 'James', 'Lisa', 'David', 'Sofia', 'Chris', 'Anna', 'Ryan'];
+  const lastNames = ['Johnson', 'Chen', 'Williams', 'Brown', 'Garcia', 'Miller', 'Rodriguez', 'Lee', 'Taylor', 'Martinez'];
+  return Array.from({ length: count }, (_, i) => {
+    const firstName = firstNames[i % firstNames.length];
+    const lastName = lastNames[i % lastNames.length];
+    return {
+      id: `student-${i + 1}`,
+      firstName,
+      lastName,
+      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
+      enrolledDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      progress: Math.floor(Math.random() * 100),
+      lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+    };
+  });
 };
 
 const generateMetricsHistory = (days: number = 30): MetricData[] => {

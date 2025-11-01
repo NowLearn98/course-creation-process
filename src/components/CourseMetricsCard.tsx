@@ -287,7 +287,7 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                       <TableBody>
                         {course.students.map((student) => (
                           <TableRow key={student.id}>
-                            <TableCell className="font-medium">{student.name}</TableCell>
+                            <TableCell className="font-medium">{student.firstName} {student.lastName}</TableCell>
                             <TableCell className="text-muted-foreground">{student.email}</TableCell>
                             <TableCell className="text-muted-foreground">
                               {new Date(student.enrolledDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -333,7 +333,8 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>First Name</TableHead>
+                    <TableHead>Last Name</TableHead>
                     <TableHead>Email Address</TableHead>
                     <TableHead>Profile</TableHead>
                     <TableHead>Actions</TableHead>
@@ -342,7 +343,8 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                 <TableBody>
                   {course.students.map((student) => (
                     <TableRow key={student.id}>
-                      <TableCell className="font-medium">{student.name}</TableCell>
+                      <TableCell className="font-medium">{student.firstName}</TableCell>
+                      <TableCell className="font-medium">{student.lastName}</TableCell>
                       <TableCell className="text-muted-foreground">{student.email}</TableCell>
                       <TableCell>
                         <Button
