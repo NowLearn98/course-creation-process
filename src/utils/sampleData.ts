@@ -26,7 +26,7 @@ const generateMetricsHistory = (days: number = 30): MetricData[] => {
     return {
       date: date.toISOString().split('T')[0],
       clicks: Math.floor(Math.random() * 100) + 20,
-      revenue: Math.floor(Math.random() * 500) + 100
+      bookings: Math.floor(Math.random() * 30) + 5
     };
   });
 };

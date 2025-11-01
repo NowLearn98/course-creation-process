@@ -11,7 +11,7 @@ export interface Student {
 export interface MetricData {
   date: string;
   clicks: number;
-  revenue: number;
+  bookings: number;
 }
 
 export interface PublishedCourse {

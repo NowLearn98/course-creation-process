@@ -249,11 +249,11 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                         />
                         <Line 
                           type="monotone" 
-                          dataKey="revenue" 
-                          stroke="hsl(var(--success))" 
+                          dataKey="bookings" 
+                          stroke="hsl(var(--primary))" 
                           strokeWidth={2}
-                          name="Revenue ($)"
-                          dot={{ fill: 'hsl(var(--success))' }}
+                          name="Bookings"
+                          dot={{ fill: 'hsl(var(--primary))' }}
                         />
                       </LineChart>
                     </ResponsiveContainer>
