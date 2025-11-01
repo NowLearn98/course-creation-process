@@ -18,6 +18,14 @@ const CourseMetricsOverview: React.FC<CourseMetricsOverviewProps> = ({ onEditCou
     setCourses(getPublishedCourses());
   }, []);
 
+  const classroomCourses = courses.filter(course => 
+    course.sessionTypes.includes('classroom')
+  );
+  
+  const oneOnOneCourses = courses.filter(course => 
+    course.sessionTypes.includes('one-on-one')
+  );
+
   const handleStatusChange = (courseId: string, status: PublishedCourse['status']) => {
     const updatedCourse = updatePublishedCourse(courseId, { status });
     if (updatedCourse) {
@@ -58,16 +66,50 @@ const CourseMetricsOverview: React.FC<CourseMetricsOverviewProps> = ({ onEditCou
   }
 
   return (
-    <div className="space-y-4">
-      {courses.map((course) => (
-        <CourseMetricsCard
-          key={course.id}
-          course={course}
-          onEdit={onEditCourse}
-          onStatusChange={handleStatusChange}
-          onDelete={handleDelete}
-        />
-      ))}
+    <div className="space-y-8">
+      {/* Classroom Sessions Section */}
+      {classroomCourses.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-1 bg-primary rounded-full" />
+            <h3 className="text-xl font-bold text-foreground">Classroom Sessions</h3>
+            <span className="text-sm text-muted-foreground">({classroomCourses.length})</span>
+          </div>
+          <div className="space-y-4">
+            {classroomCourses.map((course) => (
+              <CourseMetricsCard
+                key={course.id}
+                course={course}
+                onEdit={onEditCourse}
+                onStatusChange={handleStatusChange}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* One-on-One Sessions Section */}
+      {oneOnOneCourses.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-1 bg-accent rounded-full" />
+            <h3 className="text-xl font-bold text-foreground">One-on-One Sessions</h3>
+            <span className="text-sm text-muted-foreground">({oneOnOneCourses.length})</span>
+          </div>
+          <div className="space-y-4">
+            {oneOnOneCourses.map((course) => (
+              <CourseMetricsCard
+                key={course.id}
+                course={course}
+                onEdit={onEditCourse}
+                onStatusChange={handleStatusChange}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
