@@ -37,7 +37,9 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
   onStatusChange,
   onDelete
 }) => {
-  const revenue = course.enrollments * course.price;
+  const revenue = (course.enrollments || 0) * (course.price || 0);
+  const clicks = course.clicks || 0;
+  const enrollments = course.enrollments || 0;
   
   const getStatusColor = (status: PublishedCourse['status']) => {
     switch (status) {
@@ -145,7 +147,7 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
               <span className="text-xs font-medium text-muted-foreground">Students</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-foreground">{course.enrollments.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-foreground">{enrollments.toLocaleString()}</span>
             </div>
           </div>
 
@@ -158,7 +160,7 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
               <span className="text-xs font-medium text-muted-foreground">Clicks</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-foreground">{course.clicks.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-foreground">{clicks.toLocaleString()}</span>
             </div>
           </div>
 
