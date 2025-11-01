@@ -89,45 +89,54 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
             </p>
           </div>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-primary/10 transition-colors">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-popover/95 backdrop-blur-sm border shadow-lg">
-              <DropdownMenuItem onClick={() => onEdit?.(course)} className="cursor-pointer">
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Course
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsOpen(true)} className="cursor-pointer">
-                <Eye className="w-4 h-4 mr-2" />
-                View Details
-              </DropdownMenuItem>
-              {course.status === 'active' && (
-                <DropdownMenuItem onClick={() => onStatusChange?.(course.id, 'paused')} className="cursor-pointer">
-                  <PauseCircle className="w-4 h-4 mr-2" />
-                  Pause
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsOpen(!isOpen)}
+              className="gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Eye className="w-4 h-4" />
+              <span className="hidden sm:inline">View Details</span>
+              {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-primary/10 transition-colors">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-popover/95 backdrop-blur-sm border shadow-lg">
+                <DropdownMenuItem onClick={() => onEdit?.(course)} className="cursor-pointer">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Course
                 </DropdownMenuItem>
-              )}
-              {course.status === 'paused' && (
-                <DropdownMenuItem onClick={() => onStatusChange?.(course.id, 'active')} className="cursor-pointer">
-                  <PlayCircle className="w-4 h-4 mr-2" />
-                  Activate
+                {course.status === 'active' && (
+                  <DropdownMenuItem onClick={() => onStatusChange?.(course.id, 'paused')} className="cursor-pointer">
+                    <PauseCircle className="w-4 h-4 mr-2" />
+                    Pause
+                  </DropdownMenuItem>
+                )}
+                {course.status === 'paused' && (
+                  <DropdownMenuItem onClick={() => onStatusChange?.(course.id, 'active')} className="cursor-pointer">
+                    <PlayCircle className="w-4 h-4 mr-2" />
+                    Activate
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => onStatusChange?.(course.id, 'archived')} className="cursor-pointer">
+                  <Archive className="w-4 h-4 mr-2" />
+                  Archive
                 </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={() => onStatusChange?.(course.id, 'archived')} className="cursor-pointer">
-                <Archive className="w-4 h-4 mr-2" />
-                Archive
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => onDelete?.(course.id)}
-                className="text-destructive focus:text-destructive cursor-pointer"
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuItem 
+                  onClick={() => onDelete?.(course.id)}
+                  className="text-destructive focus:text-destructive cursor-pointer"
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </CardHeader>
       
@@ -200,19 +209,6 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                 <span>•</span>
                 <span>${course.price} per student</span>
               </div>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  {isOpen ? (
-                    <>
-                      Hide Details <ChevronUp className="h-4 w-4" />
-                    </>
-                  ) : (
-                    <>
-                      View Details <ChevronDown className="h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-              </CollapsibleTrigger>
             </div>
 
             <CollapsibleContent className="mt-4 space-y-6">
