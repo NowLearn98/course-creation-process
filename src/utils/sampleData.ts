@@ -4,12 +4,21 @@ import { publishCourse } from './publishedStorage';
 const generateStudents = (count: number, isOneOnOne: boolean = false): Student[] => {
   const firstNames = ['Sarah', 'Mike', 'Emma', 'James', 'Lisa', 'David', 'Sofia', 'Chris', 'Anna', 'Ryan'];
   const lastNames = ['Johnson', 'Chen', 'Williams', 'Brown', 'Garcia', 'Miller', 'Rodriguez', 'Lee', 'Taylor', 'Martinez'];
-  const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
+  const times = [
+    { start: '09:00', end: '10:00' },
+    { start: '10:00', end: '11:00' },
+    { start: '11:00', end: '12:00' },
+    { start: '13:00', end: '14:00' },
+    { start: '14:00', end: '15:00' },
+    { start: '15:00', end: '16:00' },
+    { start: '16:00', end: '17:00' }
+  ];
   
   return Array.from({ length: count }, (_, i) => {
     const firstName = firstNames[i % firstNames.length];
     const lastName = lastNames[i % lastNames.length];
     const bookedDate = new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000);
+    const timeSlot = times[i % times.length];
     
     return {
       id: `student-${i + 1}`,
@@ -21,7 +30,8 @@ const generateStudents = (count: number, isOneOnOne: boolean = false): Student[]
       lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
       ...(isOneOnOne && {
         bookedSessionDate: bookedDate.toISOString().split('T')[0],
-        bookedSessionTime: times[i % times.length]
+        bookedSessionTime: timeSlot.start,
+        bookedSessionEndTime: timeSlot.end
       })
     };
   });

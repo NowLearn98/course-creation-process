@@ -295,7 +295,9 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                             {student.bookedSessionDate ? new Date(student.bookedSessionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not booked'}
                           </TableCell>
                           <TableCell className="text-muted-foreground">
-                            {student.bookedSessionTime || 'Not scheduled'}
+                            {student.bookedSessionTime && student.bookedSessionEndTime 
+                              ? `${student.bookedSessionTime} - ${student.bookedSessionEndTime}` 
+                              : 'Not scheduled'}
                           </TableCell>
                         </>
                       )}

@@ -8,6 +8,7 @@ export interface Student {
   lastActive: string;
   bookedSessionDate?: string;
   bookedSessionTime?: string;
+  bookedSessionEndTime?: string;
 }
 
 export interface MetricData {
