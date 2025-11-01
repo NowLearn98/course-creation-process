@@ -29,13 +29,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { PublishedCourse } from "@/types/published";
 
 interface CourseMetricsCardProps {
@@ -52,7 +45,6 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
   onDelete
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showStudentsDialog, setShowStudentsDialog] = useState(false);
   const revenue = (course.enrollments || 0) * (course.price || 0);
   const clicks = course.clicks || 0;
   const enrollments = course.enrollments || 0;
@@ -107,7 +99,7 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Course
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowStudentsDialog(true)} className="cursor-pointer">
+              <DropdownMenuItem onClick={() => setIsOpen(true)} className="cursor-pointer">
                 <Eye className="w-4 h-4 mr-2" />
                 View Details
               </DropdownMenuItem>
@@ -277,34 +269,40 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Enrolled</TableHead>
-                          <TableHead>Progress</TableHead>
-                          <TableHead>Last Active</TableHead>
+                          <TableHead>First Name</TableHead>
+                          <TableHead>Last Name</TableHead>
+                          <TableHead>Email Address</TableHead>
+                          <TableHead>Profile</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {course.students.map((student) => (
                           <TableRow key={student.id}>
-                            <TableCell className="font-medium">{student.firstName} {student.lastName}</TableCell>
+                            <TableCell className="font-medium">{student.firstName}</TableCell>
+                            <TableCell className="font-medium">{student.lastName}</TableCell>
                             <TableCell className="text-muted-foreground">{student.email}</TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {new Date(student.enrolledDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="gap-2"
+                                onClick={() => window.open(`/student/${student.id}`, '_blank')}
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                                View Profile
+                              </Button>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center gap-2">
-                                <div className="h-2 w-20 bg-muted rounded-full overflow-hidden">
-                                  <div 
-                                    className="h-full bg-primary transition-all" 
-                                    style={{ width: `${student.progress}%` }}
-                                  />
-                                </div>
-                                <span className="text-xs text-muted-foreground">{student.progress}%</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {new Date(student.lastActive).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-2"
+                                onClick={() => console.log('Message student:', student.id)}
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                                Message
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -317,69 +315,6 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
           </Collapsible>
         </div>
       </CardContent>
-
-      {/* Students Details Dialog */}
-      <Dialog open={showStudentsDialog} onOpenChange={setShowStudentsDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Student Details - {course.title}</DialogTitle>
-            <DialogDescription>
-              View and manage enrolled students for this course
-            </DialogDescription>
-          </DialogHeader>
-          
-          {course.students && course.students.length > 0 ? (
-            <div className="rounded-lg border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>First Name</TableHead>
-                    <TableHead>Last Name</TableHead>
-                    <TableHead>Email Address</TableHead>
-                    <TableHead>Profile</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {course.students.map((student) => (
-                    <TableRow key={student.id}>
-                      <TableCell className="font-medium">{student.firstName}</TableCell>
-                      <TableCell className="font-medium">{student.lastName}</TableCell>
-                      <TableCell className="text-muted-foreground">{student.email}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="gap-2"
-                          onClick={() => window.open(`/student/${student.id}`, '_blank')}
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          View Profile
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="gap-2"
-                          onClick={() => console.log('Message student:', student.id)}
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          Message
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No students enrolled yet
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </Card>
   );
 };
