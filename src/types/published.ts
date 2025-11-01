@@ -1,3 +1,18 @@
+export interface Student {
+  id: string;
+  name: string;
+  email: string;
+  enrolledDate: string;
+  progress: number;
+  lastActive: string;
+}
+
+export interface MetricData {
+  date: string;
+  clicks: number;
+  revenue: number;
+}
+
 export interface PublishedCourse {
   id: string;
   title: string;
@@ -23,6 +38,8 @@ export interface PublishedCourse {
   price: number;
   clicks: number;
   status: 'active' | 'paused' | 'archived';
+  students?: Student[];
+  metricsHistory?: MetricData[];
 }
 
 export interface Module {

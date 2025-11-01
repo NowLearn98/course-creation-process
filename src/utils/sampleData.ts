@@ -1,5 +1,29 @@
-import { PublishedCourse } from '@/types/published';
+import { PublishedCourse, Student, MetricData } from '@/types/published';
 import { publishCourse } from './publishedStorage';
+
+const generateStudents = (count: number): Student[] => {
+  const names = ['Sarah Johnson', 'Mike Chen', 'Emma Williams', 'James Brown', 'Lisa Garcia', 'David Miller', 'Sofia Rodriguez', 'Chris Lee', 'Anna Taylor', 'Ryan Martinez'];
+  return Array.from({ length: count }, (_, i) => ({
+    id: `student-${i + 1}`,
+    name: names[i % names.length],
+    email: `${names[i % names.length].toLowerCase().replace(' ', '.')}@example.com`,
+    enrolledDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+    progress: Math.floor(Math.random() * 100),
+    lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+  }));
+};
+
+const generateMetricsHistory = (days: number = 30): MetricData[] => {
+  return Array.from({ length: days }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (days - i - 1));
+    return {
+      date: date.toISOString().split('T')[0],
+      clicks: Math.floor(Math.random() * 100) + 20,
+      revenue: Math.floor(Math.random() * 500) + 100
+    };
+  });
+};
 
 export const createSamplePublishedCourses = () => {
   const sampleCourses = [
@@ -94,13 +118,16 @@ export const createSamplePublishedCourses = () => {
       const updatedCourses = JSON.parse(localStorage.getItem('published_courses') || '[]');
       const courseIndex = updatedCourses.findIndex((c: any) => c.id === published.id);
       if (courseIndex !== -1) {
+        const enrollmentCount = Math.floor(Math.random() * 500) + 100;
         updatedCourses[courseIndex] = {
           ...updatedCourses[courseIndex],
-          enrollments: Math.floor(Math.random() * 500) + 100,
+          enrollments: enrollmentCount,
           clicks: Math.floor(Math.random() * 2000) + 500,
           rating: parseFloat((Math.random() * 2 + 3).toFixed(1)),
           reviews: Math.floor(Math.random() * 100) + 20,
-          price: course.title.includes('React') ? 149 : 99
+          price: course.title.includes('React') ? 149 : 99,
+          students: generateStudents(Math.min(enrollmentCount, 10)),
+          metricsHistory: generateMetricsHistory(30)
         };
         localStorage.setItem('published_courses', JSON.stringify(updatedCourses));
       }

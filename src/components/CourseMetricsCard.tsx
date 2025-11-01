@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import {
   DollarSign,
   Users,
@@ -14,7 +17,9 @@ import {
   PlayCircle,
   Archive,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,6 +42,7 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
   onStatusChange,
   onDelete
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const revenue = (course.enrollments || 0) * (course.price || 0);
   const clicks = course.clicks || 0;
   const enrollments = course.enrollments || 0;
@@ -183,12 +189,122 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t flex items-center justify-between text-sm">
-          <div className="flex items-center gap-4 text-muted-foreground">
-            <span>{course.modules.length} modules</span>
-            <span>•</span>
-            <span>${course.price} per student</span>
-          </div>
+        <div className="mt-4 pt-4 border-t">
+          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <span>{course.modules.length} modules</span>
+                <span>•</span>
+                <span>${course.price} per student</span>
+              </div>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  {isOpen ? (
+                    <>
+                      Hide Details <ChevronUp className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      View Details <ChevronDown className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+
+            <CollapsibleContent className="mt-4 space-y-6">
+              {/* Metrics Chart */}
+              {course.metricsHistory && course.metricsHistory.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground">Performance Over Time</h4>
+                  <div className="h-[250px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={course.metricsHistory}>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 12 }}
+                          tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          className="text-muted-foreground"
+                        />
+                        <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--popover))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px'
+                          }}
+                          labelFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="clicks" 
+                          stroke="hsl(var(--accent))" 
+                          strokeWidth={2}
+                          name="Clicks"
+                          dot={{ fill: 'hsl(var(--accent))' }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="revenue" 
+                          stroke="hsl(var(--success))" 
+                          strokeWidth={2}
+                          name="Revenue ($)"
+                          dot={{ fill: 'hsl(var(--success))' }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {/* Students Table */}
+              {course.students && course.students.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground">Enrolled Students</h4>
+                  <div className="rounded-lg border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Enrolled</TableHead>
+                          <TableHead>Progress</TableHead>
+                          <TableHead>Last Active</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {course.students.map((student) => (
+                          <TableRow key={student.id}>
+                            <TableCell className="font-medium">{student.name}</TableCell>
+                            <TableCell className="text-muted-foreground">{student.email}</TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {new Date(student.enrolledDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <div className="h-2 w-20 bg-muted rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-primary transition-all" 
+                                    style={{ width: `${student.progress}%` }}
+                                  />
+                                </div>
+                                <span className="text-xs text-muted-foreground">{student.progress}%</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {new Date(student.lastActive).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       </CardContent>
     </Card>
