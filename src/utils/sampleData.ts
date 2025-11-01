@@ -115,6 +115,52 @@ export const createSamplePublishedCourses = () => {
       oneOnOneSessions: [],
       images: [],
       videos: []
+    },
+    {
+      title: "Personal Fitness Coaching",
+      subtitle: "One-on-one personalized fitness training and nutrition guidance",
+      description: "Get personalized fitness coaching tailored to your goals. Work directly with a certified trainer who will create a custom workout plan and provide ongoing support.",
+      objectives: "Achieve your fitness goals, learn proper form and technique, develop sustainable healthy habits, improve overall wellness",
+      requirements: "Basic fitness level, commitment to regular sessions, willingness to follow a personalized plan",
+      level: "All Levels",
+      language: "English",
+      category: "Health & Fitness",
+      subcategory: "Personal Training",
+      durationHours: "12",
+      durationMinutes: "0",
+      modules: [
+        {
+          title: "Assessment & Goal Setting",
+          subsections: [
+            { title: "Initial Fitness Assessment", description: "Evaluate current fitness level", type: "lecture" as const, timeMinutes: "60" },
+            { title: "Goal Planning Session", description: "Set realistic fitness goals", type: "lecture" as const, timeMinutes: "30" }
+          ]
+        },
+        {
+          title: "Custom Training Program",
+          subsections: [
+            { title: "Strength Training", description: "Build muscle and strength", type: "lab" as const, timeMinutes: "45" },
+            { title: "Cardio & Endurance", description: "Improve cardiovascular health", type: "lab" as const, timeMinutes: "45" },
+            { title: "Nutrition Guidance", description: "Learn healthy eating habits", type: "lecture" as const, timeMinutes: "30" }
+          ]
+        }
+      ],
+      format: "online",
+      sessionTypes: ["one-on-one"],
+      classroomSessions: [],
+      oneOnOneSessions: [
+        {
+          startDate: "2024-12-01",
+          endDate: "2025-03-01",
+          daysOfWeek: ["Monday", "Wednesday", "Friday"],
+          startTime: "09:00",
+          endTime: "17:00",
+          pricePerInterval: 75,
+          intervalMinutes: 60
+        }
+      ],
+      images: [],
+      videos: []
     }
   ];
 
