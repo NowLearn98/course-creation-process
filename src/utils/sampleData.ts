@@ -35,6 +35,8 @@ export const createSamplePublishedCourses = () => {
   // Clear existing courses to ensure fresh data with correct structure
   localStorage.removeItem('published_courses');
   
+  console.log('Creating sample published courses with bookings data...');
+  
   const sampleCourses = [
     {
       title: "React Development Masterclass",
@@ -167,22 +169,29 @@ export const createSamplePublishedCourses = () => {
   // Create sample courses
   sampleCourses.forEach(course => {
     const published = publishCourse(course);
+    console.log('Published course:', published.title);
+    
     // Update sample courses with realistic metrics
     const updatedCourses = JSON.parse(localStorage.getItem('published_courses') || '[]');
     const courseIndex = updatedCourses.findIndex((c: any) => c.id === published.id);
     if (courseIndex !== -1) {
       const enrollmentCount = Math.floor(Math.random() * 500) + 100;
+      const metricsHistory = generateMetricsHistory(30);
+      console.log('Sample metrics for', published.title, ':', metricsHistory[0]);
+      
       updatedCourses[courseIndex] = {
         ...updatedCourses[courseIndex],
         enrollments: enrollmentCount,
         clicks: Math.floor(Math.random() * 2000) + 500,
         rating: parseFloat((Math.random() * 2 + 3).toFixed(1)),
         reviews: Math.floor(Math.random() * 100) + 20,
-        price: course.title.includes('React') ? 149 : 99,
+        price: course.title.includes('React') ? 149 : course.title.includes('Fitness') ? 75 : 99,
         students: generateStudents(Math.min(enrollmentCount, 10)),
-        metricsHistory: generateMetricsHistory(30)
+        metricsHistory
       };
       localStorage.setItem('published_courses', JSON.stringify(updatedCourses));
     }
   });
+  
+  console.log('Sample courses created:', JSON.parse(localStorage.getItem('published_courses') || '[]').length);
 };
