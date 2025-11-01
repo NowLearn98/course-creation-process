@@ -48,6 +48,7 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
   const revenue = (course.enrollments || 0) * (course.price || 0);
   const clicks = course.clicks || 0;
   const enrollments = course.enrollments || 0;
+  const isOneOnOne = course.sessionTypes.includes('one-on-one');
   
   const getStatusColor = (status: PublishedCourse['status']) => {
     switch (status) {
@@ -266,48 +267,64 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                 <div className="space-y-2">
                   <h4 className="text-sm font-semibold text-foreground">Enrolled Students</h4>
                   <div className="rounded-lg border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>First Name</TableHead>
-                          <TableHead>Last Name</TableHead>
-                          <TableHead>Email Address</TableHead>
-                          <TableHead>Profile</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {course.students.map((student) => (
-                          <TableRow key={student.id}>
-                            <TableCell className="font-medium">{student.firstName}</TableCell>
-                            <TableCell className="font-medium">{student.lastName}</TableCell>
-                            <TableCell className="text-muted-foreground">{student.email}</TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="gap-2"
-                                onClick={() => window.open(`/student/${student.id}`, '_blank')}
-                              >
-                                <ExternalLink className="w-4 h-4" />
-                                View Profile
-                              </Button>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="gap-2"
-                                onClick={() => console.log('Message student:', student.id)}
-                              >
-                                <MessageCircle className="w-4 h-4" />
-                                Message
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>First Name</TableHead>
+                    <TableHead>Last Name</TableHead>
+                    <TableHead>Email Address</TableHead>
+                    {isOneOnOne && (
+                      <>
+                        <TableHead>Booked Date</TableHead>
+                        <TableHead>Booked Time</TableHead>
+                      </>
+                    )}
+                    <TableHead>Profile</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {course.students.map((student) => (
+                    <TableRow key={student.id}>
+                      <TableCell className="font-medium">{student.firstName}</TableCell>
+                      <TableCell className="font-medium">{student.lastName}</TableCell>
+                      <TableCell className="text-muted-foreground">{student.email}</TableCell>
+                      {isOneOnOne && (
+                        <>
+                          <TableCell className="text-muted-foreground">
+                            {student.bookedSessionDate ? new Date(student.bookedSessionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not booked'}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {student.bookedSessionTime || 'Not scheduled'}
+                          </TableCell>
+                        </>
+                      )}
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => window.open(`/student/${student.id}`, '_blank')}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          View Profile
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => console.log('Message student:', student.id)}
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          Message
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
                   </div>
                 </div>
               )}

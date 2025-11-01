@@ -6,6 +6,8 @@ export interface Student {
   enrolledDate: string;
   progress: number;
   lastActive: string;
+  bookedSessionDate?: string;
+  bookedSessionTime?: string;
 }
 
 export interface MetricData {

@@ -1,12 +1,16 @@
 import { PublishedCourse, Student, MetricData } from '@/types/published';
 import { publishCourse } from './publishedStorage';
 
-const generateStudents = (count: number): Student[] => {
+const generateStudents = (count: number, isOneOnOne: boolean = false): Student[] => {
   const firstNames = ['Sarah', 'Mike', 'Emma', 'James', 'Lisa', 'David', 'Sofia', 'Chris', 'Anna', 'Ryan'];
   const lastNames = ['Johnson', 'Chen', 'Williams', 'Brown', 'Garcia', 'Miller', 'Rodriguez', 'Lee', 'Taylor', 'Martinez'];
+  const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
+  
   return Array.from({ length: count }, (_, i) => {
     const firstName = firstNames[i % firstNames.length];
     const lastName = lastNames[i % lastNames.length];
+    const bookedDate = new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000);
+    
     return {
       id: `student-${i + 1}`,
       firstName,
@@ -14,7 +18,11 @@ const generateStudents = (count: number): Student[] => {
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       enrolledDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
       progress: Math.floor(Math.random() * 100),
-      lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+      lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      ...(isOneOnOne && {
+        bookedSessionDate: bookedDate.toISOString().split('T')[0],
+        bookedSessionTime: times[i % times.length]
+      })
     };
   });
 };
@@ -177,6 +185,7 @@ export const createSamplePublishedCourses = () => {
     if (courseIndex !== -1) {
       const enrollmentCount = Math.floor(Math.random() * 500) + 100;
       const metricsHistory = generateMetricsHistory(30);
+      const isOneOnOne = course.sessionTypes.includes('one-on-one');
       console.log('Sample metrics for', published.title, ':', metricsHistory[0]);
       
       updatedCourses[courseIndex] = {
@@ -186,7 +195,7 @@ export const createSamplePublishedCourses = () => {
         rating: parseFloat((Math.random() * 2 + 3).toFixed(1)),
         reviews: Math.floor(Math.random() * 100) + 20,
         price: course.title.includes('React') ? 149 : course.title.includes('Fitness') ? 75 : 99,
-        students: generateStudents(Math.min(enrollmentCount, 10)),
+        students: generateStudents(Math.min(enrollmentCount, 10), isOneOnOne),
         metricsHistory
       };
       localStorage.setItem('published_courses', JSON.stringify(updatedCourses));
