@@ -73,7 +73,7 @@ const Index = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="overview" className="w-full space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-card/50 backdrop-blur-sm border shadow-sm">
+          <TabsList className="grid w-full grid-cols-2 h-auto p-1 bg-card/50 backdrop-blur-sm border shadow-sm">
             <TabsTrigger 
               value="overview" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
@@ -87,13 +87,6 @@ const Index = () => {
             >
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">Drafts</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="published" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
-            >
-              <Star className="w-4 h-4" />
-              <span className="hidden sm:inline">Published</span>
             </TabsTrigger>
           </TabsList>
 
@@ -195,22 +188,6 @@ const Index = () => {
             <DraftsList onEditDraft={handleEditDraft} />
           </TabsContent>
 
-          <TabsContent value="published" className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Published Courses</h2>
-                <p className="text-sm md:text-base text-muted-foreground mt-1">Manage your live courses</p>
-              </div>
-              <Button 
-                onClick={handleCreateNew}
-                className="shadow-md hover:shadow-lg transition-all duration-300 self-start sm:self-auto"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Publish New
-              </Button>
-            </div>
-            <PublishedCoursesList onEditCourse={handleEditPublished} />
-          </TabsContent>
         </Tabs>
 
         {/* Course Creation Modal */}
