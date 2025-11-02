@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Box,
+  Container,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  Tabs,
+  Tab,
+} from "@mui/material";
 import { Plus, BookOpen, Users, TrendingUp, Star } from "lucide-react";
 import { BookingModal } from "@/components/BookingModal";
 import { DraftsList } from "@/components/DraftsList";
@@ -10,12 +17,33 @@ import { DraftCourse } from "@/types/draft";
 import { PublishedCourse } from "@/types/published";
 import { createSamplePublishedCourses } from "@/utils/sampleData";
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
 const Index = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDraft, setEditingDraft] = useState<DraftCourse | null>(null);
   const [editingPublished, setEditingPublished] = useState<PublishedCourse | null>(null);
+  const [tabValue, setTabValue] = useState(0);
 
-  // Create sample published courses on first load
   useEffect(() => {
     createSamplePublishedCourses();
   }, []);
@@ -46,151 +74,369 @@ const Index = () => {
     setIsModalOpen(true);
   };
 
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10">
-      <div className="container mx-auto px-4 py-6 md:py-10 max-w-7xl">
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(to bottom right, hsl(0, 0%, 100%), hsl(220, 100%, 50%, 0.05), hsl(220, 14%, 96%, 0.1))",
+      }}
+    >
+      <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>
         {/* Header */}
-        <div className="mb-8 md:mb-12">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
+        <Box sx={{ mb: { xs: 4, md: 6 } }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: { xs: "flex-start", md: "center" },
+              justifyContent: "space-between",
+              gap: 2,
+            }}
+          >
+            <Box>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontSize: { xs: "2rem", md: "3rem" },
+                  fontWeight: 700,
+                  background: "linear-gradient(to right, #000, rgba(0, 0, 0, 0.7))",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  mb: 1,
+                }}
+              >
                 Course Creator
-              </h1>
-              <p className="text-base md:text-lg text-muted-foreground">
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{ fontSize: { xs: "1rem", md: "1.125rem" }, color: "text.secondary" }}
+              >
                 Build and launch your courses with ease
-              </p>
-            </div>
-            <Button 
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              size="large"
               onClick={handleCreateNew}
-              size="lg" 
-              className="shadow-lg hover:shadow-xl transition-all duration-300 self-start md:self-auto"
+              startIcon={<Plus className="w-5 h-5" />}
+              sx={{
+                boxShadow: 2,
+                "&:hover": {
+                  boxShadow: 6,
+                },
+              }}
             >
-              <Plus className="w-5 h-5 mr-2" />
               New Course
             </Button>
-          </div>
-        </div>
+          </Box>
+        </Box>
 
         {/* Main Content */}
-        <Tabs defaultValue="overview" className="w-full space-y-6">
-          <TabsList className="grid w-full grid-cols-2 h-auto p-1 bg-card/50 backdrop-blur-sm border shadow-sm">
-            <TabsTrigger 
-              value="overview" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
-            >
-              <TrendingUp className="w-4 h-4" />
-              <span className="hidden sm:inline">Overview</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="drafts" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">Drafts</span>
-            </TabsTrigger>
-          </TabsList>
+        <Box>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            sx={{
+              borderBottom: 1,
+              borderColor: "divider",
+              mb: 2,
+            }}
+          >
+            <Tab
+              icon={<TrendingUp className="w-4 h-4" />}
+              iconPosition="start"
+              label="Overview"
+            />
+            <Tab
+              icon={<BookOpen className="w-4 h-4" />}
+              iconPosition="start"
+              label="Drafts"
+            />
+          </Tabs>
 
-          <TabsContent value="overview" className="space-y-6 animate-fade-in">
+          <TabPanel value={tabValue} index={0}>
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              <Card className="relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
-                <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Courses</CardTitle>
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <BookOpen className="h-4 w-4 text-primary" />
-                  </div>
-                </CardHeader>
-                <CardContent className="relative">
-                  <div className="text-3xl font-bold text-foreground">12</div>
-                  <p className="text-xs text-muted-foreground mt-1">+2 from last month</p>
-                </CardContent>
-              </Card>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "repeat(1, 1fr)",
+                  sm: "repeat(2, 1fr)",
+                  lg: "repeat(4, 1fr)",
+                },
+                gap: { xs: 2, md: 3 },
+                mb: 3,
+              }}
+            >
+              <Box>
+                <Card
+                  sx={{
+                    position: "relative",
+                    overflow: "hidden",
+                    boxShadow: 2,
+                    transition: "all 0.3s",
+                    "&:hover": { boxShadow: 4 },
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(to bottom right, rgba(0, 90, 255, 0.05), transparent)",
+                    },
+                  }}
+                >
+                  <CardContent sx={{ position: "relative" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        mb: 2,
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                        Total Courses
+                      </Typography>
+                      <Box
+                        sx={{
+                          p: 1,
+                          bgcolor: "primary.main",
+                          color: "primary.contrastText",
+                          borderRadius: 1,
+                          display: "flex",
+                          opacity: 0.1,
+                        }}
+                      >
+                        <BookOpen className="h-4 w-4" />
+                      </Box>
+                    </Box>
+                    <Typography variant="h3" fontWeight={700} sx={{ mb: 0.5 }}>
+                      12
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      +2 from last month
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Box>
 
-              <Card className="relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
-                <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-transparent" />
-                <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Students</CardTitle>
-                  <div className="p-2 bg-success/10 rounded-lg">
-                    <Users className="h-4 w-4 text-success" />
-                  </div>
-                </CardHeader>
-                <CardContent className="relative">
-                  <div className="text-3xl font-bold text-foreground">1,234</div>
-                  <p className="text-xs text-muted-foreground mt-1">+15% from last month</p>
-                </CardContent>
-              </Card>
+              <Box>
+                <Card
+                  sx={{
+                    position: "relative",
+                    overflow: "hidden",
+                    boxShadow: 2,
+                    transition: "all 0.3s",
+                    "&:hover": { boxShadow: 4 },
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(to bottom right, rgba(34, 197, 94, 0.05), transparent)",
+                    },
+                  }}
+                >
+                  <CardContent sx={{ position: "relative" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        mb: 2,
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                        Total Students
+                      </Typography>
+                      <Box
+                        sx={{
+                          p: 1,
+                          bgcolor: "success.main",
+                          color: "success.contrastText",
+                          borderRadius: 1,
+                          display: "flex",
+                          opacity: 0.1,
+                        }}
+                      >
+                        <Users className="h-4 w-4" />
+                      </Box>
+                    </Box>
+                    <Typography variant="h3" fontWeight={700} sx={{ mb: 0.5 }}>
+                      1,234
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      +15% from last month
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Box>
 
-              <Card className="relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
-                <div className="absolute inset-0 bg-gradient-to-br from-warning/5 to-transparent" />
-                <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Avg. Rating</CardTitle>
-                  <div className="p-2 bg-warning/10 rounded-lg">
-                    <Star className="h-4 w-4 text-warning" />
-                  </div>
-                </CardHeader>
-                <CardContent className="relative">
-                  <div className="text-3xl font-bold text-foreground">4.8</div>
-                  <p className="text-xs text-muted-foreground mt-1">Based on 256 reviews</p>
-                </CardContent>
-              </Card>
+              <Box>
+                <Card
+                  sx={{
+                    position: "relative",
+                    overflow: "hidden",
+                    boxShadow: 2,
+                    transition: "all 0.3s",
+                    "&:hover": { boxShadow: 4 },
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(to bottom right, rgba(245, 158, 11, 0.05), transparent)",
+                    },
+                  }}
+                >
+                  <CardContent sx={{ position: "relative" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        mb: 2,
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                        Avg. Rating
+                      </Typography>
+                      <Box
+                        sx={{
+                          p: 1,
+                          bgcolor: "warning.main",
+                          color: "warning.contrastText",
+                          borderRadius: 1,
+                          display: "flex",
+                          opacity: 0.1,
+                        }}
+                      >
+                        <Star className="h-4 w-4" />
+                      </Box>
+                    </Box>
+                    <Typography variant="h3" fontWeight={700} sx={{ mb: 0.5 }}>
+                      4.8
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Based on 256 reviews
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Box>
 
-              <Card className="relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
-                <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Revenue</CardTitle>
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <TrendingUp className="h-4 w-4 text-primary" />
-                  </div>
-                </CardHeader>
-                <CardContent className="relative">
-                  <div className="text-3xl font-bold text-foreground">$12,345</div>
-                  <p className="text-xs text-muted-foreground mt-1">+8% from last month</p>
-                </CardContent>
-              </Card>
-            </div>
+              <Box>
+                <Card
+                  sx={{
+                    position: "relative",
+                    overflow: "hidden",
+                    boxShadow: 2,
+                    transition: "all 0.3s",
+                    "&:hover": { boxShadow: 4 },
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(to bottom right, rgba(0, 90, 255, 0.05), transparent)",
+                    },
+                  }}
+                >
+                  <CardContent sx={{ position: "relative" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        mb: 2,
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                        Revenue
+                      </Typography>
+                      <Box
+                        sx={{
+                          p: 1,
+                          bgcolor: "primary.main",
+                          color: "primary.contrastText",
+                          borderRadius: 1,
+                          display: "flex",
+                          opacity: 0.1,
+                        }}
+                      >
+                        <TrendingUp className="h-4 w-4" />
+                      </Box>
+                    </Box>
+                    <Typography variant="h3" fontWeight={700} sx={{ mb: 0.5 }}>
+                      $12,345
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      +8% from last month
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Box>
+            </Box>
 
             {/* Published Courses Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">Published Courses</h2>
-                  <p className="text-sm text-muted-foreground mt-1">Track performance metrics for each course</p>
-                </div>
-              </div>
-              
+            <Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="h2" fontWeight={700} sx={{ mb: 1 }}>
+                  Published Courses
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Track performance metrics for each course
+                </Typography>
+              </Box>
               <CourseMetricsOverview onEditCourse={handleEditPublished} />
-            </div>
-          </TabsContent>
+            </Box>
+          </TabPanel>
 
-          <TabsContent value="drafts" className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Course Drafts</h2>
-                <p className="text-sm md:text-base text-muted-foreground mt-1">Continue where you left off</p>
-              </div>
-              <Button 
+          <TabPanel value={tabValue} index={1}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "flex-start", sm: "center" },
+                justifyContent: "space-between",
+                gap: 2,
+                mb: 3,
+              }}
+            >
+              <Box>
+                <Typography variant="h2" fontWeight={700} sx={{ mb: 0.5 }}>
+                  Course Drafts
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Continue where you left off
+                </Typography>
+              </Box>
+              <Button
+                variant="contained"
                 onClick={handleCreateNew}
-                className="shadow-md hover:shadow-lg transition-all duration-300 self-start sm:self-auto"
+                startIcon={<Plus className="w-4 h-4" />}
+                sx={{
+                  boxShadow: 2,
+                  "&:hover": {
+                    boxShadow: 4,
+                  },
+                }}
               >
-                <Plus className="w-4 h-4 mr-2" />
                 New Draft
               </Button>
-            </div>
+            </Box>
             <DraftsList onEditDraft={handleEditDraft} />
-          </TabsContent>
-
-        </Tabs>
+          </TabPanel>
+        </Box>
 
         {/* Course Creation Modal */}
-        <BookingModal 
-          open={isModalOpen} 
+        <BookingModal
+          open={isModalOpen}
           onOpenChange={handleModalClose}
           editingDraft={editingDraft}
           editingPublished={editingPublished}
         />
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 };
 
