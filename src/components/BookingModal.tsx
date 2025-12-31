@@ -169,10 +169,9 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
   const [isEditingPublished, setIsEditingPublished] = useState(false);
   const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
   const [currentPublishedId, setCurrentPublishedId] = useState<string | null>(null);
-  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
-  const [isGeneratingSubtitle, setIsGeneratingSubtitle] = useState(false);
-  const [isGeneratingObjectives, setIsGeneratingObjectives] = useState(false);
-  const [isGeneratingRequirements, setIsGeneratingRequirements] = useState(false);
+  const [isGeneratingAllInfo, setIsGeneratingAllInfo] = useState(false);
+  const [showAIPromptDialog, setShowAIPromptDialog] = useState(false);
+  const [aiPrompt, setAIPrompt] = useState('');
   const [isGeneratingModuleTitle, setIsGeneratingModuleTitle] = useState(false);
   const [isGeneratingSubsectionTitle, setIsGeneratingSubsectionTitle] = useState(false);
   const [isGeneratingSubsectionDescription, setIsGeneratingSubsectionDescription] = useState(false);
@@ -243,163 +242,67 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const generateDescription = async () => {
-    if (!formData.title.trim()) {
+  const generateAllGeneralInfo = async () => {
+    if (!aiPrompt.trim()) {
       toast({
-        title: "Course title required",
-        description: "Please enter a course title first to generate a description.",
+        title: "Course description required",
+        description: "Please describe the course you want to create.",
         variant: "destructive",
       });
       return;
     }
 
-    setIsGeneratingDescription(true);
+    setIsGeneratingAllInfo(true);
+    setShowAIPromptDialog(false);
+    
     try {
       // Simulate AI generation - in a real app, this would call an AI API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 2500));
       
-      const suggestions = [
-        `Master the fundamentals of ${formData.title} with this comprehensive course designed for learners at all levels. You'll gain practical skills and theoretical knowledge through hands-on projects and real-world applications.`,
-        `Dive deep into ${formData.title} and unlock your potential with expert-led instruction. This course combines theoretical concepts with practical exercises to ensure you develop both understanding and application skills.`,
-        `Transform your career with our intensive ${formData.title} course. Learn from industry experts and build a strong foundation through interactive lessons, projects, and personalized feedback.`,
-        `Discover the power of ${formData.title} in this engaging and comprehensive course. Whether you're a beginner or looking to advance your skills, you'll find valuable insights and practical knowledge to achieve your goals.`
-      ];
+      // Extract a title from the prompt
+      const words = aiPrompt.split(' ').slice(0, 5).join(' ');
+      const generatedTitle = words.charAt(0).toUpperCase() + words.slice(1);
       
-      const randomDescription = suggestions[Math.floor(Math.random() * suggestions.length)];
-      updateFormData('description', randomDescription);
+      // Generate all fields based on the prompt
+      const generatedSubtitle = `Master ${aiPrompt} with hands-on projects and expert guidance`;
+      
+      const generatedDescription = `This comprehensive course on ${aiPrompt} is designed for learners who want to gain practical skills and theoretical knowledge. You'll work through hands-on projects and real-world applications, building a strong foundation from fundamentals to advanced concepts. By the end of this course, you'll have the confidence and expertise to apply what you've learned in professional settings.`;
+      
+      const generatedObjectives = `By the end of this course, students will be able to:\n• Understand the fundamental concepts and principles of ${aiPrompt}\n• Apply practical skills in real-world scenarios\n• Build projects using industry best practices\n• Solve complex problems independently\n• Demonstrate mastery through hands-on exercises`;
+      
+      const generatedRequirements = `To succeed in this course, students should have:\n• Basic computer literacy and internet access\n• Willingness to learn and practice regularly\n• No prior experience required - we'll start from the basics\n• Access to a computer or laptop for hands-on exercises\n• Commitment to complete assignments and projects`;
+      
+      // Determine level based on keywords in prompt
+      let level = 'Beginner';
+      if (aiPrompt.toLowerCase().includes('advanced') || aiPrompt.toLowerCase().includes('expert')) {
+        level = 'Expert';
+      } else if (aiPrompt.toLowerCase().includes('intermediate')) {
+        level = 'Intermediate';
+      }
+      
+      // Update all form fields
+      updateFormData('title', generatedTitle);
+      updateFormData('subtitle', generatedSubtitle);
+      updateFormData('description', generatedDescription);
+      updateFormData('objectives', generatedObjectives);
+      updateFormData('requirements', generatedRequirements);
+      updateFormData('level', level);
+      updateFormData('language', 'English');
+      
+      setAIPrompt('');
       
       toast({
-        title: "Description generated!",
-        description: "AI has generated a course description based on your title. Feel free to edit it as needed.",
+        title: "General information generated!",
+        description: "AI has filled all general information fields. Feel free to edit them as needed.",
       });
     } catch (error) {
       toast({
         title: "Generation failed",
-        description: "Failed to generate description. Please try again.",
+        description: "Failed to generate course information. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsGeneratingDescription(false);
-    }
-  };
-
-  const generateSubtitle = async () => {
-    if (!formData.title.trim()) {
-      toast({
-        title: "Course title required",
-        description: "Please enter a course title first to generate a subtitle.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsGeneratingSubtitle(true);
-    try {
-      // Simulate AI generation - in a real app, this would call an AI API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const suggestions = [
-        `Learn ${formData.title} from scratch to advanced level`,
-        `Master ${formData.title} with hands-on projects and expert guidance`,
-        `Complete guide to ${formData.title} for beginners and professionals`,
-        `Practical ${formData.title} skills for real-world applications`,
-        `Step-by-step ${formData.title} training with industry best practices`,
-        `Professional ${formData.title} course with certification preparation`
-      ];
-      
-      const randomSubtitle = suggestions[Math.floor(Math.random() * suggestions.length)];
-      updateFormData('subtitle', randomSubtitle);
-      
-      toast({
-        title: "Subtitle generated!",
-        description: "AI has generated a course subtitle based on your title. Feel free to edit it as needed.",
-      });
-    } catch (error) {
-      toast({
-        title: "Generation failed",
-        description: "Failed to generate subtitle. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingSubtitle(false);
-    }
-  };
-
-  const generateObjectives = async () => {
-    if (!formData.title.trim()) {
-      toast({
-        title: "Course title required",
-        description: "Please enter a course title first to generate objectives.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsGeneratingObjectives(true);
-    try {
-      // Simulate AI generation - in a real app, this would call an AI API
-      await new Promise(resolve => setTimeout(resolve, 1800));
-      
-      const suggestions = [
-        `By the end of this ${formData.title} course, students will be able to:\n• Understand the fundamental concepts and principles\n• Apply practical skills in real-world scenarios\n• Build projects using industry best practices\n• Solve complex problems independently\n• Demonstrate mastery through hands-on exercises`,
-        `Upon completion of this ${formData.title} course, learners will:\n• Master the core concepts and methodologies\n• Develop practical skills through hands-on projects\n• Analyze and solve problems using professional techniques\n• Create original work demonstrating their understanding\n• Confidently apply knowledge in professional settings`,
-        `This ${formData.title} course will enable students to:\n• Gain comprehensive understanding of key principles\n• Implement solutions using modern tools and techniques\n• Design and develop professional-quality projects\n• Evaluate and optimize their work for best results\n• Prepare for advanced studies or career opportunities`
-      ];
-      
-      const randomObjectives = suggestions[Math.floor(Math.random() * suggestions.length)];
-      updateFormData('objectives', randomObjectives);
-      
-      toast({
-        title: "Objectives generated!",
-        description: "AI has generated course objectives based on your title. Feel free to edit them as needed.",
-      });
-    } catch (error) {
-      toast({
-        title: "Generation failed",
-        description: "Failed to generate objectives. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingObjectives(false);
-    }
-  };
-
-  const generateRequirements = async () => {
-    if (!formData.title.trim()) {
-      toast({
-        title: "Course title required",
-        description: "Please enter a course title first to generate requirements.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsGeneratingRequirements(true);
-    try {
-      // Simulate AI generation - in a real app, this would call an AI API
-      await new Promise(resolve => setTimeout(resolve, 1600));
-      
-      const suggestions = [
-        `To succeed in this ${formData.title} course, students should have:\n• Basic computer literacy and internet access\n• Willingness to learn and practice regularly\n• No prior experience required - we'll start from the basics\n• Access to a computer or laptop for hands-on exercises\n• Commitment to complete assignments and projects`,
-        `Prerequisites for this ${formData.title} course:\n• Fundamental computer skills and web browsing\n• Enthusiasm for learning new skills\n• Access to necessary software (guidance provided)\n• Time commitment of 3-5 hours per week\n• Open mindset and willingness to ask questions`,
-        `Before starting this ${formData.title} course, ensure you have:\n• Basic familiarity with technology and computers\n• Reliable internet connection for online content\n• Dedication to practice and apply what you learn\n• Access to recommended tools and resources\n• Beginner-friendly approach - suitable for all levels`
-      ];
-      
-      const randomRequirements = suggestions[Math.floor(Math.random() * suggestions.length)];
-      updateFormData('requirements', randomRequirements);
-      
-      toast({
-        title: "Requirements generated!",
-        description: "AI has generated course requirements based on your title. Feel free to edit them as needed.",
-      });
-    } catch (error) {
-      toast({
-        title: "Generation failed",
-        description: "Failed to generate requirements. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingRequirements(false);
+      setIsGeneratingAllInfo(false);
     }
   };
 
@@ -1068,6 +971,31 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       case 1:
         return (
           <div className="space-y-6">
+            {/* AI Generate All Button */}
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowAIPromptDialog(true)}
+                disabled={isGeneratingAllInfo}
+                className="gap-2"
+              >
+                {isGeneratingAllInfo ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                    Generating All Info...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    AI Generate All
+                  </>
+                )}
+              </Button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Course Title *</Label>
@@ -1080,31 +1008,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                 />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="subtitle">Course Subtitle</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={generateSubtitle}
-                    disabled={!formData.title.trim() || isGeneratingSubtitle}
-                    className="text-xs"
-                  >
-                    {isGeneratingSubtitle ? (
-                      <>
-                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        AI Generate
-                      </>
-                    )}
-                  </Button>
-                </div>
+                <Label htmlFor="subtitle">Course Subtitle</Label>
                 <Input
                   id="subtitle"
                   value={formData.subtitle}
@@ -1116,31 +1020,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
             </div>
             
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="description">Course Description *</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={generateDescription}
-                  disabled={!formData.title.trim() || isGeneratingDescription}
-                  className="text-xs"
-                >
-                  {isGeneratingDescription ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      AI Generate
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Label htmlFor="description">Course Description *</Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -1151,31 +1031,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="objectives">Course Objectives</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={generateObjectives}
-                  disabled={!formData.title.trim() || isGeneratingObjectives}
-                  className="text-xs"
-                >
-                  {isGeneratingObjectives ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      AI Generate
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Label htmlFor="objectives">Course Objectives</Label>
               <Textarea
                 id="objectives"
                 value={formData.objectives}
@@ -1186,31 +1042,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="requirements">Requirements</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={generateRequirements}
-                  disabled={!formData.title.trim() || isGeneratingRequirements}
-                  className="text-xs"
-                >
-                  {isGeneratingRequirements ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-1"></div>
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      AI Generate
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Label htmlFor="requirements">Requirements</Label>
               <Textarea
                 id="requirements"
                 value={formData.requirements}
@@ -2420,6 +2252,37 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Prompt Dialog */}
+      <Dialog open={showAIPromptDialog} onOpenChange={setShowAIPromptDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Generate Course Information with AI</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              Describe the course you want to create. AI will generate the title, subtitle, description, objectives, requirements, and suggest a level.
+            </p>
+            <Textarea
+              value={aiPrompt}
+              onChange={(e) => setAIPrompt(e.target.value)}
+              placeholder="E.g., A beginner-friendly course on React.js that covers components, hooks, state management, and building real-world applications..."
+              className="min-h-32"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowAIPromptDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={generateAllGeneralInfo} disabled={!aiPrompt.trim()}>
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Generate
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
