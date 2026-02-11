@@ -9,7 +9,8 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { Plus, BookOpen, Users, TrendingUp, Star } from "lucide-react";
+import { Plus, BookOpen, Users, TrendingUp, Star, GraduationCap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { BookingModal } from "@/components/BookingModal";
 import { DraftsList } from "@/components/DraftsList";
 import CourseMetricsOverview from "@/components/CourseMetricsOverview";
@@ -39,6 +40,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDraft, setEditingDraft] = useState<DraftCourse | null>(null);
   const [editingPublished, setEditingPublished] = useState<PublishedCourse | null>(null);
@@ -118,20 +120,30 @@ const Index = () => {
                 Build and launch your courses with ease
               </Typography>
             </Box>
-            <Button
-              variant="contained"
-              size="large"
-              onClick={handleCreateNew}
-              startIcon={<Plus className="w-5 h-5" />}
-              sx={{
-                boxShadow: 2,
-                "&:hover": {
-                  boxShadow: 6,
-                },
-              }}
-            >
-              New Course
-            </Button>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => navigate("/student")}
+                startIcon={<GraduationCap className="w-5 h-5" />}
+              >
+                Student Dashboard
+              </Button>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleCreateNew}
+                startIcon={<Plus className="w-5 h-5" />}
+                sx={{
+                  boxShadow: 2,
+                  "&:hover": {
+                    boxShadow: 6,
+                  },
+                }}
+              >
+                New Course
+              </Button>
+            </Box>
           </Box>
         </Box>
 
