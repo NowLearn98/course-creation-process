@@ -30,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PublishedCourse } from "@/types/published";
+import CourseAnnouncements from "./CourseAnnouncements";
 
 interface CourseMetricsCardProps {
   course: PublishedCourse;
@@ -326,6 +327,8 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                   </div>
                 </div>
               )}
+              {/* Announcements / Classroom Chat */}
+              <CourseAnnouncements courseId={course.id} />
             </CollapsibleContent>
           </Collapsible>
         </div>
