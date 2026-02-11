@@ -204,8 +204,8 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
             </div>
           </div>
 
-          {/* Announcements Box */}
-          <div className="lg:w-[320px] shrink-0">
+          {/* Announcements Box - fixed height to match metrics */}
+          <div className="lg:w-[280px] shrink-0 h-auto lg:h-[auto] lg:max-h-[220px]">
             <CourseAnnouncements courseId={course.id} />
           </div>
         </div>
