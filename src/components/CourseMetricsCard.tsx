@@ -142,63 +142,71 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
       </CardHeader>
       
       <CardContent className="relative">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Revenue */}
-          <div className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-success/5 to-transparent border border-success/10">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-success/10 rounded">
-                <DollarSign className="w-4 h-4 text-success" />
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-2 gap-4 flex-1">
+            {/* Revenue */}
+            <div className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-success/5 to-transparent border border-success/10">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-success/10 rounded">
+                  <DollarSign className="w-4 h-4 text-success" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground">Revenue</span>
               </div>
-              <span className="text-xs font-medium text-muted-foreground">Revenue</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-foreground">${revenue.toLocaleString()}</span>
+                <TrendingUp className="w-4 h-4 text-success" />
+              </div>
             </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-foreground">${revenue.toLocaleString()}</span>
-              <TrendingUp className="w-4 h-4 text-success" />
+
+            {/* Students */}
+            <div className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-primary/5 to-transparent border border-primary/10">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded">
+                  <Users className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground">Students</span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-foreground">{enrollments.toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Clicks */}
+            <div className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-accent/5 to-transparent border border-accent/10">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-accent/10 rounded">
+                  <MousePointerClick className="w-4 h-4 text-accent" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground">Clicks</span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-foreground">{clicks.toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Rating */}
+            <div className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-warning/5 to-transparent border border-warning/10">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-warning/10 rounded">
+                  <Star className="w-4 h-4 text-warning fill-warning" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground">Rating</span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-foreground">
+                  {course.rating > 0 ? course.rating.toFixed(1) : 'N/A'}
+                </span>
+                {course.reviews > 0 && (
+                  <span className="text-xs text-muted-foreground">({course.reviews})</span>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Students */}
-          <div className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-primary/5 to-transparent border border-primary/10">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-primary/10 rounded">
-                <Users className="w-4 h-4 text-primary" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">Students</span>
-            </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-foreground">{enrollments.toLocaleString()}</span>
-            </div>
-          </div>
-
-          {/* Clicks */}
-          <div className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-accent/5 to-transparent border border-accent/10">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-accent/10 rounded">
-                <MousePointerClick className="w-4 h-4 text-accent" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">Clicks</span>
-            </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-foreground">{clicks.toLocaleString()}</span>
-            </div>
-          </div>
-
-          {/* Rating */}
-          <div className="flex flex-col gap-2 p-3 rounded-lg bg-gradient-to-br from-warning/5 to-transparent border border-warning/10">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-warning/10 rounded">
-                <Star className="w-4 h-4 text-warning fill-warning" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">Rating</span>
-            </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-foreground">
-                {course.rating > 0 ? course.rating.toFixed(1) : 'N/A'}
-              </span>
-              {course.reviews > 0 && (
-                <span className="text-xs text-muted-foreground">({course.reviews})</span>
-              )}
-            </div>
+          {/* Announcements Box */}
+          <div className="lg:w-[320px] shrink-0">
+            <CourseAnnouncements courseId={course.id} />
           </div>
         </div>
 
@@ -327,8 +335,6 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
                   </div>
                 </div>
               )}
-              {/* Announcements / Classroom Chat */}
-              <CourseAnnouncements courseId={course.id} />
             </CollapsibleContent>
           </Collapsible>
         </div>
