@@ -12,6 +12,7 @@ import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle 
 import { useNavigate } from "react-router-dom";
 import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
+import StudentAnnouncements from "@/components/StudentAnnouncements";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -200,86 +201,95 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
       }}
     >
       <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, gap: 2 }}>
           <Box sx={{ flex: 1 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-              <Typography variant="h6" fontWeight={700}>{course.title}</Typography>
-              <Chip
-                label={course.level}
-                size="small"
-                color="primary"
-                variant="outlined"
-                sx={{ fontSize: "0.7rem" }}
-              />
-            </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-              {course.subtitle}
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-              {type === "classroom" && session && "startDate" in session && (
-                <>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <Calendar className="w-3.5 h-3.5 text-gray-500" />
-                    <Typography variant="caption" color="text.secondary">
-                      {session.startDate} – {(session as any).endDate}
-                    </Typography>
+            <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, justifyContent: "space-between" }}>
+              <Box sx={{ flex: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                  <Typography variant="h6" fontWeight={700}>{course.title}</Typography>
+                  <Chip
+                    label={course.level}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{ fontSize: "0.7rem" }}
+                  />
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                  {course.subtitle}
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                  {type === "classroom" && session && "startDate" in session && (
+                    <>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <Calendar className="w-3.5 h-3.5 text-gray-500" />
+                        <Typography variant="caption" color="text.secondary">
+                          {session.startDate} – {(session as any).endDate}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <Clock className="w-3.5 h-3.5 text-gray-500" />
+                        <Typography variant="caption" color="text.secondary">
+                          {(session as any).startTime} – {(session as any).endTime}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <Users className="w-3.5 h-3.5 text-gray-500" />
+                        <Typography variant="caption" color="text.secondary">
+                          {(session as any).seatCapacity} seats
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
+                  {type === "one-on-one" && session && (
+                    <>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <Calendar className="w-3.5 h-3.5 text-gray-500" />
+                        <Typography variant="caption" color="text.secondary">
+                          {(session as any).startDate} – {(session as any).endDate}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <Clock className="w-3.5 h-3.5 text-gray-500" />
+                        <Typography variant="caption" color="text.secondary">
+                          {(session as any).intervalMinutes} min sessions
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
+                  {type === "self-paced" && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <Clock className="w-3.5 h-3.5 text-gray-500" />
+                      <Typography variant="caption" color="text.secondary">
+                        {course.modules.length} modules
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+
+              {/* Right side metrics */}
+              <Box sx={{ display: "flex", gap: 3, alignItems: "center", shrink: 0 }}>
+                <Box sx={{ textAlign: "center" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, justifyContent: "center" }}>
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <Typography variant="h6" fontWeight={700}>{course.rating}</Typography>
                   </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <Clock className="w-3.5 h-3.5 text-gray-500" />
-                    <Typography variant="caption" color="text.secondary">
-                      {(session as any).startTime} – {(session as any).endTime}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <Users className="w-3.5 h-3.5 text-gray-500" />
-                    <Typography variant="caption" color="text.secondary">
-                      {(session as any).seatCapacity} seats
-                    </Typography>
-                  </Box>
-                </>
-              )}
-              {type === "one-on-one" && session && (
-                <>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <Calendar className="w-3.5 h-3.5 text-gray-500" />
-                    <Typography variant="caption" color="text.secondary">
-                      {(session as any).startDate} – {(session as any).endDate}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <Clock className="w-3.5 h-3.5 text-gray-500" />
-                    <Typography variant="caption" color="text.secondary">
-                      {(session as any).intervalMinutes} min sessions
-                    </Typography>
-                  </Box>
-                </>
-              )}
-              {type === "self-paced" && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <Clock className="w-3.5 h-3.5 text-gray-500" />
+                  <Typography variant="caption" color="text.secondary">{course.reviews} reviews</Typography>
+                </Box>
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography variant="h6" fontWeight={700}>${course.price}</Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {course.modules.length} modules
+                    {type === "one-on-one" ? "per session" : "total"}
                   </Typography>
                 </Box>
-              )}
+              </Box>
             </Box>
           </Box>
 
-          {/* Right side metrics */}
-          <Box sx={{ display: "flex", gap: 3, alignItems: "center", shrink: 0 }}>
-            <Box sx={{ textAlign: "center" }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, justifyContent: "center" }}>
-                <Star className="w-4 h-4 text-yellow-500" />
-                <Typography variant="h6" fontWeight={700}>{course.rating}</Typography>
-              </Box>
-              <Typography variant="caption" color="text.secondary">{course.reviews} reviews</Typography>
-            </Box>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="h6" fontWeight={700}>${course.price}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {type === "one-on-one" ? "per session" : "total"}
-              </Typography>
-            </Box>
+          {/* Announcements */}
+          <Box sx={{ width: { xs: "100%", lg: 280 }, maxHeight: { lg: 220 }, shrink: 0 }}>
+            <StudentAnnouncements courseId={course.id} />
           </Box>
         </Box>
       </CardContent>
