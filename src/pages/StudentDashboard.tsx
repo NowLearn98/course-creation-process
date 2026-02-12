@@ -8,7 +8,7 @@ import {
   CardContent,
   Chip,
 } from "@mui/material";
-import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
@@ -27,11 +27,6 @@ const StudentDashboard = () => {
   );
   const oneOnOneCourses = courses.filter((c) =>
     c.sessionTypes.includes("one-on-one")
-  );
-  const selfPacedCourses = courses.filter(
-    (c) =>
-      !c.sessionTypes.includes("classroom") &&
-      !c.sessionTypes.includes("one-on-one")
   );
 
   return (
@@ -88,8 +83,20 @@ const StudentDashboard = () => {
             </Button>
           </Box>
         </Box>
-
-
+        {/* Completed Sessions Metric */}
+        <Box sx={{ mb: 4 }}>
+          <Card sx={{ boxShadow: 2, maxWidth: 280 }}>
+            <CardContent>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
+                <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                  Completed Sessions
+                </Typography>
+                <CheckCircle className="h-4 w-4 text-green-500" />
+              </Box>
+              <Typography variant="h3" fontWeight={700}>0</Typography>
+            </CardContent>
+          </Card>
+        </Box>
 
 
         {/* Course Sections */}
@@ -126,21 +133,6 @@ const StudentDashboard = () => {
             </Box>
           )}
 
-          {/* Self-Paced Courses */}
-          {selfPacedCourses.length > 0 && (
-            <Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-                <Box sx={{ height: 32, width: 4, bgcolor: "warning.main", borderRadius: 1 }} />
-                <Typography variant="h5" fontWeight={700}>Self-Paced Courses</Typography>
-                <Typography variant="body2" color="text.secondary">({selfPacedCourses.length})</Typography>
-              </Box>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {selfPacedCourses.map((course) => (
-                  <CourseCard key={course.id} course={course} type="self-paced" />
-                ))}
-              </Box>
-            </Box>
-          )}
 
           {courses.length === 0 && (
             <Card sx={{ p: 6, textAlign: "center", border: "2px dashed", borderColor: "divider" }}>
