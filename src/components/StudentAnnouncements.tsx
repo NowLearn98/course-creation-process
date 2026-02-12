@@ -27,8 +27,17 @@ const StudentAnnouncements: React.FC<StudentAnnouncementsProps> = ({ courseId })
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  const loadAnnouncements = () => setAnnouncements(getAnnouncements(courseId));
+
   useEffect(() => {
-    setAnnouncements(getAnnouncements(courseId));
+    loadAnnouncements();
+  }, [courseId]);
+
+  // Re-read on window focus (same-tab SPA navigation)
+  useEffect(() => {
+    const handleFocus = () => loadAnnouncements();
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, [courseId]);
 
   useEffect(() => {
