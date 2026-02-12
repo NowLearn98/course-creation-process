@@ -268,22 +268,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
                 </Box>
               </Box>
 
-              {/* Right side metrics */}
-              <Box sx={{ display: "flex", gap: 3, alignItems: "center", shrink: 0 }}>
-                <Box sx={{ textAlign: "center" }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, justifyContent: "center" }}>
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <Typography variant="h6" fontWeight={700}>{course.rating}</Typography>
-                  </Box>
-                  <Typography variant="caption" color="text.secondary">{course.reviews} reviews</Typography>
-                </Box>
-                <Box sx={{ textAlign: "center" }}>
-                  <Typography variant="h6" fontWeight={700}>${course.price}</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {type === "one-on-one" ? "per session" : "total"}
-                  </Typography>
-                </Box>
-              </Box>
             </Box>
           </Box>
 
