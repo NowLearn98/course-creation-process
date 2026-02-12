@@ -89,54 +89,8 @@ const StudentDashboard = () => {
           </Box>
         </Box>
 
-        {/* Stats */}
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "repeat(1, 1fr)",
-              sm: "repeat(3, 1fr)",
-            },
-            gap: { xs: 2, md: 3 },
-            mb: 4,
-          }}
-        >
-          <Card sx={{ boxShadow: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
-                <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                  Enrolled Courses
-                </Typography>
-                <BookOpen className="h-4 w-4 text-gray-400" />
-              </Box>
-              <Typography variant="h3" fontWeight={700}>{courses.length}</Typography>
-            </CardContent>
-          </Card>
-          <Card sx={{ boxShadow: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
-                <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                  Upcoming Sessions
-                </Typography>
-                <Calendar className="h-4 w-4 text-gray-400" />
-              </Box>
-              <Typography variant="h3" fontWeight={700}>
-                {classroomCourses.length + oneOnOneCourses.length}
-              </Typography>
-            </CardContent>
-          </Card>
-          <Card sx={{ boxShadow: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
-                <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                  Self-Paced
-                </Typography>
-                <Clock className="h-4 w-4 text-gray-400" />
-              </Box>
-              <Typography variant="h3" fontWeight={700}>{selfPacedCourses.length}</Typography>
-            </CardContent>
-          </Card>
-        </Box>
+
+
 
         {/* Course Sections */}
         <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
