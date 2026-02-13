@@ -18,6 +18,7 @@ import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
 import StudentAnnouncements from "@/components/StudentAnnouncements";
 import StudentCourseDetailDialog from "@/components/StudentCourseDetailDialog";
+import StudentAttachments from "@/components/StudentAttachments";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -491,15 +492,22 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
               </Box>
             </Box>
 
-            {/* Announcements */}
+            {/* Announcements & Attachments */}
             <Box
               sx={{
-                width: { xs: "100%", lg: 280 },
-                maxHeight: { lg: 220 },
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: 2,
+                width: { xs: "100%", lg: 540 },
                 flexShrink: 0,
               }}
             >
-              <StudentAnnouncements courseId={course.id} />
+              <Box sx={{ flex: 1, maxHeight: { sm: 220 } }}>
+                <StudentAnnouncements courseId={course.id} />
+              </Box>
+              <Box sx={{ flex: 1, maxHeight: { sm: 220 } }}>
+                <StudentAttachments courseId={course.id} />
+              </Box>
             </Box>
           </Box>
         </CardContent>
