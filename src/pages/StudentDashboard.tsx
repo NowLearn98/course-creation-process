@@ -8,7 +8,7 @@ import {
   CardContent,
   Chip,
 } from "@mui/material";
-import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye, GraduationCap, Sparkles } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye, GraduationCap, Sparkles, Presentation, FlaskConical } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
@@ -324,25 +324,65 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
                 )}
               </Box>
 
-              <Button
-                variant="contained"
-                size="small"
-                disableElevation
-                startIcon={<Eye className="w-4 h-4" />}
-                onClick={() => setDetailOpen(true)}
-                sx={{
-                  borderRadius: 2,
-                  textTransform: "none",
-                  fontWeight: 600,
-                  px: 2.5,
-                  background: "linear-gradient(135deg, hsl(220, 100%, 50%), hsl(220, 80%, 42%))",
-                  "&:hover": {
-                    background: "linear-gradient(135deg, hsl(220, 100%, 45%), hsl(220, 80%, 38%))",
-                  },
-                }}
-              >
-                View Details
-              </Button>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                <Button
+                  variant="contained"
+                  size="small"
+                  disableElevation
+                  startIcon={<Eye className="w-4 h-4" />}
+                  onClick={() => setDetailOpen(true)}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    px: 2.5,
+                    background: "linear-gradient(135deg, hsl(220, 100%, 50%), hsl(220, 80%, 42%))",
+                    "&:hover": {
+                      background: "linear-gradient(135deg, hsl(220, 100%, 45%), hsl(220, 80%, 38%))",
+                    },
+                  }}
+                >
+                  View Details
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<Presentation className="w-4 h-4" />}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    px: 2.5,
+                    borderColor: "hsl(260, 70%, 60%)",
+                    color: "hsl(260, 70%, 50%)",
+                    "&:hover": {
+                      borderColor: "hsl(260, 70%, 45%)",
+                      bgcolor: "hsl(260, 70%, 97%)",
+                    },
+                  }}
+                >
+                  Presentations
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<FlaskConical className="w-4 h-4" />}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    px: 2.5,
+                    borderColor: "hsl(142, 60%, 45%)",
+                    color: "hsl(142, 60%, 35%)",
+                    "&:hover": {
+                      borderColor: "hsl(142, 60%, 35%)",
+                      bgcolor: "hsl(142, 60%, 97%)",
+                    },
+                  }}
+                >
+                  Labs
+                </Button>
+              </Box>
             </Box>
 
             {/* Announcements */}
