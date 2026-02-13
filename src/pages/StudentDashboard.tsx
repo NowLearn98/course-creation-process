@@ -8,11 +8,12 @@ import {
   CardContent,
   Chip,
 } from "@mui/material";
-import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
 import StudentAnnouncements from "@/components/StudentAnnouncements";
+import StudentCourseDetailDialog from "@/components/StudentCourseDetailDialog";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -190,9 +191,11 @@ interface CourseCardProps {
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
+  const [detailOpen, setDetailOpen] = useState(false);
   const session = type === "classroom" ? course.classroomSessions?.[0] : course.oneOnOneSessions?.[0];
 
   return (
+    <>
     <Card
       sx={{
         boxShadow: 2,
@@ -266,6 +269,15 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
                     </Box>
                   )}
                 </Box>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<Eye className="w-4 h-4" />}
+                  onClick={() => setDetailOpen(true)}
+                  sx={{ mt: 1.5, alignSelf: "flex-start" }}
+                >
+                  View Details
+                </Button>
               </Box>
 
             </Box>
@@ -278,6 +290,13 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
         </Box>
       </CardContent>
     </Card>
+    <StudentCourseDetailDialog
+      course={course}
+      open={detailOpen}
+      onClose={() => setDetailOpen(false)}
+      type={type}
+    />
+    </>
   );
 };
 
