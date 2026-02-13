@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PublishedCourse } from "@/types/published";
 import CourseAnnouncements from "./CourseAnnouncements";
+import CourseAttachments from "./CourseAttachments";
 
 interface CourseMetricsCardProps {
   course: PublishedCourse;
@@ -204,9 +205,14 @@ const CourseMetricsCard: React.FC<CourseMetricsCardProps> = ({
             </div>
           </div>
 
-          {/* Announcements Box - fixed height to match metrics */}
-          <div className="lg:w-[280px] shrink-0 h-auto lg:h-[auto] lg:max-h-[220px]">
-            <CourseAnnouncements courseId={course.id} />
+          {/* Announcements & Attachments */}
+          <div className="lg:w-[280px] shrink-0 flex flex-col gap-3">
+            <div className="lg:max-h-[220px]">
+              <CourseAnnouncements courseId={course.id} />
+            </div>
+            <div>
+              <CourseAttachments courseId={course.id} />
+            </div>
           </div>
         </div>
 
