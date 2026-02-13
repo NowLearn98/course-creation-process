@@ -7,8 +7,12 @@ import {
   Card,
   CardContent,
   Chip,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
-import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye, GraduationCap, Sparkles, Presentation, FlaskConical } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye, GraduationCap, Sparkles, Presentation, FlaskConical, ChevronDown, Layers } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
@@ -247,11 +251,22 @@ interface CourseCardProps {
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
+  const navigate = useNavigate();
   const [detailOpen, setDetailOpen] = useState(false);
+  const [presAnchor, setPresAnchor] = useState<null | HTMLElement>(null);
+  const [labsAnchor, setLabsAnchor] = useState<null | HTMLElement>(null);
   const session =
     type === "classroom"
       ? course.classroomSessions?.[0]
       : course.oneOnOneSessions?.[0];
+
+  const modulesWithPresentations = course.modules
+    .map((mod, idx) => ({ mod, idx }))
+    .filter(({ mod }) => mod.subsections.some((s) => s.type === "lecture"));
+
+  const modulesWithLabs = course.modules
+    .map((mod, idx) => ({ mod, idx }))
+    .filter(({ mod }) => mod.subsections.some((s) => s.type === "lab"));
 
   return (
     <>
@@ -348,6 +363,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
                   variant="outlined"
                   size="small"
                   startIcon={<Presentation className="w-4 h-4" />}
+                  endIcon={<ChevronDown className="w-3.5 h-3.5" />}
+                  onClick={(e) => setPresAnchor(e.currentTarget)}
                   sx={{
                     borderRadius: 2,
                     textTransform: "none",
@@ -363,10 +380,56 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
                 >
                   Presentations
                 </Button>
+                <Menu
+                  anchorEl={presAnchor}
+                  open={Boolean(presAnchor)}
+                  onClose={() => setPresAnchor(null)}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: 2,
+                      boxShadow: "0 8px 24px hsla(0,0%,0%,0.12)",
+                      minWidth: 220,
+                      bgcolor: "background.paper",
+                      mt: 0.5,
+                    },
+                  }}
+                >
+                  {modulesWithPresentations.length > 0 ? (
+                    modulesWithPresentations.map(({ mod, idx }) => (
+                      <MenuItem
+                        key={idx}
+                        onClick={() => {
+                          setPresAnchor(null);
+                          navigate(`/student/course/${course.id}/module/${idx}?type=lecture`);
+                        }}
+                        sx={{ borderRadius: 1, mx: 0.5, py: 1 }}
+                      >
+                        <ListItemIcon sx={{ color: "hsl(260, 70%, 55%)" }}>
+                          <Layers className="w-4 h-4" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={mod.title}
+                          secondary={`Module ${idx + 1}`}
+                          primaryTypographyProps={{ variant: "body2", fontWeight: 600 }}
+                          secondaryTypographyProps={{ variant: "caption" }}
+                        />
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled sx={{ py: 1.5 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        No presentations available
+                      </Typography>
+                    </MenuItem>
+                  )}
+                </Menu>
+
                 <Button
                   variant="outlined"
                   size="small"
                   startIcon={<FlaskConical className="w-4 h-4" />}
+                  endIcon={<ChevronDown className="w-3.5 h-3.5" />}
+                  onClick={(e) => setLabsAnchor(e.currentTarget)}
                   sx={{
                     borderRadius: 2,
                     textTransform: "none",
@@ -382,6 +445,49 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
                 >
                   Labs
                 </Button>
+                <Menu
+                  anchorEl={labsAnchor}
+                  open={Boolean(labsAnchor)}
+                  onClose={() => setLabsAnchor(null)}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: 2,
+                      boxShadow: "0 8px 24px hsla(0,0%,0%,0.12)",
+                      minWidth: 220,
+                      bgcolor: "background.paper",
+                      mt: 0.5,
+                    },
+                  }}
+                >
+                  {modulesWithLabs.length > 0 ? (
+                    modulesWithLabs.map(({ mod, idx }) => (
+                      <MenuItem
+                        key={idx}
+                        onClick={() => {
+                          setLabsAnchor(null);
+                          navigate(`/student/course/${course.id}/module/${idx}?type=lab`);
+                        }}
+                        sx={{ borderRadius: 1, mx: 0.5, py: 1 }}
+                      >
+                        <ListItemIcon sx={{ color: "hsl(142, 60%, 40%)" }}>
+                          <Layers className="w-4 h-4" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={mod.title}
+                          secondary={`Module ${idx + 1}`}
+                          primaryTypographyProps={{ variant: "body2", fontWeight: 600 }}
+                          secondaryTypographyProps={{ variant: "caption" }}
+                        />
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled sx={{ py: 1.5 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        No labs available
+                      </Typography>
+                    </MenuItem>
+                  )}
+                </Menu>
               </Box>
             </Box>
 
