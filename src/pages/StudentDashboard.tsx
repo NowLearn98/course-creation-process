@@ -8,7 +8,7 @@ import {
   CardContent,
   Chip,
 } from "@mui/material";
-import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye, GraduationCap, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
@@ -35,156 +35,212 @@ const StudentDashboard = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background:
-          "linear-gradient(to bottom right, hsl(0, 0%, 100%), hsl(220, 100%, 50%, 0.05), hsl(220, 14%, 96%, 0.1))",
+        background: "linear-gradient(180deg, hsl(220, 60%, 97%) 0%, hsl(0, 0%, 100%) 50%)",
       }}
     >
       <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 } }}>
         {/* Header */}
-        <Box sx={{ mb: { xs: 4, md: 6 } }}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              alignItems: { xs: "flex-start", md: "center" },
-              justifyContent: "space-between",
-              gap: 2,
-            }}
-          >
+        <Box
+          sx={{
+            mb: { xs: 4, md: 5 },
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: { xs: "flex-start", md: "center" },
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box
+              sx={{
+                width: 52,
+                height: 52,
+                borderRadius: 3,
+                background: "linear-gradient(135deg, hsl(220, 100%, 50%) 0%, hsl(220, 80%, 40%) 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 4px 14px hsla(220, 100%, 50%, 0.3)",
+              }}
+            >
+              <GraduationCap className="w-6 h-6 text-white" />
+            </Box>
             <Box>
               <Typography
-                variant="h1"
+                variant="h4"
                 sx={{
-                  fontSize: { xs: "2rem", md: "3rem" },
-                  fontWeight: 700,
-                  background:
-                    "linear-gradient(to right, #000, rgba(0, 0, 0, 0.7))",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  mb: 1,
+                  fontWeight: 800,
+                  color: "text.primary",
+                  fontSize: { xs: "1.5rem", md: "2rem" },
+                  letterSpacing: "-0.02em",
                 }}
               >
-                Student Dashboard
+                My Learning
               </Typography>
               <Typography
-                variant="body1"
-                sx={{
-                  fontSize: { xs: "1rem", md: "1.125rem" },
-                  color: "text.secondary",
-                }}
+                variant="body2"
+                sx={{ color: "text.secondary", mt: 0.25 }}
               >
-                View your booked and enrolled courses
+                Track your courses and upcoming sessions
               </Typography>
             </Box>
-            <Button
-              variant="outlined"
-              onClick={() => navigate("/")}
-              startIcon={<ArrowLeft className="w-5 h-5" />}
-            >
-              Back to Creator
-            </Button>
           </Box>
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/")}
+            startIcon={<ArrowLeft className="w-4 h-4" />}
+            sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
+          >
+            Back to Creator
+          </Button>
         </Box>
+
+        {/* Stats */}
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "repeat(1, 1fr)", sm: "repeat(3, 1fr)" },
-            gap: { xs: 2, md: 3 },
-            mb: 4,
+            gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
+            gap: 2.5,
+            mb: 5,
           }}
         >
-          <Card sx={{ boxShadow: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
-                <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                  Enrolled Courses
-                </Typography>
-                <BookOpen className="h-4 w-4 text-gray-400" />
-              </Box>
-              <Typography variant="h3" fontWeight={700}>{courses.length}</Typography>
-            </CardContent>
-          </Card>
-          <Card sx={{ boxShadow: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
-                <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                  Upcoming Sessions
-                </Typography>
-                <Calendar className="h-4 w-4 text-gray-400" />
-              </Box>
-              <Typography variant="h3" fontWeight={700}>
-                {classroomCourses.length + oneOnOneCourses.length}
-              </Typography>
-            </CardContent>
-          </Card>
-          <Card sx={{ boxShadow: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
-                <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                  Completed Sessions
-                </Typography>
-                <CheckCircle className="h-4 w-4 text-green-500" />
-              </Box>
-              <Typography variant="h3" fontWeight={700}>0</Typography>
-            </CardContent>
-          </Card>
+          <StatCard
+            label="Enrolled Courses"
+            value={courses.length}
+            icon={<BookOpen className="w-5 h-5" />}
+            color="hsl(220, 100%, 50%)"
+            bgColor="hsl(220, 100%, 96%)"
+          />
+          <StatCard
+            label="Upcoming Sessions"
+            value={classroomCourses.length + oneOnOneCourses.length}
+            icon={<Calendar className="w-5 h-5" />}
+            color="hsl(260, 70%, 55%)"
+            bgColor="hsl(260, 70%, 96%)"
+          />
+          <StatCard
+            label="Completed"
+            value={0}
+            icon={<CheckCircle className="w-5 h-5" />}
+            color="hsl(142, 70%, 40%)"
+            bgColor="hsl(142, 70%, 96%)"
+          />
         </Box>
-
 
         {/* Course Sections */}
         <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {/* Classroom Courses */}
           {classroomCourses.length > 0 && (
-            <Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-                <Box sx={{ height: 32, width: 4, bgcolor: "primary.main", borderRadius: 1 }} />
-                <Typography variant="h5" fontWeight={700}>Classroom Sessions</Typography>
-                <Typography variant="body2" color="text.secondary">({classroomCourses.length})</Typography>
-              </Box>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {classroomCourses.map((course) => (
-                  <CourseCard key={course.id} course={course} type="classroom" />
-                ))}
-              </Box>
-            </Box>
+            <CourseSection
+              title="Classroom Sessions"
+              count={classroomCourses.length}
+              color="hsl(220, 100%, 50%)"
+              courses={classroomCourses}
+              type="classroom"
+            />
           )}
 
-          {/* One-on-One Courses */}
           {oneOnOneCourses.length > 0 && (
-            <Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-                <Box sx={{ height: 32, width: 4, bgcolor: "secondary.main", borderRadius: 1 }} />
-                <Typography variant="h5" fontWeight={700}>One-on-One Sessions</Typography>
-                <Typography variant="body2" color="text.secondary">({oneOnOneCourses.length})</Typography>
-              </Box>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {oneOnOneCourses.map((course) => (
-                  <CourseCard key={course.id} course={course} type="one-on-one" />
-                ))}
-              </Box>
-            </Box>
+            <CourseSection
+              title="One-on-One Sessions"
+              count={oneOnOneCourses.length}
+              color="hsl(260, 70%, 55%)"
+              courses={oneOnOneCourses}
+              type="one-on-one"
+            />
           )}
 
-
-          {courses.length === 0 && (
-            <Card sx={{ p: 6, textAlign: "center", border: "2px dashed", borderColor: "divider" }}>
-              <CardContent>
-                <BookOpen className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
-                  No Booked Courses Yet
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Browse available courses and enroll to see them here.
-                </Typography>
-              </CardContent>
-            </Card>
-          )}
+          {courses.length === 0 && <EmptyState />}
         </Box>
       </Container>
     </Box>
   );
 };
 
+/* --- Stat Card --- */
+const StatCard: React.FC<{
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  color: string;
+  bgColor: string;
+}> = ({ label, value, icon, color, bgColor }) => (
+  <Card
+    sx={{
+      borderRadius: 3,
+      border: "1px solid",
+      borderColor: "divider",
+      boxShadow: "0 1px 3px hsla(0,0%,0%,0.04)",
+      transition: "all 0.25s ease",
+      "&:hover": {
+        boxShadow: "0 4px 16px hsla(0,0%,0%,0.08)",
+        transform: "translateY(-2px)",
+      },
+    }}
+  >
+    <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <Box>
+          <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 500, mb: 1 }}>
+            {label}
+          </Typography>
+          <Typography variant="h3" sx={{ fontWeight: 800, fontSize: "2rem", color: "text.primary" }}>
+            {value}
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            width: 44,
+            height: 44,
+            borderRadius: 2.5,
+            bgcolor: bgColor,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: color,
+          }}
+        >
+          {icon}
+        </Box>
+      </Box>
+    </CardContent>
+  </Card>
+);
+
+/* --- Course Section --- */
+const CourseSection: React.FC<{
+  title: string;
+  count: number;
+  color: string;
+  courses: PublishedCourse[];
+  type: "classroom" | "one-on-one";
+}> = ({ title, count, color, courses, type }) => (
+  <Box>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
+      <Box sx={{ height: 28, width: 4, bgcolor: color, borderRadius: 1 }} />
+      <Typography variant="h6" fontWeight={700}>
+        {title}
+      </Typography>
+      <Chip
+        label={count}
+        size="small"
+        sx={{
+          bgcolor: `${color}18`,
+          color: color,
+          fontWeight: 700,
+          fontSize: "0.75rem",
+          height: 24,
+        }}
+      />
+    </Box>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {courses.map((course) => (
+        <CourseCard key={course.id} course={course} type={type} />
+      ))}
+    </Box>
+  </Box>
+);
+
+/* --- Course Card --- */
 interface CourseCardProps {
   course: PublishedCourse;
   type: "classroom" | "one-on-one" | "self-paced";
@@ -192,112 +248,184 @@ interface CourseCardProps {
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
   const [detailOpen, setDetailOpen] = useState(false);
-  const session = type === "classroom" ? course.classroomSessions?.[0] : course.oneOnOneSessions?.[0];
+  const session =
+    type === "classroom"
+      ? course.classroomSessions?.[0]
+      : course.oneOnOneSessions?.[0];
 
   return (
     <>
-    <Card
-      sx={{
-        boxShadow: 2,
-        transition: "all 0.2s",
-        "&:hover": { boxShadow: 4 },
-      }}
-    >
-      <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, gap: 2 }}>
-          <Box sx={{ flex: 1 }}>
-            <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, justifyContent: "space-between" }}>
-              <Box sx={{ flex: 1 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                  <Typography variant="h6" fontWeight={700}>{course.title}</Typography>
-                  <Chip
-                    label={course.level}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                    sx={{ fontSize: "0.7rem" }}
-                  />
-                </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                  {course.subtitle}
+      <Card
+        sx={{
+          borderRadius: 3,
+          border: "1px solid",
+          borderColor: "divider",
+          boxShadow: "0 1px 3px hsla(0,0%,0%,0.04)",
+          transition: "all 0.25s ease",
+          overflow: "visible",
+          "&:hover": {
+            boxShadow: "0 6px 24px hsla(0,0%,0%,0.08)",
+            borderColor: "primary.light",
+          },
+        }}
+      >
+        <CardContent sx={{ p: { xs: 2.5, md: 3 }, "&:last-child": { pb: { xs: 2.5, md: 3 } } }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", lg: "row" },
+              gap: 2.5,
+            }}
+          >
+            {/* Course Info */}
+            <Box sx={{ flex: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.75, flexWrap: "wrap" }}>
+                <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.05rem" }}>
+                  {course.title}
                 </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                  {type === "classroom" && session && "startDate" in session && (
-                    <>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        <Calendar className="w-3.5 h-3.5 text-gray-500" />
-                        <Typography variant="caption" color="text.secondary">
-                          {session.startDate} – {(session as any).endDate}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        <Clock className="w-3.5 h-3.5 text-gray-500" />
-                        <Typography variant="caption" color="text.secondary">
-                          {(session as any).startTime} – {(session as any).endTime}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        <Users className="w-3.5 h-3.5 text-gray-500" />
-                        <Typography variant="caption" color="text.secondary">
-                          {(session as any).seatCapacity} seats
-                        </Typography>
-                      </Box>
-                    </>
-                  )}
-                  {type === "one-on-one" && session && (
-                    <>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        <Calendar className="w-3.5 h-3.5 text-gray-500" />
-                        <Typography variant="caption" color="text.secondary">
-                          {(session as any).startDate} – {(session as any).endDate}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        <Clock className="w-3.5 h-3.5 text-gray-500" />
-                        <Typography variant="caption" color="text.secondary">
-                          {(session as any).intervalMinutes} min sessions
-                        </Typography>
-                      </Box>
-                    </>
-                  )}
-                  {type === "self-paced" && (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                      <Clock className="w-3.5 h-3.5 text-gray-500" />
-                      <Typography variant="caption" color="text.secondary">
-                        {course.modules.length} modules
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-                <Button
-                  variant="outlined"
+                <Chip
+                  label={course.level}
                   size="small"
-                  startIcon={<Eye className="w-4 h-4" />}
-                  onClick={() => setDetailOpen(true)}
-                  sx={{ mt: 1.5, alignSelf: "flex-start" }}
-                >
-                  View Details
-                </Button>
+                  sx={{
+                    fontSize: "0.7rem",
+                    fontWeight: 600,
+                    height: 22,
+                    bgcolor: "hsl(220, 100%, 96%)",
+                    color: "hsl(220, 100%, 45%)",
+                    border: "1px solid hsl(220, 80%, 90%)",
+                  }}
+                />
+              </Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 2, lineHeight: 1.6 }}
+              >
+                {course.subtitle}
+              </Typography>
+
+              {/* Session Info Pills */}
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+                {type === "classroom" && session && "startDate" in session && (
+                  <>
+                    <InfoPill icon={<Calendar className="w-3.5 h-3.5" />} label={`${session.startDate} – ${(session as any).endDate}`} />
+                    <InfoPill icon={<Clock className="w-3.5 h-3.5" />} label={`${(session as any).startTime} – ${(session as any).endTime}`} />
+                    <InfoPill icon={<Users className="w-3.5 h-3.5" />} label={`${(session as any).seatCapacity} seats`} />
+                  </>
+                )}
+                {type === "one-on-one" && session && (
+                  <>
+                    <InfoPill icon={<Calendar className="w-3.5 h-3.5" />} label={`${(session as any).startDate} – ${(session as any).endDate}`} />
+                    <InfoPill icon={<Clock className="w-3.5 h-3.5" />} label={`${(session as any).intervalMinutes} min sessions`} />
+                  </>
+                )}
+                {type === "self-paced" && (
+                  <InfoPill icon={<Clock className="w-3.5 h-3.5" />} label={`${course.modules.length} modules`} />
+                )}
               </Box>
 
+              <Button
+                variant="contained"
+                size="small"
+                disableElevation
+                startIcon={<Eye className="w-4 h-4" />}
+                onClick={() => setDetailOpen(true)}
+                sx={{
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  px: 2.5,
+                  background: "linear-gradient(135deg, hsl(220, 100%, 50%), hsl(220, 80%, 42%))",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, hsl(220, 100%, 45%), hsl(220, 80%, 38%))",
+                  },
+                }}
+              >
+                View Details
+              </Button>
+            </Box>
+
+            {/* Announcements */}
+            <Box
+              sx={{
+                width: { xs: "100%", lg: 280 },
+                maxHeight: { lg: 220 },
+                flexShrink: 0,
+              }}
+            >
+              <StudentAnnouncements courseId={course.id} />
             </Box>
           </Box>
-
-          {/* Announcements */}
-          <Box sx={{ width: { xs: "100%", lg: 280 }, maxHeight: { lg: 220 }, shrink: 0 }}>
-            <StudentAnnouncements courseId={course.id} />
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
-    <StudentCourseDetailDialog
-      course={course}
-      open={detailOpen}
-      onClose={() => setDetailOpen(false)}
-      type={type}
-    />
+        </CardContent>
+      </Card>
+      <StudentCourseDetailDialog
+        course={course}
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        type={type}
+      />
     </>
   );
 };
+
+/* --- Info Pill --- */
+const InfoPill: React.FC<{ icon: React.ReactNode; label: string }> = ({ icon, label }) => (
+  <Box
+    sx={{
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 0.75,
+      px: 1.5,
+      py: 0.5,
+      borderRadius: 2,
+      bgcolor: "hsl(220, 20%, 96%)",
+      border: "1px solid hsl(220, 20%, 92%)",
+      color: "text.secondary",
+    }}
+  >
+    {icon}
+    <Typography variant="caption" fontWeight={500} sx={{ fontSize: "0.75rem" }}>
+      {label}
+    </Typography>
+  </Box>
+);
+
+/* --- Empty State --- */
+const EmptyState = () => (
+  <Card
+    sx={{
+      borderRadius: 3,
+      border: "2px dashed",
+      borderColor: "hsl(220, 30%, 88%)",
+      bgcolor: "hsl(220, 60%, 98%)",
+      textAlign: "center",
+      py: 8,
+    }}
+  >
+    <CardContent>
+      <Box
+        sx={{
+          width: 72,
+          height: 72,
+          borderRadius: "50%",
+          bgcolor: "hsl(220, 100%, 95%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mx: "auto",
+          mb: 2.5,
+        }}
+      >
+        <Sparkles className="w-8 h-8" style={{ color: "hsl(220, 100%, 60%)" }} />
+      </Box>
+      <Typography variant="h6" fontWeight={700} sx={{ mb: 1, color: "text.primary" }}>
+        No Booked Courses Yet
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 320, mx: "auto" }}>
+        Browse available courses and enroll to start your learning journey.
+      </Typography>
+    </CardContent>
+  </Card>
+);
 
 export default StudentDashboard;
