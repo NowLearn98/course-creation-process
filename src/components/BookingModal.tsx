@@ -1383,6 +1383,27 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                     Add Session
                   </Button>
                 </div>
+
+                {formData.classroomSessions.length === 0 && (
+                  <Card className="p-4 border-dashed border-2 border-muted-foreground/20 bg-accent/20">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-foreground">📋 How to create a Classroom Session</p>
+                      <p className="text-sm text-muted-foreground">
+                        Click <span className="font-medium">"Add Session"</span> above, then fill in the details:
+                      </p>
+                      <div className="text-sm text-muted-foreground pl-4 space-y-1">
+                        <p>• <span className="font-medium">Start & End Date</span> — e.g., Mar 1 – Mar 30</p>
+                        <p>• <span className="font-medium">Start & End Time</span> — e.g., 9:00 AM – 12:00 PM</p>
+                        <p>• <span className="font-medium">Timezone</span> — e.g., EST (Eastern Time)</p>
+                        <p>• <span className="font-medium">Seat Capacity</span> — e.g., 25 students</p>
+                        <p>• <span className="font-medium">Course Price</span> — e.g., $199 for the entire course</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground/70 italic mt-2">
+                        Example: A web development bootcamp running weekdays from Mar 1–30, 9 AM–12 PM EST, with 25 seats at $199 per student.
+                      </p>
+                    </div>
+                  </Card>
+                )}
                 
                 {formData.classroomSessions.length > 0 && formData.classroomSessions.map((session, index) => (
                   <Card key={index} className="p-4">
@@ -1514,6 +1535,27 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                     Add Session
                   </Button>
                 </div>
+
+                {formData.oneOnOneSessions.length === 0 && (
+                  <Card className="p-4 border-dashed border-2 border-muted-foreground/20 bg-accent/20">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-foreground">📋 How to create a 1-on-1 Session</p>
+                      <p className="text-sm text-muted-foreground">
+                        Click <span className="font-medium">"Add Session"</span> above, then fill in the details:
+                      </p>
+                      <div className="text-sm text-muted-foreground pl-4 space-y-1">
+                        <p>• <span className="font-medium">Start & End Date</span> — your availability window, e.g., Mar 1 – Apr 30</p>
+                        <p>• <span className="font-medium">Available Days</span> — select which days you're available, e.g., Mon, Wed, Fri</p>
+                        <p>• <span className="font-medium">Start & End Time</span> — your daily time window, e.g., 10:00 AM – 4:00 PM</p>
+                        <p>• <span className="font-medium">Time Interval</span> — booking slot duration, e.g., 60 minutes</p>
+                        <p>• <span className="font-medium">Price per Interval</span> — e.g., $50 per 60-minute session</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground/70 italic mt-2">
+                        Example: Available Mon/Wed/Fri from Mar 1–Apr 30, 10 AM–4 PM, with 60-min slots at $50 each. Students book individual time slots.
+                      </p>
+                    </div>
+                  </Card>
+                )}
                 
                 {formData.oneOnOneSessions.length > 0 && formData.oneOnOneSessions.map((session, index) => (
                   <Card key={index} className="p-4">
