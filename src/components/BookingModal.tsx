@@ -176,6 +176,8 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
   const [isGeneratingSubsectionTitle, setIsGeneratingSubsectionTitle] = useState(false);
   const [isGeneratingSubsectionDescription, setIsGeneratingSubsectionDescription] = useState(false);
   const [isGeneratingModuleSubsections, setIsGeneratingModuleSubsections] = useState(false);
+  const [isGeneratingSessions, setIsGeneratingSessions] = useState(false);
+  const [sessionAIPrompt, setSessionAIPrompt] = useState('');
   const { toast } = useToast();
 
   // Load draft or published course data when editing
@@ -533,6 +535,154 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
 
   const nextStep = () => {
     if (currentStep < 5) setCurrentStep(currentStep + 1);
+  };
+
+  const generateSessionsFromAI = async () => {
+    if (!sessionAIPrompt.trim()) {
+      toast({
+        title: "Availability description required",
+        description: "Please describe your availability and timing preferences.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingSessions(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const prompt = sessionAIPrompt.toLowerCase();
+      const newSessionTypes: string[] = [];
+      const newClassroomSessions: ClassroomSession[] = [];
+      const newOneOnOneSessions: OneOnOneSession[] = [];
+
+      const dayMap: Record<string, string> = {
+        'monday': 'Monday', 'mon': 'Monday',
+        'tuesday': 'Tuesday', 'tue': 'Tuesday', 'tues': 'Tuesday',
+        'wednesday': 'Wednesday', 'wed': 'Wednesday',
+        'thursday': 'Thursday', 'thu': 'Thursday', 'thurs': 'Thursday',
+        'friday': 'Friday', 'fri': 'Friday',
+        'saturday': 'Saturday', 'sat': 'Saturday',
+        'sunday': 'Sunday', 'sun': 'Sunday',
+        'weekdays': 'weekdays', 'weekends': 'weekends',
+      };
+
+      let detectedDays: string[] = [];
+      for (const [key, val] of Object.entries(dayMap)) {
+        if (prompt.includes(key)) {
+          if (val === 'weekdays') {
+            detectedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+          } else if (val === 'weekends') {
+            detectedDays.push('Saturday', 'Sunday');
+          } else if (!detectedDays.includes(val)) {
+            detectedDays.push(val);
+          }
+        }
+      }
+      if (detectedDays.length === 0) detectedDays = ['Monday', 'Wednesday', 'Friday'];
+
+      let startTime = '09:00';
+      let endTime = '17:00';
+      const timeMatch = prompt.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/gi);
+      if (timeMatch && timeMatch.length >= 2) {
+        const parseTime = (t: string) => {
+          const m = t.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+          if (!m) return null;
+          let h = parseInt(m[1]);
+          const min = m[2] ? parseInt(m[2]) : 0;
+          if (m[3]?.toLowerCase() === 'pm' && h < 12) h += 12;
+          if (m[3]?.toLowerCase() === 'am' && h === 12) h = 0;
+          return `${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+        };
+        const t1 = parseTime(timeMatch[0]);
+        const t2 = parseTime(timeMatch[1]);
+        if (t1) startTime = t1;
+        if (t2) endTime = t2;
+      } else if (prompt.includes('morning')) {
+        startTime = '09:00'; endTime = '12:00';
+      } else if (prompt.includes('afternoon')) {
+        startTime = '13:00'; endTime = '17:00';
+      } else if (prompt.includes('evening')) {
+        startTime = '18:00'; endTime = '21:00';
+      }
+
+      const today = new Date();
+      const startDate = new Date(today);
+      startDate.setDate(startDate.getDate() + 7);
+      const endDate = new Date(startDate);
+      
+      if (prompt.includes('month') || prompt.includes('4 week')) {
+        endDate.setDate(endDate.getDate() + 30);
+      } else if (prompt.includes('2 week')) {
+        endDate.setDate(endDate.getDate() + 14);
+      } else if (prompt.includes('3 month')) {
+        endDate.setMonth(endDate.getMonth() + 3);
+      } else {
+        endDate.setDate(endDate.getDate() + 30);
+      }
+
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const endDateStr = endDate.toISOString().split('T')[0];
+
+      const isOneOnOne = prompt.includes('1-on-1') || prompt.includes('one-on-one') || prompt.includes('1 on 1') || prompt.includes('individual') || prompt.includes('private') || prompt.includes('tutoring');
+      const isClassroom = prompt.includes('classroom') || prompt.includes('group') || prompt.includes('class') || prompt.includes('batch');
+
+      if (isOneOnOne || (!isClassroom && !isOneOnOne)) {
+        newSessionTypes.push('oneOnOne');
+        let interval = 60;
+        if (prompt.includes('30 min')) interval = 30;
+        else if (prompt.includes('90 min') || prompt.includes('1.5 hour')) interval = 90;
+        else if (prompt.includes('2 hour')) interval = 120;
+
+        newOneOnOneSessions.push({
+          startDate: startDateStr,
+          endDate: endDateStr,
+          daysOfWeek: detectedDays,
+          startTime,
+          endTime,
+          intervalMinutes: interval,
+          pricePerInterval: undefined,
+        });
+      }
+
+      if (isClassroom) {
+        newSessionTypes.push('classroom');
+        let capacity = 20;
+        const capMatch = prompt.match(/(\d+)\s*(student|seat|people|participant)/i);
+        if (capMatch) capacity = parseInt(capMatch[1]);
+
+        newClassroomSessions.push({
+          startDate: startDateStr,
+          endDate: endDateStr,
+          startTime,
+          endTime,
+          timezone: 'UTC',
+          seatCapacity: capacity,
+          price: undefined,
+        });
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        sessionTypes: [...new Set([...prev.sessionTypes, ...newSessionTypes])],
+        classroomSessions: [...prev.classroomSessions, ...newClassroomSessions],
+        oneOnOneSessions: [...prev.oneOnOneSessions, ...newOneOnOneSessions],
+      }));
+
+      setSessionAIPrompt('');
+      toast({
+        title: "Sessions generated!",
+        description: "AI has created sessions based on your availability. Feel free to adjust them.",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation failed",
+        description: "Failed to generate sessions. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingSessions(false);
+    }
   };
 
   const prevStep = () => {
@@ -1370,6 +1520,54 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                 );
               })}
             </div>
+
+            {/* AI Session Generator */}
+            <Card className="p-5 border-dashed border-2 border-primary/30 bg-accent/20">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <h4 className="font-semibold text-foreground">AI Generate Sessions</h4>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Describe your availability and timing preferences, and AI will create sessions for you.
+                </p>
+                <div className="p-3 rounded-md bg-muted/50 border border-border">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Example prompt:</p>
+                  <p className="text-xs text-muted-foreground italic">
+                    "I'm available for 1-on-1 tutoring on Monday, Wednesday, and Friday from 10am to 4pm for the next month. Each session should be 60 minutes."
+                  </p>
+                </div>
+                <Textarea
+                  value={sessionAIPrompt}
+                  onChange={(e) => setSessionAIPrompt(e.target.value)}
+                  placeholder="e.g., I want to teach a classroom course on weekdays from 2pm to 5pm for 2 weeks with 30 students..."
+                  className="min-h-[80px] text-sm"
+                />
+                <Button
+                  onClick={generateSessionsFromAI}
+                  disabled={!sessionAIPrompt.trim() || isGeneratingSessions}
+                  className="w-full"
+                  size="sm"
+                >
+                  {isGeneratingSessions ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                      Generating Sessions...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Generate Sessions with AI
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Card>
+
 
             {formData.sessionTypes.includes('classroom') && (
               <div className="space-y-4">
