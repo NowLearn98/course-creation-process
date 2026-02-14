@@ -1384,7 +1384,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                   </Button>
                 </div>
 
-                {formData.classroomSessions.length === 0 && (
+                {(
                   <Card className="p-4 border-dashed border-2 border-muted-foreground/20 bg-accent/20">
                     <div className="space-y-2">
                       <p className="text-sm font-medium text-foreground">📋 How to create a Classroom Session</p>
@@ -1536,7 +1536,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                   </Button>
                 </div>
 
-                {formData.oneOnOneSessions.length === 0 && (
+                {(
                   <Card className="p-4 border-dashed border-2 border-muted-foreground/20 bg-accent/20">
                     <div className="space-y-2">
                       <p className="text-sm font-medium text-foreground">📋 How to create a 1-on-1 Session</p>
