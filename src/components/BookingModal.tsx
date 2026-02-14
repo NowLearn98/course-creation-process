@@ -625,9 +625,13 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       const endDateStr = endDate.toISOString().split('T')[0];
 
       const isOneOnOne = prompt.includes('1-on-1') || prompt.includes('one-on-one') || prompt.includes('1 on 1') || prompt.includes('individual') || prompt.includes('private') || prompt.includes('tutoring');
-      const isClassroom = prompt.includes('classroom') || prompt.includes('group') || prompt.includes('class') || prompt.includes('batch');
+      const isClassroom = prompt.includes('classroom') || prompt.includes('group') || prompt.includes('class') || prompt.includes('batch') || prompt.includes('student') || prompt.includes('seat');
 
-      if (isOneOnOne || (!isClassroom && !isOneOnOne)) {
+      // If both or neither detected, create both types
+      const createOneOnOne = isOneOnOne || (!isClassroom && !isOneOnOne);
+      const createClassroom = isClassroom || (!isClassroom && !isOneOnOne);
+
+      if (createOneOnOne) {
         newSessionTypes.push('oneOnOne');
         let interval = 60;
         if (prompt.includes('30 min')) interval = 30;
@@ -645,7 +649,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
         });
       }
 
-      if (isClassroom) {
+      if (createClassroom) {
         newSessionTypes.push('classroom');
         let capacity = 20;
         const capMatch = prompt.match(/(\d+)\s*(student|seat|people|participant)/i);
@@ -1832,7 +1836,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
             )}
 
             {/* Calendar Preview - Always at the bottom */}
-            {(formData.sessionTypes.includes('oneOnOne') && formData.oneOnOneSessions.length > 0 && formData.oneOnOneSessions[0].daysOfWeek.length > 0) && (
+            {((formData.sessionTypes.includes('oneOnOne') && formData.oneOnOneSessions.length > 0 && formData.oneOnOneSessions[0].daysOfWeek.length > 0) || (formData.sessionTypes.includes('classroom') && formData.classroomSessions.length > 0 && formData.classroomSessions[0].startDate)) && (
               <div className="space-y-4 mt-8">
                 <h5 className="text-sm font-medium text-foreground text-center">Session Preview</h5>
                 <div className="flex justify-center">
@@ -1953,6 +1957,27 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                                 
                                 {/* Session Blocks */}
                                 <div className="absolute inset-1 top-6 flex flex-col gap-1">
+                                  {/* Classroom Session Block */}
+                                  {classroomSession?.startDate && calendarDay.isCurrentMonth && !isPastDate && isAfterClassroomStart && (
+                                    <div className="flex-1">
+                                      {classroomSession.startTime && classroomSession.endTime ? (
+                                        <div className="bg-primary text-primary-foreground rounded-sm p-1 h-full flex flex-col justify-center text-center">
+                                          <div className="text-xs font-medium leading-tight">
+                                            Class
+                                          </div>
+                                          <div className="text-xs opacity-90 leading-tight">
+                                            {classroomSession.startTime.slice(0, 5)} - {classroomSession.endTime.slice(0, 5)}
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <div className="bg-accent border border-dashed border-primary rounded-sm p-1 h-full flex items-center justify-center">
+                                          <div className="text-xs text-muted-foreground text-center leading-tight">
+                                            Class
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
                                   {/* 1-on-1 Session Block */}
                                   {isOneOnOneDay && calendarDay.isCurrentMonth && !isPastDate && isAfterOneOnOneStart && (
                                     <div className="flex-1">
