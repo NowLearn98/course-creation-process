@@ -398,6 +398,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
   const [reviewRating, setReviewRating] = useState<number | null>(null);
   const [courseReview, setCourseReview] = useState("");
   const [instructorReview, setInstructorReview] = useState("");
+  const [privateInstructorReview, setPrivateInstructorReview] = useState("");
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const session =
     type === "classroom"
@@ -763,9 +764,30 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
 
           {/* Instructor Review */}
           <Box>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+              Instructor Review
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+              Share your feedback about the instructor's teaching style and communication.
+            </Typography>
+            <TextField
+              multiline
+              rows={3}
+              fullWidth
+              placeholder="How was the instructor's teaching?"
+              value={instructorReview}
+              onChange={(e) => setInstructorReview(e.target.value)}
+              sx={{
+                "& .MuiOutlinedInput-root": { borderRadius: 2 },
+              }}
+            />
+          </Box>
+
+          {/* Private Review for Instructor */}
+          <Box sx={{ border: "1px dashed rgba(0,0,0,0.15)", borderRadius: 2, p: 2, bgcolor: "rgba(0,0,0,0.02)" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
               <Typography variant="subtitle2" fontWeight={600}>
-                Instructor Review
+                Private Feedback for Instructor
               </Typography>
               <Chip
                 label="Private"
@@ -780,15 +802,15 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
               />
             </Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
-              This review is private and will only be shared with the instructor, not visible to other students.
+              This feedback is private and will only be visible to the instructor. It will not be shared publicly.
             </Typography>
             <TextField
               multiline
               rows={3}
               fullWidth
-              placeholder="How was the instructor's teaching?"
-              value={instructorReview}
-              onChange={(e) => setInstructorReview(e.target.value)}
+              placeholder="Any private feedback for the instructor?"
+              value={privateInstructorReview}
+              onChange={(e) => setPrivateInstructorReview(e.target.value)}
               sx={{
                 "& .MuiOutlinedInput-root": { borderRadius: 2 },
               }}
