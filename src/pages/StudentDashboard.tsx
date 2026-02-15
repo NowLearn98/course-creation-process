@@ -699,53 +699,82 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
-            p: 1,
+            borderRadius: 4,
+            overflow: "hidden",
           },
         }}
       >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
+        {/* Header with gradient */}
+        <Box
+          sx={{
+            background: "linear-gradient(135deg, hsl(220, 100%, 50%), hsl(220, 80%, 38%))",
+            color: "white",
+            px: 3,
+            py: 2.5,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Box>
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="h6" fontWeight={700} color="inherit">
               Submit a Review
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ opacity: 0.85 }}>
               {course.title}
             </Typography>
           </Box>
-          <IconButton onClick={() => setReviewOpen(false)} size="small">
+          <IconButton onClick={() => setReviewOpen(false)} size="small" sx={{ color: "white" }}>
             <X className="w-5 h-5" />
           </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
+        </Box>
+
+        <DialogContent sx={{ pt: 3, pb: 1, px: 3 }}>
           {/* Star Rating */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-              Overall Rating
+          <Box
+            sx={{
+              mb: 3,
+              textAlign: "center",
+              py: 2.5,
+              px: 2,
+              borderRadius: 3,
+              bgcolor: "rgba(0,0,0,0.02)",
+              border: "1px solid rgba(0,0,0,0.06)",
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
+              How would you rate this course?
             </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1.5 }}>
+              Tap a star to rate your overall experience
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1.5 }}>
               <Rating
                 value={reviewRating}
                 onChange={(_, newValue) => setReviewRating(newValue)}
                 size="large"
                 sx={{
+                  fontSize: "2.2rem",
                   "& .MuiRating-iconFilled": { color: "hsl(40, 95%, 50%)" },
                   "& .MuiRating-iconHover": { color: "hsl(40, 95%, 55%)" },
                 }}
               />
-              {reviewRating && (
-                <Typography variant="body2" fontWeight={600} color="text.secondary">
-                  {reviewRating}/5
-                </Typography>
-              )}
             </Box>
+            {reviewRating && (
+              <Typography variant="body2" fontWeight={700} sx={{ mt: 1, color: "hsl(40, 95%, 45%)" }}>
+                {reviewRating === 5 ? "Outstanding! ⭐" : reviewRating === 4 ? "Great! 👍" : reviewRating === 3 ? "Good 👌" : reviewRating === 2 ? "Fair" : "Poor"}
+              </Typography>
+            )}
           </Box>
 
           {/* Course Review */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-              Course Review
-            </Typography>
+          <Box sx={{ mb: 2.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+              <BookOpen className="w-4 h-4" style={{ color: "hsl(220, 80%, 50%)" }} />
+              <Typography variant="subtitle2" fontWeight={700}>
+                Course Review
+              </Typography>
+            </Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
               Share your experience about the course content, materials, and structure.
             </Typography>
@@ -757,16 +786,24 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
               value={courseReview}
               onChange={(e) => setCourseReview(e.target.value)}
               sx={{
-                "& .MuiOutlinedInput-root": { borderRadius: 2 },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2.5,
+                  transition: "border-color 0.2s",
+                  "&:hover fieldset": { borderColor: "hsl(220, 80%, 60%)" },
+                  "&.Mui-focused fieldset": { borderColor: "hsl(220, 80%, 50%)" },
+                },
               }}
             />
           </Box>
 
           {/* Instructor Review */}
-          <Box>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-              Instructor Review
-            </Typography>
+          <Box sx={{ mb: 2.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+              <GraduationCap className="w-4 h-4" style={{ color: "hsl(220, 80%, 50%)" }} />
+              <Typography variant="subtitle2" fontWeight={700}>
+                Instructor Review
+              </Typography>
+            </Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
               Share your feedback about the instructor's teaching style and communication.
             </Typography>
@@ -778,31 +815,44 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
               value={instructorReview}
               onChange={(e) => setInstructorReview(e.target.value)}
               sx={{
-                "& .MuiOutlinedInput-root": { borderRadius: 2 },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2.5,
+                  transition: "border-color 0.2s",
+                  "&:hover fieldset": { borderColor: "hsl(220, 80%, 60%)" },
+                  "&.Mui-focused fieldset": { borderColor: "hsl(220, 80%, 50%)" },
+                },
               }}
             />
           </Box>
 
           {/* Private Review for Instructor */}
-          <Box sx={{ border: "1px dashed rgba(0,0,0,0.15)", borderRadius: 2, p: 2, bgcolor: "rgba(0,0,0,0.02)" }}>
+          <Box
+            sx={{
+              border: "1px solid hsl(220, 80%, 90%)",
+              borderRadius: 3,
+              p: 2.5,
+              bgcolor: "hsl(220, 60%, 97%)",
+              mb: 1,
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-              <Typography variant="subtitle2" fontWeight={600}>
-                Private Feedback for Instructor
+              <Typography variant="subtitle2" fontWeight={700}>
+                🔒 Private Feedback for Instructor
               </Typography>
               <Chip
-                label="Private"
+                label="Only visible to instructor"
                 size="small"
-                icon={<span style={{ fontSize: 14, marginLeft: 8 }}>🔒</span>}
                 sx={{
-                  bgcolor: "rgba(0,0,0,0.06)",
-                  fontSize: "0.7rem",
-                  height: 22,
-                  fontWeight: 500,
+                  bgcolor: "hsl(220, 60%, 92%)",
+                  color: "hsl(220, 80%, 40%)",
+                  fontSize: "0.65rem",
+                  height: 20,
+                  fontWeight: 600,
                 }}
               />
             </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
-              This feedback is private and will only be visible to the instructor. It will not be shared publicly.
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1.5 }}>
+              This feedback is completely private and will not be shared publicly or with other students.
             </Typography>
             <TextField
               multiline
@@ -812,16 +862,31 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
               value={privateInstructorReview}
               onChange={(e) => setPrivateInstructorReview(e.target.value)}
               sx={{
-                "& .MuiOutlinedInput-root": { borderRadius: 2 },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2.5,
+                  bgcolor: "white",
+                  transition: "border-color 0.2s",
+                  "&:hover fieldset": { borderColor: "hsl(220, 80%, 60%)" },
+                  "&.Mui-focused fieldset": { borderColor: "hsl(220, 80%, 50%)" },
+                },
               }}
             />
           </Box>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+
+        <DialogActions sx={{ px: 3, pb: 3, pt: 1.5 }}>
           <Button
             variant="outlined"
             onClick={() => setReviewOpen(false)}
-            sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
+            sx={{
+              borderRadius: 2.5,
+              textTransform: "none",
+              fontWeight: 600,
+              px: 3,
+              borderColor: "rgba(0,0,0,0.15)",
+              color: "text.secondary",
+              "&:hover": { borderColor: "rgba(0,0,0,0.3)", bgcolor: "rgba(0,0,0,0.02)" },
+            }}
           >
             Cancel
           </Button>
@@ -834,12 +899,17 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
               setReviewOpen(false);
             }}
             sx={{
-              borderRadius: 2,
+              borderRadius: 2.5,
               textTransform: "none",
-              fontWeight: 600,
+              fontWeight: 700,
+              px: 4,
+              py: 1.2,
               background: "linear-gradient(135deg, hsl(220, 100%, 50%), hsl(220, 80%, 42%))",
               "&:hover": {
                 background: "linear-gradient(135deg, hsl(220, 100%, 45%), hsl(220, 80%, 38%))",
+              },
+              "&.Mui-disabled": {
+                background: "rgba(0,0,0,0.08)",
               },
             }}
           >
