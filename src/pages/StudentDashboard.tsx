@@ -227,7 +227,7 @@ const StudentDashboard = () => {
           />
           <StatCard
             label="Completed"
-            value={0}
+            value={pastCourses.length}
             icon={<CheckCircle className="w-5 h-5" />}
             color="hsl(142, 70%, 40%)"
             bgColor="hsl(142, 70%, 96%)"
@@ -280,73 +280,7 @@ const StudentDashboard = () => {
               </Box>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 {pastCourses.map((course) => (
-                  <Card
-                    key={course.id}
-                    sx={{
-                      borderRadius: 3,
-                      border: "1px solid",
-                      borderColor: "divider",
-                      boxShadow: "0 1px 3px hsla(0,0%,0%,0.04)",
-                      opacity: 0.85,
-                    }}
-                  >
-                    <CardContent sx={{ p: { xs: 2.5, md: 3 }, "&:last-child": { pb: { xs: 2.5, md: 3 } } }}>
-                      <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, alignItems: { sm: "center" }, justifyContent: "space-between" }}>
-                        <Box sx={{ flex: 1 }}>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.75, flexWrap: "wrap" }}>
-                            <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.05rem" }}>
-                              {course.title}
-                            </Typography>
-                            <Chip
-                              label={course.level}
-                              size="small"
-                              sx={{
-                                fontSize: "0.7rem",
-                                fontWeight: 600,
-                                height: 22,
-                                bgcolor: "hsl(220, 100%, 96%)",
-                                color: "hsl(220, 100%, 45%)",
-                                border: "1px solid hsl(220, 80%, 90%)",
-                              }}
-                            />
-                            <Chip
-                              label={course.sessionType === "classroom" ? "Classroom" : "One-on-One"}
-                              size="small"
-                              sx={{
-                                fontSize: "0.7rem",
-                                fontWeight: 600,
-                                height: 22,
-                                bgcolor: course.sessionType === "classroom" ? "hsl(220, 100%, 96%)" : "hsl(260, 70%, 96%)",
-                                color: course.sessionType === "classroom" ? "hsl(220, 100%, 45%)" : "hsl(260, 70%, 50%)",
-                                border: `1px solid ${course.sessionType === "classroom" ? "hsl(220, 80%, 90%)" : "hsl(260, 60%, 88%)"}`,
-                              }}
-                            />
-                            <Chip
-                              icon={<CheckCircle className="w-3 h-3" />}
-                              label="Completed"
-                              size="small"
-                              sx={{
-                                fontSize: "0.7rem",
-                                fontWeight: 600,
-                                height: 22,
-                                bgcolor: "hsl(142, 70%, 95%)",
-                                color: "hsl(142, 60%, 35%)",
-                                border: "1px solid hsl(142, 50%, 85%)",
-                                "& .MuiChip-icon": { color: "hsl(142, 60%, 35%)" },
-                              }}
-                            />
-                          </Box>
-                          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                            {course.subtitle}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, flexShrink: 0 }}>
-                          <InfoPill icon={<Calendar className="w-3.5 h-3.5" />} label={`Completed ${course.completedDate}`} />
-                          <InfoPill icon={<Star className="w-3.5 h-3.5" />} label={`${course.rating} ★`} />
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
+                  <CourseCard key={course.id} course={course} type={course.sessionType} />
                 ))}
               </Box>
             </Box>
