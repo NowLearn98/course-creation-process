@@ -11,8 +11,15 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  IconButton,
+  Rating,
 } from "@mui/material";
-import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye, GraduationCap, Sparkles, Presentation, FlaskConical, ChevronDown, Layers } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye, GraduationCap, Sparkles, Presentation, FlaskConical, ChevronDown, Layers, MessageSquarePlus, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
@@ -280,7 +287,7 @@ const StudentDashboard = () => {
               </Box>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 {pastCourses.map((course) => (
-                  <CourseCard key={course.id} course={course} type={course.sessionType} />
+                  <CourseCard key={course.id} course={course} type={course.sessionType} isPast />
                 ))}
               </Box>
             </Box>
@@ -379,13 +386,19 @@ const CourseSection: React.FC<{
 interface CourseCardProps {
   course: PublishedCourse;
   type: "classroom" | "one-on-one" | "self-paced";
+  isPast?: boolean;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false }) => {
   const navigate = useNavigate();
   const [detailOpen, setDetailOpen] = useState(false);
   const [presAnchor, setPresAnchor] = useState<null | HTMLElement>(null);
   const [labsAnchor, setLabsAnchor] = useState<null | HTMLElement>(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState<number | null>(null);
+  const [courseReview, setCourseReview] = useState("");
+  const [instructorReview, setInstructorReview] = useState("");
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const session =
     type === "classroom"
       ? course.classroomSessions?.[0]
@@ -619,6 +632,34 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
                     </MenuItem>
                   )}
                 </Menu>
+                {isPast && (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={reviewSubmitted ? <CheckCircle className="w-4 h-4" /> : <MessageSquarePlus className="w-4 h-4" />}
+                    onClick={() => !reviewSubmitted && setReviewOpen(true)}
+                    disabled={reviewSubmitted}
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontWeight: 600,
+                      px: 2.5,
+                      borderColor: reviewSubmitted ? "hsl(142, 60%, 45%)" : "hsl(30, 90%, 50%)",
+                      color: reviewSubmitted ? "hsl(142, 60%, 35%)" : "hsl(30, 90%, 40%)",
+                      "&:hover": {
+                        borderColor: reviewSubmitted ? "hsl(142, 60%, 45%)" : "hsl(30, 90%, 40%)",
+                        bgcolor: reviewSubmitted ? "hsl(142, 60%, 97%)" : "hsl(30, 90%, 97%)",
+                      },
+                      "&.Mui-disabled": {
+                        borderColor: "hsl(142, 60%, 45%)",
+                        color: "hsl(142, 60%, 35%)",
+                        opacity: 0.8,
+                      },
+                    }}
+                  >
+                    {reviewSubmitted ? "Review Submitted" : "Submit a Review"}
+                  </Button>
+                )}
               </Box>
             </Box>
 
@@ -648,6 +689,129 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type }) => {
         onClose={() => setDetailOpen(false)}
         type={type}
       />
+
+      {/* Review Dialog */}
+      <Dialog
+        open={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 1,
+          },
+        }}
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
+          <Box>
+            <Typography variant="h6" fontWeight={700}>
+              Submit a Review
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {course.title}
+            </Typography>
+          </Box>
+          <IconButton onClick={() => setReviewOpen(false)} size="small">
+            <X className="w-5 h-5" />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          {/* Star Rating */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+              Overall Rating
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Rating
+                value={reviewRating}
+                onChange={(_, newValue) => setReviewRating(newValue)}
+                size="large"
+                sx={{
+                  "& .MuiRating-iconFilled": { color: "hsl(40, 95%, 50%)" },
+                  "& .MuiRating-iconHover": { color: "hsl(40, 95%, 55%)" },
+                }}
+              />
+              {reviewRating && (
+                <Typography variant="body2" fontWeight={600} color="text.secondary">
+                  {reviewRating}/5
+                </Typography>
+              )}
+            </Box>
+          </Box>
+
+          {/* Course Review */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+              Course Review
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+              Share your experience about the course content, materials, and structure.
+            </Typography>
+            <TextField
+              multiline
+              rows={3}
+              fullWidth
+              placeholder="What did you think about the course content?"
+              value={courseReview}
+              onChange={(e) => setCourseReview(e.target.value)}
+              sx={{
+                "& .MuiOutlinedInput-root": { borderRadius: 2 },
+              }}
+            />
+          </Box>
+
+          {/* Instructor Review */}
+          <Box>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+              Instructor Review
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+              Share your feedback about the instructor's teaching style and communication.
+            </Typography>
+            <TextField
+              multiline
+              rows={3}
+              fullWidth
+              placeholder="How was the instructor's teaching?"
+              value={instructorReview}
+              onChange={(e) => setInstructorReview(e.target.value)}
+              sx={{
+                "& .MuiOutlinedInput-root": { borderRadius: 2 },
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button
+            variant="outlined"
+            onClick={() => setReviewOpen(false)}
+            sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            disableElevation
+            disabled={!reviewRating}
+            onClick={() => {
+              setReviewSubmitted(true);
+              setReviewOpen(false);
+            }}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 600,
+              background: "linear-gradient(135deg, hsl(220, 100%, 50%), hsl(220, 80%, 42%))",
+              "&:hover": {
+                background: "linear-gradient(135deg, hsl(220, 100%, 45%), hsl(220, 80%, 38%))",
+              },
+            }}
+          >
+            Submit Review
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
