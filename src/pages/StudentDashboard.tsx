@@ -763,11 +763,24 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
 
           {/* Instructor Review */}
           <Box>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-              Instructor Review
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+              <Typography variant="subtitle2" fontWeight={600}>
+                Instructor Review
+              </Typography>
+              <Chip
+                label="Private"
+                size="small"
+                icon={<span style={{ fontSize: 14, marginLeft: 8 }}>🔒</span>}
+                sx={{
+                  bgcolor: "rgba(0,0,0,0.06)",
+                  fontSize: "0.7rem",
+                  height: 22,
+                  fontWeight: 500,
+                }}
+              />
+            </Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
-              Share your feedback about the instructor's teaching style and communication.
+              This review is private and will only be shared with the instructor, not visible to other students.
             </Typography>
             <TextField
               multiline
