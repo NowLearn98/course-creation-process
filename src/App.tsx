@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentCourseMaterialPage from "./pages/StudentCourseMaterialPage";
 import NotFound from "./pages/NotFound";
+import ReviewsPage from "./pages/ReviewsPage";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/student/course/:courseId/module/:moduleIndex" element={<StudentCourseMaterialPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

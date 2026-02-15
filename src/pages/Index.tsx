@@ -10,7 +10,6 @@ import {
   Tab,
 } from "@mui/material";
 import { Plus, BookOpen, Users, TrendingUp, Star, GraduationCap, MessageSquare } from "lucide-react";
-import ReviewsTab from "@/components/ReviewsTab";
 import { useNavigate } from "react-router-dom";
 import { BookingModal } from "@/components/BookingModal";
 import { DraftsList } from "@/components/DraftsList";
@@ -125,6 +124,14 @@ const Index = () => {
               <Button
                 variant="outlined"
                 size="large"
+                onClick={() => navigate("/reviews")}
+                startIcon={<MessageSquare className="w-5 h-5" />}
+              >
+                Reviews
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
                 onClick={() => navigate("/student")}
                 startIcon={<GraduationCap className="w-5 h-5" />}
               >
@@ -168,11 +175,6 @@ const Index = () => {
               icon={<BookOpen className="w-4 h-4" />}
               iconPosition="start"
               label="Drafts"
-            />
-            <Tab
-              icon={<MessageSquare className="w-4 h-4" />}
-              iconPosition="start"
-              label="Reviews"
             />
           </Tabs>
 
@@ -443,10 +445,6 @@ const Index = () => {
               </Button>
             </Box>
             <DraftsList onEditDraft={handleEditDraft} />
-          </TabPanel>
-
-          <TabPanel value={tabValue} index={2}>
-            <ReviewsTab />
           </TabPanel>
         </Box>
 
