@@ -36,6 +36,108 @@ const StudentDashboard = () => {
     c.sessionTypes.includes("one-on-one")
   );
 
+  // Demo past courses
+  const pastCourses: (PublishedCourse & { completedDate: string; sessionType: "classroom" | "one-on-one" })[] = [
+    {
+      id: "past-1",
+      title: "Python for Data Science",
+      subtitle: "A hands-on bootcamp covering data analysis with Python, Pandas, and visualization",
+      description: "",
+      objectives: "",
+      requirements: "",
+      level: "Intermediate",
+      language: "English",
+      category: "Technology",
+      subcategory: "Data Science",
+      modules: [
+        {
+          title: "Data Analysis with Pandas",
+          subsections: [
+            { title: "Introduction to Pandas", description: "DataFrames and Series", type: "lecture" as const, timeMinutes: "60" },
+            { title: "Data Cleaning Lab", description: "Hands-on data wrangling", type: "lab" as const, timeMinutes: "90" },
+          ],
+        },
+        {
+          title: "Data Visualization",
+          subsections: [
+            { title: "Matplotlib & Seaborn", description: "Creating charts", type: "lecture" as const, timeMinutes: "45" },
+          ],
+        },
+      ],
+      format: "online",
+      sessionTypes: ["classroom"],
+      classroomSessions: [
+        {
+          startDate: "2025-10-01",
+          endDate: "2025-10-15",
+          startTime: "09:00",
+          endTime: "13:00",
+          timezone: "America/New_York",
+          seatCapacity: 30,
+          price: 299,
+        },
+      ],
+      oneOnOneSessions: [],
+      images: [],
+      videos: [],
+      publishedAt: "2025-09-15",
+      enrollments: 28,
+      rating: 4.7,
+      reviews: 22,
+      price: 299,
+      clicks: 540,
+      status: "active",
+      completedDate: "2025-10-15",
+      sessionType: "classroom",
+    },
+    {
+      id: "past-2",
+      title: "Spanish Conversation Practice",
+      subtitle: "Personalized 1-on-1 Spanish lessons focused on real-world conversation skills",
+      description: "",
+      objectives: "",
+      requirements: "",
+      level: "Beginner",
+      language: "English",
+      category: "Language",
+      subcategory: "Spanish",
+      modules: [
+        {
+          title: "Everyday Conversations",
+          subsections: [
+            { title: "Greetings & Introductions", description: "Basic conversational phrases", type: "lecture" as const, timeMinutes: "30" },
+            { title: "Ordering Food & Shopping", description: "Practical scenarios", type: "lecture" as const, timeMinutes: "30" },
+          ],
+        },
+      ],
+      format: "online",
+      sessionTypes: ["one-on-one"],
+      classroomSessions: [],
+      oneOnOneSessions: [
+        {
+          startDate: "2025-11-01",
+          endDate: "2025-12-20",
+          daysOfWeek: ["Tuesday", "Thursday"],
+          startTime: "18:00",
+          endTime: "20:00",
+          pricePerInterval: 40,
+          intervalMinutes: 30,
+        },
+      ],
+      images: [],
+      videos: [],
+      publishedAt: "2025-10-20",
+      enrollments: 1,
+      rating: 5.0,
+      reviews: 1,
+      price: 40,
+      clicks: 120,
+      status: "active",
+      completedDate: "2025-12-20",
+      sessionType: "one-on-one",
+    },
+  ];
+
   return (
     <Box
       sx={{
@@ -154,7 +256,101 @@ const StudentDashboard = () => {
             />
           )}
 
-          {courses.length === 0 && <EmptyState />}
+          {courses.length === 0 && pastCourses.length === 0 && <EmptyState />}
+
+          {/* Past Courses Section */}
+          {pastCourses.length > 0 && (
+            <Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
+                <Box sx={{ height: 28, width: 4, bgcolor: "hsl(0, 0%, 55%)", borderRadius: 1 }} />
+                <Typography variant="h6" fontWeight={700}>
+                  Past Courses
+                </Typography>
+                <Chip
+                  label={pastCourses.length}
+                  size="small"
+                  sx={{
+                    bgcolor: "hsl(0, 0%, 92%)",
+                    color: "hsl(0, 0%, 45%)",
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                    height: 24,
+                  }}
+                />
+              </Box>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                {pastCourses.map((course) => (
+                  <Card
+                    key={course.id}
+                    sx={{
+                      borderRadius: 3,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      boxShadow: "0 1px 3px hsla(0,0%,0%,0.04)",
+                      opacity: 0.85,
+                    }}
+                  >
+                    <CardContent sx={{ p: { xs: 2.5, md: 3 }, "&:last-child": { pb: { xs: 2.5, md: 3 } } }}>
+                      <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2, alignItems: { sm: "center" }, justifyContent: "space-between" }}>
+                        <Box sx={{ flex: 1 }}>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.75, flexWrap: "wrap" }}>
+                            <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1.05rem" }}>
+                              {course.title}
+                            </Typography>
+                            <Chip
+                              label={course.level}
+                              size="small"
+                              sx={{
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                height: 22,
+                                bgcolor: "hsl(220, 100%, 96%)",
+                                color: "hsl(220, 100%, 45%)",
+                                border: "1px solid hsl(220, 80%, 90%)",
+                              }}
+                            />
+                            <Chip
+                              label={course.sessionType === "classroom" ? "Classroom" : "One-on-One"}
+                              size="small"
+                              sx={{
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                height: 22,
+                                bgcolor: course.sessionType === "classroom" ? "hsl(220, 100%, 96%)" : "hsl(260, 70%, 96%)",
+                                color: course.sessionType === "classroom" ? "hsl(220, 100%, 45%)" : "hsl(260, 70%, 50%)",
+                                border: `1px solid ${course.sessionType === "classroom" ? "hsl(220, 80%, 90%)" : "hsl(260, 60%, 88%)"}`,
+                              }}
+                            />
+                            <Chip
+                              icon={<CheckCircle className="w-3 h-3" />}
+                              label="Completed"
+                              size="small"
+                              sx={{
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                height: 22,
+                                bgcolor: "hsl(142, 70%, 95%)",
+                                color: "hsl(142, 60%, 35%)",
+                                border: "1px solid hsl(142, 50%, 85%)",
+                                "& .MuiChip-icon": { color: "hsl(142, 60%, 35%)" },
+                              }}
+                            />
+                          </Box>
+                          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                            {course.subtitle}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, flexShrink: 0 }}>
+                          <InfoPill icon={<Calendar className="w-3.5 h-3.5" />} label={`Completed ${course.completedDate}`} />
+                          <InfoPill icon={<Star className="w-3.5 h-3.5" />} label={`${course.rating} ★`} />
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Box>
+            </Box>
+          )}
         </Box>
       </Container>
     </Box>
