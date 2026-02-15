@@ -9,7 +9,8 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { Plus, BookOpen, Users, TrendingUp, Star, GraduationCap } from "lucide-react";
+import { Plus, BookOpen, Users, TrendingUp, Star, GraduationCap, MessageSquare } from "lucide-react";
+import ReviewsTab from "@/components/ReviewsTab";
 import { useNavigate } from "react-router-dom";
 import { BookingModal } from "@/components/BookingModal";
 import { DraftsList } from "@/components/DraftsList";
@@ -167,6 +168,11 @@ const Index = () => {
               icon={<BookOpen className="w-4 h-4" />}
               iconPosition="start"
               label="Drafts"
+            />
+            <Tab
+              icon={<MessageSquare className="w-4 h-4" />}
+              iconPosition="start"
+              label="Reviews"
             />
           </Tabs>
 
@@ -437,6 +443,10 @@ const Index = () => {
               </Button>
             </Box>
             <DraftsList onEditDraft={handleEditDraft} />
+          </TabPanel>
+
+          <TabPanel value={tabValue} index={2}>
+            <ReviewsTab />
           </TabPanel>
         </Box>
 
