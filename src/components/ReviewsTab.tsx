@@ -12,8 +12,10 @@ import {
   Tab,
   TextField,
   Button,
+  Collapse,
+  IconButton,
 } from "@mui/material";
-import { MessageSquare, BookOpen, GraduationCap, Lock, Send, CheckCircle } from "lucide-react";
+import { MessageSquare, BookOpen, GraduationCap, Lock, Send, CheckCircle, Reply } from "lucide-react";
 
 interface Review {
   id: string;
@@ -92,12 +94,20 @@ const ReviewsTab: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [tabValue, setTabValue] = useState(0);
   const [replyDrafts, setReplyDrafts] = useState<Record<string, { course: string; instructor: string }>>({});
+  const [openReplyFields, setOpenReplyFields] = useState<Record<string, { course: boolean; instructor: boolean }>>({});
 
   const pendingReviews = reviews.filter((r) => !r.courseReplyFromInstructor && !r.instructorReplyFromInstructor);
   const completedReviews = reviews.filter((r) => r.courseReplyFromInstructor || r.instructorReplyFromInstructor);
   const displayedReviews = tabValue === 0 ? pendingReviews : completedReviews;
 
   const avgRating = reviews.reduce((sum, r) => sum + r.courseRating, 0) / reviews.length;
+
+  const toggleReplyField = (reviewId: string, field: "course" | "instructor") => {
+    setOpenReplyFields((prev) => ({
+      ...prev,
+      [reviewId]: { ...prev[reviewId], [field]: !prev[reviewId]?.[field] },
+    }));
+  };
 
   const handleReplyChange = (reviewId: string, field: "course" | "instructor", value: string) => {
     setReplyDrafts((prev) => ({
@@ -106,21 +116,27 @@ const ReviewsTab: React.FC = () => {
     }));
   };
 
-  const handleSubmitReply = (reviewId: string) => {
-    const draft = replyDrafts[reviewId];
-    if (!draft?.course && !draft?.instructor) return;
+  const handleSubmitSingleReply = (reviewId: string, field: "course" | "instructor") => {
+    const value = replyDrafts[reviewId]?.[field];
+    if (!value) return;
     setReviews((prev) =>
-      prev.map((r) =>
-        r.id === reviewId
-          ? { ...r, courseReplyFromInstructor: draft?.course || "", instructorReplyFromInstructor: draft?.instructor || "" }
-          : r
-      )
+      prev.map((r) => {
+        if (r.id !== reviewId) return r;
+        const updated = { ...r };
+        if (field === "course") updated.courseReplyFromInstructor = value;
+        if (field === "instructor") updated.instructorReplyFromInstructor = value;
+        // If both replies now exist, it counts as completed
+        return updated;
+      })
     );
-    setReplyDrafts((prev) => {
-      const next = { ...prev };
-      delete next[reviewId];
-      return next;
-    });
+    setReplyDrafts((prev) => ({
+      ...prev,
+      [reviewId]: { ...prev[reviewId], [field]: "" },
+    }));
+    setOpenReplyFields((prev) => ({
+      ...prev,
+      [reviewId]: { ...prev[reviewId], [field]: false },
+    }));
   };
 
   return (
@@ -256,11 +272,20 @@ const ReviewsTab: React.FC = () => {
                     <Typography variant="subtitle2" fontWeight={600}>
                       Course Review
                     </Typography>
+                    {!review.courseReplyFromInstructor && (
+                      <Button
+                        size="small"
+                        startIcon={<Reply className="w-3.5 h-3.5" />}
+                        onClick={() => toggleReplyField(review.id, "course")}
+                        sx={{ ml: "auto", textTransform: "none", fontSize: "0.75rem", fontWeight: 600, borderRadius: 2 }}
+                      >
+                        {openReplyFields[review.id]?.course ? "Cancel" : "Reply"}
+                      </Button>
+                    )}
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ pl: 3.5, lineHeight: 1.7 }}>
                     {review.courseReview}
                   </Typography>
-                  {/* Instructor reply for course review */}
                   {review.courseReplyFromInstructor && (
                     <Box
                       sx={{
@@ -280,6 +305,31 @@ const ReviewsTab: React.FC = () => {
                       </Typography>
                     </Box>
                   )}
+                  <Collapse in={openReplyFields[review.id]?.course} timeout="auto">
+                    <Box sx={{ ml: 3.5, mt: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
+                      <TextField
+                        placeholder="Write your reply to the course review..."
+                        multiline
+                        minRows={2}
+                        size="small"
+                        value={replyDrafts[review.id]?.course || ""}
+                        onChange={(e) => handleReplyChange(review.id, "course", e.target.value)}
+                        sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+                      />
+                      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<Send className="w-3.5 h-3.5" />}
+                          disabled={!replyDrafts[review.id]?.course}
+                          onClick={() => handleSubmitSingleReply(review.id, "course")}
+                          sx={{ textTransform: "none", fontWeight: 600, borderRadius: 2, background: "linear-gradient(135deg, hsl(220, 100%, 50%), hsl(220, 100%, 40%))" }}
+                        >
+                          Submit
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Collapse>
                 </Box>
 
                 {/* Instructor Review */}
@@ -289,11 +339,20 @@ const ReviewsTab: React.FC = () => {
                     <Typography variant="subtitle2" fontWeight={600}>
                       Instructor Review
                     </Typography>
+                    {!review.instructorReplyFromInstructor && (
+                      <Button
+                        size="small"
+                        startIcon={<Reply className="w-3.5 h-3.5" />}
+                        onClick={() => toggleReplyField(review.id, "instructor")}
+                        sx={{ ml: "auto", textTransform: "none", fontSize: "0.75rem", fontWeight: 600, borderRadius: 2 }}
+                      >
+                        {openReplyFields[review.id]?.instructor ? "Cancel" : "Reply"}
+                      </Button>
+                    )}
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ pl: 3.5, lineHeight: 1.7 }}>
                     {review.instructorReview}
                   </Typography>
-                  {/* Instructor reply for instructor review */}
                   {review.instructorReplyFromInstructor && (
                     <Box
                       sx={{
@@ -313,6 +372,31 @@ const ReviewsTab: React.FC = () => {
                       </Typography>
                     </Box>
                   )}
+                  <Collapse in={openReplyFields[review.id]?.instructor} timeout="auto">
+                    <Box sx={{ ml: 3.5, mt: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
+                      <TextField
+                        placeholder="Write your reply to the instructor review..."
+                        multiline
+                        minRows={2}
+                        size="small"
+                        value={replyDrafts[review.id]?.instructor || ""}
+                        onChange={(e) => handleReplyChange(review.id, "instructor", e.target.value)}
+                        sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+                      />
+                      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<Send className="w-3.5 h-3.5" />}
+                          disabled={!replyDrafts[review.id]?.instructor}
+                          onClick={() => handleSubmitSingleReply(review.id, "instructor")}
+                          sx={{ textTransform: "none", fontWeight: 600, borderRadius: 2, background: "linear-gradient(135deg, hsl(262, 80%, 55%), hsl(262, 80%, 45%))" }}
+                        >
+                          Submit
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Collapse>
                 </Box>
 
                 {/* Private Feedback */}
@@ -322,7 +406,6 @@ const ReviewsTab: React.FC = () => {
                     borderRadius: 2,
                     bgcolor: "hsl(220, 60%, 97%)",
                     border: "1px dashed hsl(220, 40%, 85%)",
-                    mb: tabValue === 0 ? 2.5 : 0,
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
@@ -345,66 +428,6 @@ const ReviewsTab: React.FC = () => {
                     {review.privateReview}
                   </Typography>
                 </Box>
-
-                {/* Reply Section (only for pending reviews) */}
-                {tabValue === 0 && (
-                  <Box
-                    sx={{
-                      p: 2.5,
-                      borderRadius: 2.5,
-                      bgcolor: "hsl(220, 30%, 98%)",
-                      border: "1px solid hsl(220, 30%, 90%)",
-                    }}
-                  >
-                    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
-                      <Send className="w-4 h-4" style={{ color: "hsl(220, 100%, 50%)" }} />
-                      Write Your Replies
-                    </Typography>
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                      <TextField
-                        label="Reply to Course Review"
-                        placeholder="Share your thoughts on the student's course feedback..."
-                        multiline
-                        minRows={2}
-                        size="small"
-                        value={replyDrafts[review.id]?.course || ""}
-                        onChange={(e) => handleReplyChange(review.id, "course", e.target.value)}
-                        sx={{
-                          "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                        }}
-                      />
-                      <TextField
-                        label="Reply to Instructor Review"
-                        placeholder="Respond to the student's instructor feedback..."
-                        multiline
-                        minRows={2}
-                        size="small"
-                        value={replyDrafts[review.id]?.instructor || ""}
-                        onChange={(e) => handleReplyChange(review.id, "instructor", e.target.value)}
-                        sx={{
-                          "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                        }}
-                      />
-                      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          startIcon={<Send className="w-4 h-4" />}
-                          disabled={!replyDrafts[review.id]?.course && !replyDrafts[review.id]?.instructor}
-                          onClick={() => handleSubmitReply(review.id)}
-                          sx={{
-                            borderRadius: 2,
-                            textTransform: "none",
-                            fontWeight: 600,
-                            background: "linear-gradient(135deg, hsl(220, 100%, 50%), hsl(220, 100%, 40%))",
-                          }}
-                        >
-                          Submit Reply
-                        </Button>
-                      </Box>
-                    </Box>
-                  </Box>
-                )}
               </CardContent>
             </Card>
           ))}
