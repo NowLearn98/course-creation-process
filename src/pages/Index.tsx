@@ -132,6 +132,14 @@ const Index = () => {
               <Button
                 variant="outlined"
                 size="large"
+                onClick={() => navigate("/performance")}
+                startIcon={<TrendingUp className="w-5 h-5" />}
+              >
+                Performance
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
                 onClick={() => navigate("/student")}
                 startIcon={<GraduationCap className="w-5 h-5" />}
               >
