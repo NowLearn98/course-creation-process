@@ -207,26 +207,48 @@ const PerformancePage = () => {
             </CardContent>
           </Card>
 
-          {/* Course Summary Table */}
-          <Card>
+          {/* Course Metrics Table */}
+          <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle className="text-lg">Course Summary</CardTitle>
+              <CardTitle className="text-lg">Course Breakdown</CardTitle>
             </CardHeader>
             <CardContent>
               {courses.length > 0 ? (
                 <div className="space-y-3">
-                  {courses.map((course) => (
-                    <div key={course.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-foreground truncate">{course.title}</p>
-                        <p className="text-xs text-muted-foreground">{course.enrollments || 0} students · ${((course.enrollments || 0) * (course.price || 0)).toLocaleString()} revenue</p>
+                  {courses.map((course) => {
+                    const revenue = (course.enrollments || 0) * (course.price || 0);
+                    const bookings = (course.metricsHistory || []).reduce((sum, m) => sum + m.bookings, 0);
+                    return (
+                      <div key={course.id} className="p-3 rounded-lg border bg-muted/30 space-y-2">
+                        <p className="text-sm font-semibold text-foreground truncate">{course.title}</p>
+                        <div className="grid grid-cols-5 gap-2">
+                          <div className="text-center">
+                            <p className="text-xs text-muted-foreground">Revenue</p>
+                            <p className="text-sm font-bold text-foreground">${revenue.toLocaleString()}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-xs text-muted-foreground">Students</p>
+                            <p className="text-sm font-bold text-foreground">{(course.enrollments || 0).toLocaleString()}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-xs text-muted-foreground">Clicks</p>
+                            <p className="text-sm font-bold text-foreground">{(course.clicks || 0).toLocaleString()}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-xs text-muted-foreground">Rating</p>
+                            <div className="flex items-center justify-center gap-0.5">
+                              <Star className="w-3 h-3 text-warning fill-warning" />
+                              <p className="text-sm font-bold text-foreground">{course.rating > 0 ? course.rating.toFixed(1) : "–"}</p>
+                            </div>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-xs text-muted-foreground">Bookings</p>
+                            <p className="text-sm font-bold text-foreground">{bookings.toLocaleString()}</p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 ml-3">
-                        <Star className="w-3.5 h-3.5 text-warning fill-warning" />
-                        <span className="text-sm font-semibold">{course.rating > 0 ? course.rating.toFixed(1) : "–"}</span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-muted-foreground text-center py-12">No courses published yet</p>
