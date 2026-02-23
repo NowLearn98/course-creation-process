@@ -5,7 +5,7 @@ import {
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
   TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp,
   MousePointerClick, Presentation, FlaskConical, ExternalLink, FileEdit,
-  Trash2, Settings, Save, Sparkles, Bot, Zap, TicketCheck, MessageSquare, Briefcase,
+  Trash2, Settings, Save, Sparkles, Bot, Zap, TicketCheck, MessageSquare, Briefcase, Search, ArrowDownAZ, ArrowUpAZ, Filter,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -114,6 +115,12 @@ const AdminPortalPage = () => {
   const [removeDialog, setRemoveDialog] = useState<{ open: boolean; name: string; type: "instructor" | "student" }>({ open: false, name: "", type: "student" });
   const [removedUsers, setRemovedUsers] = useState<Set<string>>(new Set());
   const [viewDialog, setViewDialog] = useState<{ open: boolean; type: "project" | "forum"; title: string; clicks: number; responses: number } | null>(null);
+
+  // Support ticket filters
+  const [ticketSearch, setTicketSearch] = useState("");
+  const [ticketPriorityFilter, setTicketPriorityFilter] = useState<string>("all");
+  const [ticketStatusFilter, setTicketStatusFilter] = useState<string>("all");
+  const [ticketSortBy, setTicketSortBy] = useState<string>("date-desc");
 
   const handleRemove = () => {
     setRemovedUsers(prev => new Set(prev).add(removeDialog.name));
@@ -1020,6 +1027,59 @@ const AdminPortalPage = () => {
               <StatCard label="Investor Relations" value="7" icon={Briefcase} trend={{ value: "+2", positive: true }} accent="emerald" />
             </div>
 
+            {/* Filter & Sort Controls */}
+            <Card className="border-border/60">
+              <CardContent className="p-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="relative flex-1 min-w-[200px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search tickets..."
+                      value={ticketSearch}
+                      onChange={(e) => setTicketSearch(e.target.value)}
+                      className="pl-9 h-9 text-sm"
+                    />
+                  </div>
+                  <Select value={ticketPriorityFilter} onValueChange={setTicketPriorityFilter}>
+                    <SelectTrigger className="w-[130px] h-9 text-xs">
+                      <Filter className="w-3.5 h-3.5 mr-1" />
+                      <SelectValue placeholder="Priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Priorities</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={ticketStatusFilter} onValueChange={setTicketStatusFilter}>
+                    <SelectTrigger className="w-[130px] h-9 text-xs">
+                      <Filter className="w-3.5 h-3.5 mr-1" />
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="open">Open</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="resolved">Resolved</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={ticketSortBy} onValueChange={setTicketSortBy}>
+                    <SelectTrigger className="w-[140px] h-9 text-xs">
+                      <ArrowDownAZ className="w-3.5 h-3.5 mr-1" />
+                      <SelectValue placeholder="Sort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date-desc">Newest First</SelectItem>
+                      <SelectItem value="date-asc">Oldest First</SelectItem>
+                      <SelectItem value="priority-desc">Priority: High→Low</SelectItem>
+                      <SelectItem value="priority-asc">Priority: Low→High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
             <Tabs defaultValue="student-tickets" className="space-y-4">
               <TabsList className="bg-muted/50 p-1">
                 <TabsTrigger value="student-tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm text-xs">
@@ -1033,24 +1093,30 @@ const AdminPortalPage = () => {
                 </TabsTrigger>
               </TabsList>
 
-              {/* Student Tickets */}
-              <TabsContent value="student-tickets">
-                <Card className="border-border/60">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-semibold">Student Support Tickets</CardTitle>
-                    <CardDescription>Issues and requests from enrolled students</CardDescription>
-                  </CardHeader>
-                  <CardContent>
+              {(() => {
+                const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
+                const filterAndSort = (tickets: { id: string; subject: string; from: string; date: string; priority: string; status: string }[]) => {
+                  return tickets
+                    .filter(t => {
+                      const matchesSearch = !ticketSearch || t.subject.toLowerCase().includes(ticketSearch.toLowerCase()) || t.from.toLowerCase().includes(ticketSearch.toLowerCase()) || t.id.toLowerCase().includes(ticketSearch.toLowerCase());
+                      const matchesPriority = ticketPriorityFilter === "all" || t.priority === ticketPriorityFilter;
+                      const matchesStatus = ticketStatusFilter === "all" || t.status === ticketStatusFilter;
+                      return matchesSearch && matchesPriority && matchesStatus;
+                    })
+                    .sort((a, b) => {
+                      if (ticketSortBy === "date-desc") return b.date.localeCompare(a.date);
+                      if (ticketSortBy === "date-asc") return a.date.localeCompare(b.date);
+                      if (ticketSortBy === "priority-desc") return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
+                      if (ticketSortBy === "priority-asc") return (priorityOrder[a.priority] || 0) - (priorityOrder[b.priority] || 0);
+                      return 0;
+                    });
+                };
+                const renderTickets = (tickets: { id: string; subject: string; from: string; date: string; priority: string; status: string }[]) => {
+                  const filtered = filterAndSort(tickets);
+                  if (filtered.length === 0) return <p className="text-sm text-muted-foreground text-center py-8">No tickets match your filters</p>;
+                  return (
                     <div className="space-y-2">
-                      {[
-                        { id: "ST-001", subject: "Cannot access course materials", from: "Sarah Johnson", date: "2026-02-22", priority: "high", status: "open" },
-                        { id: "ST-002", subject: "Payment not reflecting in account", from: "Mike Chen", date: "2026-02-21", priority: "high", status: "open" },
-                        { id: "ST-003", subject: "Quiz score not saved properly", from: "Emma Williams", date: "2026-02-21", priority: "medium", status: "in-progress" },
-                        { id: "ST-004", subject: "Certificate not generated after completion", from: "James Brown", date: "2026-02-20", priority: "medium", status: "open" },
-                        { id: "ST-005", subject: "Video playback issues on mobile", from: "Lisa Garcia", date: "2026-02-20", priority: "low", status: "in-progress" },
-                        { id: "ST-006", subject: "Request to change enrolled email", from: "David Miller", date: "2026-02-19", priority: "low", status: "resolved" },
-                        { id: "ST-007", subject: "Booking session not showing in calendar", from: "Anna Taylor", date: "2026-02-18", priority: "medium", status: "resolved" },
-                      ].map((ticket) => (
+                      {filtered.map((ticket) => (
                         <div key={ticket.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
                           <span className="text-xs font-mono text-muted-foreground shrink-0">{ticket.id}</span>
                           <div className="flex-1 min-w-0">
@@ -1073,92 +1139,65 @@ const AdminPortalPage = () => {
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Instructor Tickets */}
-              <TabsContent value="instructor-tickets">
-                <Card className="border-border/60">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-semibold">Instructor Support Tickets</CardTitle>
-                    <CardDescription>Issues and requests from instructors</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {[
-                        { id: "IT-001", subject: "Revenue payout delay for January", from: "Dr. Sarah Chen", date: "2026-02-22", priority: "high", status: "open" },
-                        { id: "IT-002", subject: "Course analytics not updating", from: "Prof. James Wilson", date: "2026-02-21", priority: "medium", status: "in-progress" },
-                        { id: "IT-003", subject: "Need to update course pricing structure", from: "Maria Garcia", date: "2026-02-20", priority: "medium", status: "open" },
-                        { id: "IT-004", subject: "Student review flagged incorrectly", from: "Alex Thompson", date: "2026-02-19", priority: "low", status: "in-progress" },
-                        { id: "IT-005", subject: "Request for bulk upload feature", from: "Dr. Emily Park", date: "2026-02-18", priority: "low", status: "resolved" },
-                      ].map((ticket) => (
-                        <div key={ticket.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
-                          <span className="text-xs font-mono text-muted-foreground shrink-0">{ticket.id}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{ticket.subject}</p>
-                            <p className="text-xs text-muted-foreground">{ticket.from} · {ticket.date}</p>
-                          </div>
-                          <Badge variant="outline" className={`text-[10px] shrink-0 ${
-                            ticket.priority === "high" ? "border-destructive/50 text-destructive" :
-                            ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
-                            "border-border text-muted-foreground"
-                          }`}>{ticket.priority}</Badge>
-                          <Badge className={`text-[10px] shrink-0 ${
-                            ticket.status === "open" ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" :
-                            ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20" :
-                            "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
-                          }`}>{ticket.status}</Badge>
-                          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
-                            <Eye className="w-3 h-3" /> View
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Investor Relations Tickets */}
-              <TabsContent value="investor-tickets">
-                <Card className="border-border/60">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-semibold">Investor Relations Tickets</CardTitle>
-                    <CardDescription>Inquiries and requests from investors and stakeholders</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {[
-                        { id: "IR-001", subject: "Q4 2025 financial report request", from: "Capital Ventures LLC", date: "2026-02-22", priority: "high", status: "open" },
-                        { id: "IR-002", subject: "Platform growth metrics for due diligence", from: "Horizon Partners", date: "2026-02-20", priority: "high", status: "in-progress" },
-                        { id: "IR-003", subject: "Partnership proposal - corporate training", from: "TechCorp Inc.", date: "2026-02-18", priority: "medium", status: "open" },
-                        { id: "IR-004", subject: "Board meeting scheduling for March", from: "Angel Fund Group", date: "2026-02-17", priority: "medium", status: "resolved" },
-                      ].map((ticket) => (
-                        <div key={ticket.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
-                          <span className="text-xs font-mono text-muted-foreground shrink-0">{ticket.id}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{ticket.subject}</p>
-                            <p className="text-xs text-muted-foreground">{ticket.from} · {ticket.date}</p>
-                          </div>
-                          <Badge variant="outline" className={`text-[10px] shrink-0 ${
-                            ticket.priority === "high" ? "border-destructive/50 text-destructive" :
-                            ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
-                            "border-border text-muted-foreground"
-                          }`}>{ticket.priority}</Badge>
-                          <Badge className={`text-[10px] shrink-0 ${
-                            ticket.status === "open" ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" :
-                            ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20" :
-                            "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
-                          }`}>{ticket.status}</Badge>
-                          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
-                            <Eye className="w-3 h-3" /> View
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                  );
+                };
+                return (
+                  <>
+                    <TabsContent value="student-tickets">
+                      <Card className="border-border/60">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-base font-semibold">Student Support Tickets</CardTitle>
+                          <CardDescription>Issues and requests from enrolled students</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          {renderTickets([
+                            { id: "ST-001", subject: "Cannot access course materials", from: "Sarah Johnson", date: "2026-02-22", priority: "high", status: "open" },
+                            { id: "ST-002", subject: "Payment not reflecting in account", from: "Mike Chen", date: "2026-02-21", priority: "high", status: "open" },
+                            { id: "ST-003", subject: "Quiz score not saved properly", from: "Emma Williams", date: "2026-02-21", priority: "medium", status: "in-progress" },
+                            { id: "ST-004", subject: "Certificate not generated after completion", from: "James Brown", date: "2026-02-20", priority: "medium", status: "open" },
+                            { id: "ST-005", subject: "Video playback issues on mobile", from: "Lisa Garcia", date: "2026-02-20", priority: "low", status: "in-progress" },
+                            { id: "ST-006", subject: "Request to change enrolled email", from: "David Miller", date: "2026-02-19", priority: "low", status: "resolved" },
+                            { id: "ST-007", subject: "Booking session not showing in calendar", from: "Anna Taylor", date: "2026-02-18", priority: "medium", status: "resolved" },
+                          ])}
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                    <TabsContent value="instructor-tickets">
+                      <Card className="border-border/60">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-base font-semibold">Instructor Support Tickets</CardTitle>
+                          <CardDescription>Issues and requests from instructors</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          {renderTickets([
+                            { id: "IT-001", subject: "Revenue payout delay for January", from: "Dr. Sarah Chen", date: "2026-02-22", priority: "high", status: "open" },
+                            { id: "IT-002", subject: "Course analytics not updating", from: "Prof. James Wilson", date: "2026-02-21", priority: "medium", status: "in-progress" },
+                            { id: "IT-003", subject: "Need to update course pricing structure", from: "Maria Garcia", date: "2026-02-20", priority: "medium", status: "open" },
+                            { id: "IT-004", subject: "Student review flagged incorrectly", from: "Alex Thompson", date: "2026-02-19", priority: "low", status: "in-progress" },
+                            { id: "IT-005", subject: "Request for bulk upload feature", from: "Dr. Emily Park", date: "2026-02-18", priority: "low", status: "resolved" },
+                          ])}
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                    <TabsContent value="investor-tickets">
+                      <Card className="border-border/60">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-base font-semibold">Investor Relations Tickets</CardTitle>
+                          <CardDescription>Inquiries and requests from investors and stakeholders</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          {renderTickets([
+                            { id: "IR-001", subject: "Q4 2025 financial report request", from: "Capital Ventures LLC", date: "2026-02-22", priority: "high", status: "open" },
+                            { id: "IR-002", subject: "Platform growth metrics for due diligence", from: "Horizon Partners", date: "2026-02-20", priority: "high", status: "in-progress" },
+                            { id: "IR-003", subject: "Partnership proposal - corporate training", from: "TechCorp Inc.", date: "2026-02-18", priority: "medium", status: "open" },
+                            { id: "IR-004", subject: "Board meeting scheduling for March", from: "Angel Fund Group", date: "2026-02-17", priority: "medium", status: "resolved" },
+                          ])}
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  </>
+                );
+              })()}
             </Tabs>
           </TabsContent>
         </Tabs>
