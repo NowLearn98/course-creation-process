@@ -338,6 +338,33 @@ const AdminPortalPage = () => {
 
               <Card className="border-border/60">
                 <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-semibold">Projects & Applicants by Category</CardTitle>
+                  <CardDescription>Number of projects posted and applicants per category</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={[
+                      { category: "Technology", projects: 42, applicants: 185 },
+                      { category: "Marketing", projects: 28, applicants: 120 },
+                      { category: "Design", projects: 35, applicants: 155 },
+                      { category: "Data Science", projects: 22, applicants: 98 },
+                      { category: "Business", projects: 18, applicants: 72 },
+                      { category: "Health", projects: 15, applicants: 58 },
+                    ]} barSize={20}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" />
+                      <XAxis dataKey="category" tick={{ fontSize: 10 }} className="text-muted-foreground" />
+                      <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
+                      <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid hsl(var(--border))", fontSize: 12 }} />
+                      <Legend wrapperStyle={{ fontSize: 12 }} />
+                      <Bar dataKey="projects" fill="hsl(280, 60%, 55%)" radius={[6, 6, 0, 0]} name="Projects Posted" />
+                      <Bar dataKey="applicants" fill="hsl(190, 70%, 50%)" radius={[6, 6, 0, 0]} name="Applicants" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/60">
+                <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-base font-semibold">Top Courses</CardTitle>
