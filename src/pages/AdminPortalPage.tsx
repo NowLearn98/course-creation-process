@@ -688,10 +688,9 @@ const AdminPortalPage = () => {
 
           {/* ===== STUDENTS ===== */}
           <TabsContent value="students" className="space-y-6">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <StatCard label="Total Enrollments" value={metrics.totalStudents.toLocaleString()} icon={GraduationCap} trend={{ value: "+15%", positive: true }} accent="blue" />
               <StatCard label="Total Bookings" value={metrics.totalBookings.toLocaleString()} icon={Clock} trend={{ value: "+12%", positive: true }} accent="violet" />
-              <StatCard label="Avg Completion" value="72%" icon={CheckCircle} trend={{ value: "+5%", positive: true }} accent="emerald" />
             </div>
 
             <Card className="border-border/60">
