@@ -709,6 +709,61 @@ const AdminPortalPage = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Student List */}
+            <Card className="border-border/60">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold">All Students</CardTitle>
+                <CardDescription>Student activity breakdown across courses</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border/50">
+                        <th className="text-left py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Name</th>
+                        <th className="text-left py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email</th>
+                        <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Bookings</th>
+                        <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Presentations</th>
+                        <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Quizzes</th>
+                        <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Labs</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { name: "Sarah Johnson", email: "sarah.johnson@example.com", bookings: 8, presentations: 12, quizzes: 15, labs: 6 },
+                        { name: "Mike Chen", email: "mike.chen@example.com", bookings: 5, presentations: 9, quizzes: 11, labs: 4 },
+                        { name: "Emma Williams", email: "emma.williams@example.com", bookings: 12, presentations: 18, quizzes: 22, labs: 9 },
+                        { name: "James Brown", email: "james.brown@example.com", bookings: 3, presentations: 6, quizzes: 8, labs: 3 },
+                        { name: "Lisa Garcia", email: "lisa.garcia@example.com", bookings: 7, presentations: 14, quizzes: 17, labs: 7 },
+                        { name: "David Miller", email: "david.miller@example.com", bookings: 10, presentations: 16, quizzes: 20, labs: 8 },
+                        { name: "Sofia Rodriguez", email: "sofia.rodriguez@example.com", bookings: 6, presentations: 10, quizzes: 13, labs: 5 },
+                        { name: "Chris Lee", email: "chris.lee@example.com", bookings: 4, presentations: 7, quizzes: 9, labs: 3 },
+                        { name: "Anna Taylor", email: "anna.taylor@example.com", bookings: 9, presentations: 15, quizzes: 19, labs: 8 },
+                        { name: "Ryan Martinez", email: "ryan.martinez@example.com", bookings: 11, presentations: 17, quizzes: 21, labs: 10 },
+                      ].map((student) => (
+                        <tr key={student.email} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                          <td className="py-3 px-3 font-medium text-foreground">{student.name}</td>
+                          <td className="py-3 px-3 text-muted-foreground">{student.email}</td>
+                          <td className="py-3 px-3 text-center">
+                            <Badge variant="outline" className="text-[10px] font-semibold">{student.bookings}</Badge>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <Badge variant="outline" className="text-[10px] font-semibold">{student.presentations}</Badge>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <Badge variant="outline" className="text-[10px] font-semibold">{student.quizzes}</Badge>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <Badge variant="outline" className="text-[10px] font-semibold">{student.labs}</Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
