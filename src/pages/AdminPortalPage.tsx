@@ -449,6 +449,14 @@ const AdminPortalPage = () => {
               <StatCard label="Total Labs" value="64" icon={FlaskConical} trend={{ value: "+14%", positive: true }} accent="emerald" />
               <StatCard label="Total Presentations" value="112" icon={Presentation} trend={{ value: "+11%", positive: true }} accent="violet" />
             </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <StatCard label="Avg Courses" value={(metrics.totalCourses / metrics.totalInstructors).toFixed(1)} icon={BookOpen} accent="blue" />
+              <StatCard label="Avg Students" value={Math.round(metrics.totalStudents / metrics.totalInstructors).toLocaleString()} icon={GraduationCap} accent="cyan" />
+              <StatCard label="Avg Revenue" value={`$${Math.round(metrics.totalRevenue / metrics.totalInstructors).toLocaleString()}`} icon={DollarSign} accent="emerald" />
+              <StatCard label="Avg Profit" value={`$${Math.round(metrics.totalRevenue * 0.3 / metrics.totalInstructors).toLocaleString()}`} icon={TrendingUp} accent="emerald" />
+              <StatCard label="Avg Bookings" value={Math.round(metrics.totalBookings / metrics.totalInstructors).toLocaleString()} icon={Clock} accent="violet" />
+              <StatCard label="Avg Clicks" value={Math.round(metrics.totalClicks / metrics.totalInstructors).toLocaleString()} icon={Activity} accent="amber" />
+            </div>
             <Card className="border-border/60">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
@@ -675,63 +683,6 @@ const AdminPortalPage = () => {
                 </div>
               </CardContent>
             </Card>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <Card className="border-border/60">
-                <CardContent className="p-5 flex flex-col items-center text-center">
-                  <div className="p-2 rounded-lg bg-primary/10 mb-3">
-                    <BookOpen className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-2xl font-bold text-foreground">{(metrics.totalCourses / metrics.totalInstructors).toFixed(1)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Avg Courses</p>
-                </CardContent>
-              </Card>
-              <Card className="border-border/60">
-                <CardContent className="p-5 flex flex-col items-center text-center">
-                  <div className="p-2 rounded-lg bg-primary/10 mb-3">
-                    <GraduationCap className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-2xl font-bold text-foreground">{Math.round(metrics.totalStudents / metrics.totalInstructors).toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Avg Students</p>
-                </CardContent>
-              </Card>
-              <Card className="border-border/60">
-                <CardContent className="p-5 flex flex-col items-center text-center">
-                  <div className="p-2 rounded-lg bg-primary/10 mb-3">
-                    <DollarSign className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-2xl font-bold text-foreground">${Math.round(metrics.totalRevenue / metrics.totalInstructors).toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Avg Revenue</p>
-                </CardContent>
-              </Card>
-              <Card className="border-border/60">
-                <CardContent className="p-5 flex flex-col items-center text-center">
-                  <div className="p-2 rounded-lg bg-emerald-500/10 mb-3">
-                    <TrendingUp className="w-4 h-4 text-emerald-600" />
-                  </div>
-                  <p className="text-2xl font-bold text-emerald-600">${Math.round(metrics.totalRevenue * 0.3 / metrics.totalInstructors).toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Avg Platform Profit</p>
-                </CardContent>
-              </Card>
-              <Card className="border-border/60">
-                <CardContent className="p-5 flex flex-col items-center text-center">
-                  <div className="p-2 rounded-lg bg-primary/10 mb-3">
-                    <Clock className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-2xl font-bold text-foreground">{Math.round(metrics.totalBookings / metrics.totalInstructors).toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Avg Bookings</p>
-                </CardContent>
-              </Card>
-              <Card className="border-border/60">
-                <CardContent className="p-5 flex flex-col items-center text-center">
-                  <div className="p-2 rounded-lg bg-primary/10 mb-3">
-                    <Activity className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-2xl font-bold text-foreground">{Math.round(metrics.totalClicks / metrics.totalInstructors).toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Avg Clicks</p>
-                </CardContent>
-              </Card>
-            </div>
           </TabsContent>
 
           {/* ===== STUDENTS ===== */}
