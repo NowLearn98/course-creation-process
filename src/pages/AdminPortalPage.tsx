@@ -5,6 +5,7 @@ import {
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
   TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp,
   MousePointerClick, Presentation, FlaskConical, ExternalLink, FileEdit,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -419,6 +420,19 @@ const AdminPortalPage = () => {
                               <Eye className="w-3.5 h-3.5" />
                               View Profile
                             </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30"
+                              onClick={() => {
+                                if (confirm(`Remove ${inst.name} from the platform?`)) {
+                                  console.log("Removing instructor:", inst.name);
+                                }
+                              }}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              Remove
+                            </Button>
                           </div>
                         </div>
 
@@ -695,6 +709,7 @@ const AdminPortalPage = () => {
                         <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Presentations</th>
                         <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Quizzes</th>
                         <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Labs</th>
+                        <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -724,6 +739,21 @@ const AdminPortalPage = () => {
                           </td>
                           <td className="py-3 px-3 text-center">
                             <Badge variant="outline" className="text-[10px] font-semibold">{student.labs}</Badge>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 text-xs"
+                              onClick={() => {
+                                if (confirm(`Remove ${student.name} from the platform?`)) {
+                                  console.log("Removing student:", student.name);
+                                }
+                              }}
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              Remove
+                            </Button>
                           </td>
                         </tr>
                       ))}
