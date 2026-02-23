@@ -336,7 +336,9 @@ const AdminPortalPage = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold">{inst.name}</p>
-                            <p className="text-xs text-muted-foreground">{inst.courses} course{inst.courses !== 1 ? "s" : ""} published</p>
+                            <p className="text-xs text-muted-foreground">
+                              {inst.courseDetails.filter(c => c.status === "published").length} published · {inst.courseDetails.filter(c => c.status === "draft").length} draft{inst.courseDetails.filter(c => c.status === "draft").length !== 1 ? "s" : ""}
+                            </p>
                           </div>
                           <div className="hidden sm:grid grid-cols-3 gap-8 text-center">
                             <div>
