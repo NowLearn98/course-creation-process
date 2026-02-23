@@ -557,14 +557,23 @@ const AdminPortalPage = () => {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
               <Card className="border-border/60">
                 <CardContent className="p-5 flex flex-col items-center text-center">
                   <div className="p-2 rounded-lg bg-primary/10 mb-3">
                     <BookOpen className="w-4 h-4 text-primary" />
                   </div>
                   <p className="text-2xl font-bold text-foreground">{(metrics.totalCourses / metrics.totalInstructors).toFixed(1)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Avg Courses / Instructor</p>
+                  <p className="text-xs text-muted-foreground mt-1">Avg Courses</p>
+                </CardContent>
+              </Card>
+              <Card className="border-border/60">
+                <CardContent className="p-5 flex flex-col items-center text-center">
+                  <div className="p-2 rounded-lg bg-primary/10 mb-3">
+                    <GraduationCap className="w-4 h-4 text-primary" />
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">{Math.round(metrics.totalStudents / metrics.totalInstructors).toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Avg Students</p>
                 </CardContent>
               </Card>
               <Card className="border-border/60">
@@ -573,7 +582,7 @@ const AdminPortalPage = () => {
                     <DollarSign className="w-4 h-4 text-primary" />
                   </div>
                   <p className="text-2xl font-bold text-foreground">${Math.round(metrics.totalRevenue / metrics.totalInstructors).toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Avg Revenue / Instructor</p>
+                  <p className="text-xs text-muted-foreground mt-1">Avg Revenue</p>
                 </CardContent>
               </Card>
               <Card className="border-border/60">
@@ -582,7 +591,25 @@ const AdminPortalPage = () => {
                     <TrendingUp className="w-4 h-4 text-emerald-600" />
                   </div>
                   <p className="text-2xl font-bold text-emerald-600">${Math.round(metrics.totalRevenue * 0.3 / metrics.totalInstructors).toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Avg Platform Profit / Instructor</p>
+                  <p className="text-xs text-muted-foreground mt-1">Avg Platform Profit</p>
+                </CardContent>
+              </Card>
+              <Card className="border-border/60">
+                <CardContent className="p-5 flex flex-col items-center text-center">
+                  <div className="p-2 rounded-lg bg-primary/10 mb-3">
+                    <Clock className="w-4 h-4 text-primary" />
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">{Math.round(metrics.totalBookings / metrics.totalInstructors).toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Avg Bookings</p>
+                </CardContent>
+              </Card>
+              <Card className="border-border/60">
+                <CardContent className="p-5 flex flex-col items-center text-center">
+                  <div className="p-2 rounded-lg bg-primary/10 mb-3">
+                    <Activity className="w-4 h-4 text-primary" />
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">{Math.round(metrics.totalClicks / metrics.totalInstructors).toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Avg Clicks</p>
                 </CardContent>
               </Card>
               <Card className="border-border/60">
