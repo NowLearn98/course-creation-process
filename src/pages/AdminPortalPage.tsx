@@ -340,7 +340,7 @@ const AdminPortalPage = () => {
                               {inst.courseDetails.filter(c => c.status === "published").length} published · {inst.courseDetails.filter(c => c.status === "draft").length} draft{inst.courseDetails.filter(c => c.status === "draft").length !== 1 ? "s" : ""}
                             </p>
                           </div>
-                          <div className="hidden sm:grid grid-cols-4 gap-6 text-center">
+                          <div className="hidden sm:grid grid-cols-6 gap-4 text-center">
                             <div>
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Students</p>
                               <p className="text-sm font-bold text-foreground">{inst.students.toLocaleString()}</p>
@@ -352,6 +352,14 @@ const AdminPortalPage = () => {
                             <div>
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Platform Profit</p>
                               <p className="text-sm font-bold text-emerald-600">${Math.round(inst.revenue * 0.3).toLocaleString()}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Bookings</p>
+                              <p className="text-sm font-bold text-foreground">{inst.courseDetails.filter(c => c.status === "published").reduce((sum, c) => sum + c.bookings, 0).toLocaleString()}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Clicks</p>
+                              <p className="text-sm font-bold text-foreground">{inst.courseDetails.filter(c => c.status === "published").reduce((sum, c) => sum + c.clicks, 0).toLocaleString()}</p>
                             </div>
                             <div>
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Rating</p>
