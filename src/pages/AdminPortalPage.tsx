@@ -219,14 +219,18 @@ const AdminPortalPage = () => {
                           <stop offset="5%" stopColor="hsl(220, 90%, 56%)" stopOpacity={0.2} />
                           <stop offset="95%" stopColor="hsl(220, 90%, 56%)" stopOpacity={0} />
                         </linearGradient>
+                        <linearGradient id="gradInstructors" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(160, 60%, 45%)" stopOpacity={0.2} />
+                          <stop offset="95%" stopColor="hsl(160, 60%, 45%)" stopOpacity={0} />
+                        </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" />
                       <XAxis dataKey="month" tick={{ fontSize: 12 }} className="text-muted-foreground" />
                       <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
                       <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid hsl(var(--border))", fontSize: 12 }} />
                       <Legend wrapperStyle={{ fontSize: 12 }} />
-                      <Area type="monotone" dataKey="students" stroke="hsl(220, 90%, 56%)" fill="url(#gradStudents)" strokeWidth={2} />
-                      <Line type="monotone" dataKey="instructors" stroke="hsl(160, 60%, 45%)" strokeWidth={2} dot={{ r: 3 }} />
+                      <Area type="monotone" dataKey="students" stroke="hsl(220, 90%, 56%)" fill="url(#gradStudents)" strokeWidth={2} name="Students Joined" />
+                      <Area type="monotone" dataKey="instructors" stroke="hsl(160, 60%, 45%)" fill="url(#gradInstructors)" strokeWidth={2} name="Instructors Joined" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </CardContent>
