@@ -398,10 +398,14 @@ const AdminPortalPage = () => {
                                             <p className="text-sm font-medium">{course.title}</p>
                                             <Badge variant="default" className="text-[9px] px-1.5 py-0">Published</Badge>
                                           </div>
-                                          <div className="grid grid-cols-5 gap-3">
+                                          <div className="grid grid-cols-6 gap-3">
                                             <div className="text-center">
                                               <p className="text-[10px] text-muted-foreground">Revenue</p>
                                               <p className="text-sm font-bold text-foreground">${course.revenue.toLocaleString()}</p>
+                                            </div>
+                                            <div className="text-center">
+                                              <p className="text-[10px] text-muted-foreground">Platform Profit</p>
+                                              <p className="text-sm font-bold text-emerald-600">${Math.round(course.revenue * 0.3).toLocaleString()}</p>
                                             </div>
                                             <div className="text-center">
                                               <p className="text-[10px] text-muted-foreground">Students</p>
