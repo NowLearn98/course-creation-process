@@ -5,7 +5,7 @@ import {
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
   TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp,
   MousePointerClick, Presentation, FlaskConical, ExternalLink, FileEdit,
-  Trash2, Settings, Save, Sparkles, Bot, Zap,
+  Trash2, Settings, Save, Sparkles, Bot, Zap, TicketCheck, MessageSquare, Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -259,6 +259,9 @@ const AdminPortalPage = () => {
             </TabsTrigger>
             <TabsTrigger value="students" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <GraduationCap className="w-4 h-4 mr-1.5" /> Students
+            </TabsTrigger>
+            <TabsTrigger value="support" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <TicketCheck className="w-4 h-4 mr-1.5" /> Support
             </TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <Settings className="w-4 h-4 mr-1.5" /> Settings
@@ -1007,6 +1010,156 @@ const AdminPortalPage = () => {
                 </Button>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* ===== SUPPORT TICKETS ===== */}
+          <TabsContent value="support" className="space-y-6">
+            <div className="grid grid-cols-3 gap-4">
+              <StatCard label="Student Tickets" value="48" icon={GraduationCap} trend={{ value: "+5", positive: false }} accent="blue" />
+              <StatCard label="Instructor Tickets" value="23" icon={Users} trend={{ value: "-3", positive: true }} accent="violet" />
+              <StatCard label="Investor Relations" value="7" icon={Briefcase} trend={{ value: "+2", positive: true }} accent="emerald" />
+            </div>
+
+            <Tabs defaultValue="student-tickets" className="space-y-4">
+              <TabsList className="bg-muted/50 p-1">
+                <TabsTrigger value="student-tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm text-xs">
+                  <GraduationCap className="w-3.5 h-3.5 mr-1" /> Student Tickets
+                </TabsTrigger>
+                <TabsTrigger value="instructor-tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm text-xs">
+                  <Users className="w-3.5 h-3.5 mr-1" /> Instructor Tickets
+                </TabsTrigger>
+                <TabsTrigger value="investor-tickets" className="data-[state=active]:bg-background data-[state=active]:shadow-sm text-xs">
+                  <Briefcase className="w-3.5 h-3.5 mr-1" /> Investor Relations
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Student Tickets */}
+              <TabsContent value="student-tickets">
+                <Card className="border-border/60">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-semibold">Student Support Tickets</CardTitle>
+                    <CardDescription>Issues and requests from enrolled students</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {[
+                        { id: "ST-001", subject: "Cannot access course materials", from: "Sarah Johnson", date: "2026-02-22", priority: "high", status: "open" },
+                        { id: "ST-002", subject: "Payment not reflecting in account", from: "Mike Chen", date: "2026-02-21", priority: "high", status: "open" },
+                        { id: "ST-003", subject: "Quiz score not saved properly", from: "Emma Williams", date: "2026-02-21", priority: "medium", status: "in-progress" },
+                        { id: "ST-004", subject: "Certificate not generated after completion", from: "James Brown", date: "2026-02-20", priority: "medium", status: "open" },
+                        { id: "ST-005", subject: "Video playback issues on mobile", from: "Lisa Garcia", date: "2026-02-20", priority: "low", status: "in-progress" },
+                        { id: "ST-006", subject: "Request to change enrolled email", from: "David Miller", date: "2026-02-19", priority: "low", status: "resolved" },
+                        { id: "ST-007", subject: "Booking session not showing in calendar", from: "Anna Taylor", date: "2026-02-18", priority: "medium", status: "resolved" },
+                      ].map((ticket) => (
+                        <div key={ticket.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
+                          <span className="text-xs font-mono text-muted-foreground shrink-0">{ticket.id}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{ticket.subject}</p>
+                            <p className="text-xs text-muted-foreground">{ticket.from} · {ticket.date}</p>
+                          </div>
+                          <Badge variant="outline" className={`text-[10px] shrink-0 ${
+                            ticket.priority === "high" ? "border-destructive/50 text-destructive" :
+                            ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
+                            "border-border text-muted-foreground"
+                          }`}>{ticket.priority}</Badge>
+                          <Badge className={`text-[10px] shrink-0 ${
+                            ticket.status === "open" ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" :
+                            ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20" :
+                            "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
+                          }`}>{ticket.status}</Badge>
+                          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
+                            <Eye className="w-3 h-3" /> View
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Instructor Tickets */}
+              <TabsContent value="instructor-tickets">
+                <Card className="border-border/60">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-semibold">Instructor Support Tickets</CardTitle>
+                    <CardDescription>Issues and requests from instructors</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {[
+                        { id: "IT-001", subject: "Revenue payout delay for January", from: "Dr. Sarah Chen", date: "2026-02-22", priority: "high", status: "open" },
+                        { id: "IT-002", subject: "Course analytics not updating", from: "Prof. James Wilson", date: "2026-02-21", priority: "medium", status: "in-progress" },
+                        { id: "IT-003", subject: "Need to update course pricing structure", from: "Maria Garcia", date: "2026-02-20", priority: "medium", status: "open" },
+                        { id: "IT-004", subject: "Student review flagged incorrectly", from: "Alex Thompson", date: "2026-02-19", priority: "low", status: "in-progress" },
+                        { id: "IT-005", subject: "Request for bulk upload feature", from: "Dr. Emily Park", date: "2026-02-18", priority: "low", status: "resolved" },
+                      ].map((ticket) => (
+                        <div key={ticket.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
+                          <span className="text-xs font-mono text-muted-foreground shrink-0">{ticket.id}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{ticket.subject}</p>
+                            <p className="text-xs text-muted-foreground">{ticket.from} · {ticket.date}</p>
+                          </div>
+                          <Badge variant="outline" className={`text-[10px] shrink-0 ${
+                            ticket.priority === "high" ? "border-destructive/50 text-destructive" :
+                            ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
+                            "border-border text-muted-foreground"
+                          }`}>{ticket.priority}</Badge>
+                          <Badge className={`text-[10px] shrink-0 ${
+                            ticket.status === "open" ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" :
+                            ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20" :
+                            "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
+                          }`}>{ticket.status}</Badge>
+                          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
+                            <Eye className="w-3 h-3" /> View
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Investor Relations Tickets */}
+              <TabsContent value="investor-tickets">
+                <Card className="border-border/60">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-semibold">Investor Relations Tickets</CardTitle>
+                    <CardDescription>Inquiries and requests from investors and stakeholders</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {[
+                        { id: "IR-001", subject: "Q4 2025 financial report request", from: "Capital Ventures LLC", date: "2026-02-22", priority: "high", status: "open" },
+                        { id: "IR-002", subject: "Platform growth metrics for due diligence", from: "Horizon Partners", date: "2026-02-20", priority: "high", status: "in-progress" },
+                        { id: "IR-003", subject: "Partnership proposal - corporate training", from: "TechCorp Inc.", date: "2026-02-18", priority: "medium", status: "open" },
+                        { id: "IR-004", subject: "Board meeting scheduling for March", from: "Angel Fund Group", date: "2026-02-17", priority: "medium", status: "resolved" },
+                      ].map((ticket) => (
+                        <div key={ticket.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
+                          <span className="text-xs font-mono text-muted-foreground shrink-0">{ticket.id}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{ticket.subject}</p>
+                            <p className="text-xs text-muted-foreground">{ticket.from} · {ticket.date}</p>
+                          </div>
+                          <Badge variant="outline" className={`text-[10px] shrink-0 ${
+                            ticket.priority === "high" ? "border-destructive/50 text-destructive" :
+                            ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
+                            "border-border text-muted-foreground"
+                          }`}>{ticket.priority}</Badge>
+                          <Badge className={`text-[10px] shrink-0 ${
+                            ticket.status === "open" ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" :
+                            ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20" :
+                            "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
+                          }`}>{ticket.status}</Badge>
+                          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1">
+                            <Eye className="w-3 h-3" /> View
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </div>
