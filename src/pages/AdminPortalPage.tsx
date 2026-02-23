@@ -557,7 +557,7 @@ const AdminPortalPage = () => {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card className="border-border/60">
                 <CardContent className="p-5 flex flex-col items-center text-center">
                   <div className="p-2 rounded-lg bg-primary/10 mb-3">
@@ -574,6 +574,15 @@ const AdminPortalPage = () => {
                   </div>
                   <p className="text-2xl font-bold text-foreground">${Math.round(metrics.totalRevenue / metrics.totalInstructors).toLocaleString()}</p>
                   <p className="text-xs text-muted-foreground mt-1">Avg Revenue / Instructor</p>
+                </CardContent>
+              </Card>
+              <Card className="border-border/60">
+                <CardContent className="p-5 flex flex-col items-center text-center">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 mb-3">
+                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-emerald-600">${Math.round(metrics.totalRevenue * 0.3 / metrics.totalInstructors).toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Avg Platform Profit / Instructor</p>
                 </CardContent>
               </Card>
               <Card className="border-border/60">
