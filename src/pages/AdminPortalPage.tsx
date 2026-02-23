@@ -678,36 +678,6 @@ const AdminPortalPage = () => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-
-            <Card className="border-border/60">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold">Most Popular Courses</CardTitle>
-                <CardDescription>Courses ranked by enrollment with completion progress</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {topCourses.map((course) => {
-                    const completionRate = courseCompletionRates[course.id] || 70;
-                    return (
-                      <div key={course.id} className="p-4 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
-                        <div className="flex items-center justify-between mb-3">
-                          <p className="text-sm font-semibold truncate">{course.title}</p>
-                          <Badge variant="outline" className="text-[10px] shrink-0 ml-2">{course.enrollments} enrolled</Badge>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Progress value={completionRate} className="h-2 flex-1" />
-                          <span className="text-xs font-medium text-muted-foreground w-10 text-right">{completionRate}%</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {topCourses.length === 0 && (
-                    <p className="text-muted-foreground text-center py-12 text-sm">No courses published yet</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Student List */}
             <Card className="border-border/60">
               <CardHeader className="pb-2">
