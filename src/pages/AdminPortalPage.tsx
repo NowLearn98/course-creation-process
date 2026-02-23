@@ -5,7 +5,7 @@ import {
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
   TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp,
   MousePointerClick, Presentation, FlaskConical, ExternalLink, FileEdit,
-  Trash2, Settings, Save, Sparkles, Bot, Zap, TicketCheck, MessageSquare, Briefcase, Search, ArrowDownAZ, ArrowUpAZ, Filter,
+  Trash2, Settings, Save, Sparkles, Bot, Zap, TicketCheck, MessageSquare, Briefcase, Search, ArrowDownAZ, ArrowUpAZ, Filter, Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -116,6 +116,8 @@ const AdminPortalPage = () => {
   const [removedUsers, setRemovedUsers] = useState<Set<string>>(new Set());
   const [viewDialog, setViewDialog] = useState<{ open: boolean; type: "project" | "forum"; title: string; clicks: number; responses: number } | null>(null);
   const [ticketDialog, setTicketDialog] = useState<{ open: boolean; ticket: any } | null>(null);
+  const [ticketChats, setTicketChats] = useState<Record<string, { from: string; message: string; date: string }[]>>({});
+  const [ticketReplyText, setTicketReplyText] = useState<string>("");
 
   // Support ticket filters
   const [ticketSearch, setTicketSearch] = useState("");
@@ -1157,6 +1159,67 @@ const AdminPortalPage = () => {
                                 <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Message</p>
                                 <div className="bg-muted/30 rounded-lg border border-border/50 p-3">
                                   <p className="text-sm text-foreground leading-relaxed">{ticket.message}</p>
+                                </div>
+                              </div>
+                              <Separator />
+                              {/* Chat Thread */}
+                              <div className="space-y-2">
+                                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Conversation</p>
+                                {(ticketChats[ticket.id] || []).length > 0 ? (
+                                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                                    {ticketChats[ticket.id].map((chat, idx) => (
+                                      <div key={idx} className={`flex ${chat.from === "Admin" ? "justify-end" : "justify-start"}`}>
+                                        <div className={`max-w-[75%] rounded-lg px-3 py-2 ${
+                                          chat.from === "Admin"
+                                            ? "bg-primary/10 border border-primary/20"
+                                            : "bg-muted/40 border border-border/50"
+                                        }`}>
+                                          <div className="flex items-center gap-2 mb-0.5">
+                                            <span className="text-[10px] font-semibold text-muted-foreground">{chat.from}</span>
+                                            <span className="text-[10px] text-muted-foreground/60">{chat.date}</span>
+                                          </div>
+                                          <p className="text-sm text-foreground">{chat.message}</p>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-muted-foreground italic">No replies yet</p>
+                                )}
+                                <div className="flex gap-2 mt-2">
+                                  <Input
+                                    placeholder="Type your reply..."
+                                    value={ticketDialog?.ticket?.id === ticket.id ? ticketReplyText : ""}
+                                    onChange={(e) => setTicketReplyText(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter" && ticketReplyText.trim()) {
+                                        const now = new Date().toISOString().split("T")[0];
+                                        setTicketChats(prev => ({
+                                          ...prev,
+                                          [ticket.id]: [...(prev[ticket.id] || []), { from: "Admin", message: ticketReplyText.trim(), date: now }]
+                                        }));
+                                        setTicketReplyText("");
+                                      }
+                                    }}
+                                    className="flex-1 h-9 text-sm"
+                                  />
+                                  <Button
+                                    size="sm"
+                                    className="h-9 px-3 gap-1.5"
+                                    disabled={!ticketReplyText.trim()}
+                                    onClick={() => {
+                                      if (ticketReplyText.trim()) {
+                                        const now = new Date().toISOString().split("T")[0];
+                                        setTicketChats(prev => ({
+                                          ...prev,
+                                          [ticket.id]: [...(prev[ticket.id] || []), { from: "Admin", message: ticketReplyText.trim(), date: now }]
+                                        }));
+                                        setTicketReplyText("");
+                                      }
+                                    }}
+                                  >
+                                    <Send className="w-3.5 h-3.5" /> Send
+                                  </Button>
                                 </div>
                               </div>
                             </div>
