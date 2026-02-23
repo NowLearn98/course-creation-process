@@ -205,6 +205,10 @@ const AdminPortalPage = () => {
 
           {/* ===== OVERVIEW ===== */}
           <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <StatCard label="Explore Page Clicks" value={(Math.floor(Math.random() * 5000) + 8000).toLocaleString()} icon={MousePointerClick} trend={{ value: "+12%", positive: true }} />
+              <StatCard label="Projects Page Clicks" value={(Math.floor(Math.random() * 3000) + 4500).toLocaleString()} icon={Presentation} trend={{ value: "+9%", positive: true }} />
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="border-border/60">
                 <CardHeader className="pb-2">
