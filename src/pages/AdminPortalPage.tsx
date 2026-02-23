@@ -649,11 +649,12 @@ const AdminPortalPage = () => {
 
           {/* ===== STUDENTS ===== */}
           <TabsContent value="students" className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard label="Total Enrollments" value={metrics.totalStudents.toLocaleString()} icon={GraduationCap} trend={{ value: "+15%", positive: true }} />
-              <StatCard label="Avg Completion" value="72%" icon={CheckCircle} trend={{ value: "+5%", positive: true }} />
-              <StatCard label="Churn Rate" value="4.2%" icon={TrendingDown} trend={{ value: "-0.8%", positive: true }} />
-              <StatCard label="Avg Time to Complete" value="6.3 wks" icon={Clock} />
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <StatCard label="Total Enrollments" value={metrics.totalStudents.toLocaleString()} icon={GraduationCap} trend={{ value: "+15%", positive: true }} accent="blue" />
+              <StatCard label="Total Bookings" value={metrics.totalBookings.toLocaleString()} icon={Clock} trend={{ value: "+12%", positive: true }} accent="violet" />
+              <StatCard label="Avg Completion" value="72%" icon={CheckCircle} trend={{ value: "+5%", positive: true }} accent="emerald" />
+              <StatCard label="Churn Rate" value="4.2%" icon={TrendingDown} trend={{ value: "-0.8%", positive: true }} accent="rose" />
+              <StatCard label="Avg Time to Complete" value="6.3 wks" icon={Clock} accent="cyan" />
             </div>
 
             <Card className="border-border/60">
