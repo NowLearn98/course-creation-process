@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Users, GraduationCap, BookOpen, DollarSign,
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
-  TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp, MousePointerClick,
+  TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp, MousePointerClick, Presentation, FlaskConical, ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -77,26 +77,26 @@ const AdminPortalPage = () => {
 
   const topInstructors = [
     { name: "Dr. Sarah Chen", initials: "SC", courses: 4, students: 520, revenue: 15600, rating: 4.9, courseDetails: [
-      { title: "Advanced Machine Learning", revenue: 5200, bookings: 42, clicks: 1800, rating: 4.9, students: 180 },
-      { title: "Data Science Fundamentals", revenue: 4100, bookings: 35, clicks: 1500, rating: 4.8, students: 140 },
-      { title: "Python for AI", revenue: 3800, bookings: 28, clicks: 1200, rating: 4.9, students: 120 },
-      { title: "Neural Networks Deep Dive", revenue: 2500, bookings: 18, clicks: 900, rating: 5.0, students: 80 },
+      { title: "Advanced Machine Learning", revenue: 5200, bookings: 42, clicks: 1800, rating: 4.9, students: 180, presentations: ["Intro to ML Algorithms", "Supervised Learning Deep Dive", "Model Evaluation Techniques"], labs: ["Build a Classifier", "Neural Network from Scratch"] },
+      { title: "Data Science Fundamentals", revenue: 4100, bookings: 35, clicks: 1500, rating: 4.8, students: 140, presentations: ["Data Wrangling Basics", "Statistical Analysis"], labs: ["Pandas Workshop", "Data Visualization Lab"] },
+      { title: "Python for AI", revenue: 3800, bookings: 28, clicks: 1200, rating: 4.9, students: 120, presentations: ["Python Refresher"], labs: [] },
+      { title: "Neural Networks Deep Dive", revenue: 2500, bookings: 18, clicks: 900, rating: 5.0, students: 80, presentations: [], labs: ["CNN Image Classifier"] },
     ]},
     { name: "Prof. James Wilson", initials: "JW", courses: 3, students: 380, revenue: 11400, rating: 4.7, courseDetails: [
-      { title: "Web Development Bootcamp", revenue: 4800, bookings: 38, clicks: 1600, rating: 4.7, students: 160 },
-      { title: "React Masterclass", revenue: 3600, bookings: 30, clicks: 1300, rating: 4.8, students: 120 },
-      { title: "JavaScript Essentials", revenue: 3000, bookings: 25, clicks: 1100, rating: 4.6, students: 100 },
+      { title: "Web Development Bootcamp", revenue: 4800, bookings: 38, clicks: 1600, rating: 4.7, students: 160, presentations: ["HTML & CSS Foundations", "Responsive Design"], labs: ["Build a Portfolio Site", "CSS Grid Challenge"] },
+      { title: "React Masterclass", revenue: 3600, bookings: 30, clicks: 1300, rating: 4.8, students: 120, presentations: ["Component Architecture", "State Management"], labs: ["Todo App Lab"] },
+      { title: "JavaScript Essentials", revenue: 3000, bookings: 25, clicks: 1100, rating: 4.6, students: 100, presentations: ["ES6+ Features"], labs: [] },
     ]},
     { name: "Maria Garcia", initials: "MG", courses: 2, students: 210, revenue: 6300, rating: 4.8, courseDetails: [
-      { title: "UX Design Principles", revenue: 3500, bookings: 22, clicks: 950, rating: 4.9, students: 120 },
-      { title: "Figma for Teams", revenue: 2800, bookings: 18, clicks: 800, rating: 4.7, students: 90 },
+      { title: "UX Design Principles", revenue: 3500, bookings: 22, clicks: 950, rating: 4.9, students: 120, presentations: ["Design Thinking Workshop", "User Research Methods"], labs: ["Wireframing Lab"] },
+      { title: "Figma for Teams", revenue: 2800, bookings: 18, clicks: 800, rating: 4.7, students: 90, presentations: ["Figma Basics"], labs: ["Collaborative Design Lab"] },
     ]},
     { name: "Alex Thompson", initials: "AT", courses: 2, students: 180, revenue: 5400, rating: 4.6, courseDetails: [
-      { title: "Cloud Architecture", revenue: 3200, bookings: 20, clicks: 850, rating: 4.6, students: 100 },
-      { title: "AWS Certified Prep", revenue: 2200, bookings: 15, clicks: 700, rating: 4.6, students: 80 },
+      { title: "Cloud Architecture", revenue: 3200, bookings: 20, clicks: 850, rating: 4.6, students: 100, presentations: ["Cloud Fundamentals", "Microservices Overview"], labs: ["Deploy to AWS Lab"] },
+      { title: "AWS Certified Prep", revenue: 2200, bookings: 15, clicks: 700, rating: 4.6, students: 80, presentations: ["Exam Strategy"], labs: [] },
     ]},
     { name: "Dr. Emily Park", initials: "EP", courses: 1, students: 95, revenue: 2850, rating: 4.5, courseDetails: [
-      { title: "Intro to Cybersecurity", revenue: 2850, bookings: 12, clicks: 600, rating: 4.5, students: 95 },
+      { title: "Intro to Cybersecurity", revenue: 2850, bookings: 12, clicks: 600, rating: 4.5, students: 95, presentations: ["Threat Landscape Overview"], labs: ["Penetration Testing Basics"] },
     ]},
   ];
 
@@ -370,8 +370,8 @@ const AdminPortalPage = () => {
                           <div className="border-t border-border/40 bg-background p-4 space-y-2">
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Published Courses</p>
                             {inst.courseDetails.map((course) => (
-                              <div key={course.title} className="p-3 rounded-lg border border-border/30 bg-muted/10 hover:bg-muted/30 transition-colors">
-                                <p className="text-sm font-medium mb-2">{course.title}</p>
+                              <div key={course.title} className="p-3 rounded-lg border border-border/30 bg-muted/10 hover:bg-muted/30 transition-colors space-y-3">
+                                <p className="text-sm font-medium">{course.title}</p>
                                 <div className="grid grid-cols-5 gap-3">
                                   <div className="text-center">
                                     <p className="text-[10px] text-muted-foreground">Revenue</p>
@@ -395,6 +395,53 @@ const AdminPortalPage = () => {
                                       <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                                       <p className="text-sm font-bold text-foreground">{course.rating}</p>
                                     </div>
+                                  </div>
+                                </div>
+
+                                {/* Presentations & Labs */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border/30">
+                                  {/* Presentations */}
+                                  <div>
+                                    <div className="flex items-center gap-1.5 mb-1.5">
+                                      <Presentation className="w-3.5 h-3.5 text-primary" />
+                                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Presentations ({course.presentations.length})</p>
+                                    </div>
+                                    {course.presentations.length > 0 ? (
+                                      <div className="space-y-1">
+                                        {course.presentations.map((p) => (
+                                          <div key={p} className="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-background border border-border/30">
+                                            <p className="text-xs text-foreground truncate">{p}</p>
+                                            <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] gap-1 shrink-0">
+                                              <ExternalLink className="w-3 h-3" /> View
+                                            </Button>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-xs text-muted-foreground/60 italic px-2">No presentations</p>
+                                    )}
+                                  </div>
+
+                                  {/* Labs */}
+                                  <div>
+                                    <div className="flex items-center gap-1.5 mb-1.5">
+                                      <FlaskConical className="w-3.5 h-3.5 text-primary" />
+                                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Labs ({course.labs.length})</p>
+                                    </div>
+                                    {course.labs.length > 0 ? (
+                                      <div className="space-y-1">
+                                        {course.labs.map((l) => (
+                                          <div key={l} className="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-background border border-border/30">
+                                            <p className="text-xs text-foreground truncate">{l}</p>
+                                            <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] gap-1 shrink-0">
+                                              <ExternalLink className="w-3 h-3" /> View
+                                            </Button>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-xs text-muted-foreground/60 italic px-2">No labs</p>
+                                    )}
                                   </div>
                                 </div>
                               </div>
