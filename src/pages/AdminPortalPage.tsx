@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Users, GraduationCap, BookOpen, DollarSign,
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
-  TrendingDown, ArrowUpRight, Crown,
+  TrendingDown, ArrowUpRight, Crown, Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -323,6 +323,10 @@ const AdminPortalPage = () => {
                           </div>
                         </div>
                       </div>
+                      <Button variant="outline" size="sm" className="shrink-0 ml-2 gap-1.5">
+                        <Eye className="w-3.5 h-3.5" />
+                        View Profile
+                      </Button>
                     </div>
                   ))}
                 </div>
