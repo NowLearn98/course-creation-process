@@ -1,9 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Users, GraduationCap, BookOpen, DollarSign,
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
-  TrendingDown, ArrowUpRight, Crown, Eye,
+  TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp, MousePointerClick,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -73,12 +73,31 @@ const AdminPortalPage = () => {
     return { totalInstructors, totalStudents, totalRevenue, totalCourses, activeCourses, avgRating, totalClicks, totalReviews, totalBookings };
   }, [courses]);
 
+  const [expandedInstructor, setExpandedInstructor] = useState<string | null>(null);
+
   const topInstructors = [
-    { name: "Dr. Sarah Chen", initials: "SC", courses: 4, students: 520, revenue: 15600, rating: 4.9 },
-    { name: "Prof. James Wilson", initials: "JW", courses: 3, students: 380, revenue: 11400, rating: 4.7 },
-    { name: "Maria Garcia", initials: "MG", courses: 2, students: 210, revenue: 6300, rating: 4.8 },
-    { name: "Alex Thompson", initials: "AT", courses: 2, students: 180, revenue: 5400, rating: 4.6 },
-    { name: "Dr. Emily Park", initials: "EP", courses: 1, students: 95, revenue: 2850, rating: 4.5 },
+    { name: "Dr. Sarah Chen", initials: "SC", courses: 4, students: 520, revenue: 15600, rating: 4.9, courseDetails: [
+      { title: "Advanced Machine Learning", revenue: 5200, bookings: 42, clicks: 1800, rating: 4.9, students: 180 },
+      { title: "Data Science Fundamentals", revenue: 4100, bookings: 35, clicks: 1500, rating: 4.8, students: 140 },
+      { title: "Python for AI", revenue: 3800, bookings: 28, clicks: 1200, rating: 4.9, students: 120 },
+      { title: "Neural Networks Deep Dive", revenue: 2500, bookings: 18, clicks: 900, rating: 5.0, students: 80 },
+    ]},
+    { name: "Prof. James Wilson", initials: "JW", courses: 3, students: 380, revenue: 11400, rating: 4.7, courseDetails: [
+      { title: "Web Development Bootcamp", revenue: 4800, bookings: 38, clicks: 1600, rating: 4.7, students: 160 },
+      { title: "React Masterclass", revenue: 3600, bookings: 30, clicks: 1300, rating: 4.8, students: 120 },
+      { title: "JavaScript Essentials", revenue: 3000, bookings: 25, clicks: 1100, rating: 4.6, students: 100 },
+    ]},
+    { name: "Maria Garcia", initials: "MG", courses: 2, students: 210, revenue: 6300, rating: 4.8, courseDetails: [
+      { title: "UX Design Principles", revenue: 3500, bookings: 22, clicks: 950, rating: 4.9, students: 120 },
+      { title: "Figma for Teams", revenue: 2800, bookings: 18, clicks: 800, rating: 4.7, students: 90 },
+    ]},
+    { name: "Alex Thompson", initials: "AT", courses: 2, students: 180, revenue: 5400, rating: 4.6, courseDetails: [
+      { title: "Cloud Architecture", revenue: 3200, bookings: 20, clicks: 850, rating: 4.6, students: 100 },
+      { title: "AWS Certified Prep", revenue: 2200, bookings: 15, clicks: 700, rating: 4.6, students: 80 },
+    ]},
+    { name: "Dr. Emily Park", initials: "EP", courses: 1, students: 95, revenue: 2850, rating: 4.5, courseDetails: [
+      { title: "Intro to Cybersecurity", revenue: 2850, bookings: 12, clicks: 600, rating: 4.5, students: 95 },
+    ]},
   ];
 
   const topCourses = useMemo(() =>
@@ -288,47 +307,93 @@ const AdminPortalPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {topInstructors.map((inst, i) => (
-                    <div key={inst.name} className="flex items-center gap-4 p-4 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
-                      <div className="relative shrink-0">
-                        <Avatar className="w-10 h-10">
-                          <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                            {inst.initials}
-                          </AvatarFallback>
-                        </Avatar>
-                        {i < 3 && (
-                          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-[9px] font-bold text-white flex items-center justify-center">
-                            {i + 1}
-                          </span>
+                  {topInstructors.map((inst, i) => {
+                    const isExpanded = expandedInstructor === inst.name;
+                    return (
+                      <div key={inst.name} className="rounded-lg border border-border/40 overflow-hidden">
+                        <div className="flex items-center gap-4 p-4 bg-muted/20 hover:bg-muted/40 transition-colors">
+                          <div className="relative shrink-0">
+                            <Avatar className="w-10 h-10">
+                              <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                                {inst.initials}
+                              </AvatarFallback>
+                            </Avatar>
+                            {i < 3 && (
+                              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-[9px] font-bold text-white flex items-center justify-center">
+                                {i + 1}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold">{inst.name}</p>
+                            <p className="text-xs text-muted-foreground">{inst.courses} course{inst.courses !== 1 ? "s" : ""} published</p>
+                          </div>
+                          <div className="hidden sm:grid grid-cols-3 gap-8 text-center">
+                            <div>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Students</p>
+                              <p className="text-sm font-bold text-foreground">{inst.students.toLocaleString()}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Revenue</p>
+                              <p className="text-sm font-bold text-foreground">${inst.revenue.toLocaleString()}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Rating</p>
+                              <div className="flex items-center justify-center gap-0.5">
+                                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                                <p className="text-sm font-bold text-foreground">{inst.rating}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="shrink-0 ml-2 gap-1.5"
+                            onClick={() => setExpandedInstructor(isExpanded ? null : inst.name)}
+                          >
+                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                            View Details
+                          </Button>
+                        </div>
+
+                        {isExpanded && (
+                          <div className="border-t border-border/40 bg-background p-4 space-y-2">
+                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Published Courses</p>
+                            {inst.courseDetails.map((course) => (
+                              <div key={course.title} className="p-3 rounded-lg border border-border/30 bg-muted/10 hover:bg-muted/30 transition-colors">
+                                <p className="text-sm font-medium mb-2">{course.title}</p>
+                                <div className="grid grid-cols-5 gap-3">
+                                  <div className="text-center">
+                                    <p className="text-[10px] text-muted-foreground">Revenue</p>
+                                    <p className="text-sm font-bold text-foreground">${course.revenue.toLocaleString()}</p>
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-[10px] text-muted-foreground">Students</p>
+                                    <p className="text-sm font-bold text-foreground">{course.students}</p>
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-[10px] text-muted-foreground">Bookings</p>
+                                    <p className="text-sm font-bold text-foreground">{course.bookings}</p>
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-[10px] text-muted-foreground">Clicks</p>
+                                    <p className="text-sm font-bold text-foreground">{course.clicks.toLocaleString()}</p>
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-[10px] text-muted-foreground">Rating</p>
+                                    <div className="flex items-center justify-center gap-0.5">
+                                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                                      <p className="text-sm font-bold text-foreground">{course.rating}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold">{inst.name}</p>
-                        <p className="text-xs text-muted-foreground">{inst.courses} course{inst.courses !== 1 ? "s" : ""} published</p>
-                      </div>
-                      <div className="hidden sm:grid grid-cols-3 gap-8 text-center">
-                        <div>
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Students</p>
-                          <p className="text-sm font-bold text-foreground">{inst.students.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Revenue</p>
-                          <p className="text-sm font-bold text-foreground">${inst.revenue.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Rating</p>
-                          <div className="flex items-center justify-center gap-0.5">
-                            <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                            <p className="text-sm font-bold text-foreground">{inst.rating}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm" className="shrink-0 ml-2 gap-1.5">
-                        <Eye className="w-3.5 h-3.5" />
-                        View Profile
-                      </Button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
