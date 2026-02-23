@@ -5,7 +5,7 @@ import {
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
   TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp,
   MousePointerClick, Presentation, FlaskConical, ExternalLink, FileEdit,
-  Trash2, Settings, Save,
+  Trash2, Settings, Save, Sparkles, Bot, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -398,6 +398,44 @@ const AdminPortalPage = () => {
                       <p className="text-muted-foreground text-center py-12 text-sm">No courses published yet</p>
                     )}
                   </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* AI Metrics Section */}
+            <Separator />
+            <div>
+              <h3 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-violet-500" /> AI Usage Metrics
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <StatCard label="Total AI Prompts" value="3,842" icon={Bot} trend={{ value: "+22%", positive: true }} accent="violet" />
+                <StatCard label="AI Button Clicks" value="5,610" icon={Zap} trend={{ value: "+18%", positive: true }} accent="amber" />
+                <StatCard label="Avg Prompts / User" value="4.8" icon={Sparkles} accent="cyan" />
+                <StatCard label="AI Success Rate" value="94%" icon={CheckCircle} trend={{ value: "+3%", positive: true }} accent="emerald" />
+              </div>
+              <Card className="border-border/60">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-semibold">AI Prompts by Feature</CardTitle>
+                  <CardDescription>Breakdown of AI usage across creation tools</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={[
+                      { feature: "Course Creation", prompts: 1420, clicks: 2100 },
+                      { feature: "Profile Creation", prompts: 890, clicks: 1350 },
+                      { feature: "Lab Creation", prompts: 680, clicks: 980 },
+                      { feature: "Presentation Creation", prompts: 852, clicks: 1180 },
+                    ]} barSize={24}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" />
+                      <XAxis dataKey="feature" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                      <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
+                      <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid hsl(var(--border))", fontSize: 12 }} />
+                      <Legend wrapperStyle={{ fontSize: 12 }} />
+                      <Bar dataKey="prompts" fill="hsl(280, 60%, 55%)" radius={[6, 6, 0, 0]} name="Prompts Used" />
+                      <Bar dataKey="clicks" fill="hsl(40, 90%, 55%)" radius={[6, 6, 0, 0]} name="AI Button Clicks" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>
