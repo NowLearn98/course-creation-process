@@ -345,15 +345,25 @@ const AdminPortalPage = () => {
                               </div>
                             </div>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="shrink-0 ml-2 gap-1.5"
-                            onClick={() => setExpandedInstructor(isExpanded ? null : inst.name)}
-                          >
-                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                            View Details
-                          </Button>
+                          <div className="flex items-center gap-2 shrink-0 ml-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1.5"
+                              onClick={() => setExpandedInstructor(isExpanded ? null : inst.name)}
+                            >
+                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                              View Details
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1.5"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              View Profile
+                            </Button>
+                          </div>
                         </div>
 
                         {isExpanded && (
