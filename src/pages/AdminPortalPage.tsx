@@ -443,6 +443,12 @@ const AdminPortalPage = () => {
 
           {/* ===== INSTRUCTORS ===== */}
           <TabsContent value="instructors" className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <StatCard label="Total Quizzes" value="128" icon={CheckCircle} trend={{ value: "+10%", positive: true }} accent="blue" />
+              <StatCard label="Total Assignments" value="95" icon={FileEdit} trend={{ value: "+8%", positive: true }} accent="amber" />
+              <StatCard label="Total Labs" value="64" icon={FlaskConical} trend={{ value: "+14%", positive: true }} accent="emerald" />
+              <StatCard label="Total Presentations" value="112" icon={Presentation} trend={{ value: "+11%", positive: true }} accent="violet" />
+            </div>
             <Card className="border-border/60">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
