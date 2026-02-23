@@ -8,6 +8,9 @@ import {
   Trash2, Settings, Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -110,6 +113,7 @@ const AdminPortalPage = () => {
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [removeDialog, setRemoveDialog] = useState<{ open: boolean; name: string; type: "instructor" | "student" }>({ open: false, name: "", type: "student" });
   const [removedUsers, setRemovedUsers] = useState<Set<string>>(new Set());
+  const [viewDialog, setViewDialog] = useState<{ open: boolean; type: "project" | "forum"; title: string; clicks: number; responses: number } | null>(null);
 
   const handleRemove = () => {
     setRemovedUsers(prev => new Set(prev).add(removeDialog.name));
@@ -895,16 +899,19 @@ const AdminPortalPage = () => {
                                     </h4>
                                     {student.projectDetails.length > 0 ? (
                                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                                        {student.projectDetails.map((proj) => (
+                                         {student.projectDetails.map((proj) => (
                                           <div key={proj.title} className="flex items-center justify-between bg-background rounded-lg border border-border/50 px-3 py-2">
                                             <span className="text-xs font-medium text-foreground truncate mr-2">{proj.title}</span>
-                                            <div className="flex items-center gap-3 shrink-0">
+                                            <div className="flex items-center gap-2 shrink-0">
                                               <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                                 <MousePointerClick className="w-3 h-3" /> {proj.clicks}
                                               </span>
                                               <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                                 <ArrowUpRight className="w-3 h-3" /> {proj.responses}
                                               </span>
+                                              <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] gap-1" onClick={() => setViewDialog({ open: true, type: "project", title: proj.title, clicks: proj.clicks, responses: proj.responses })}>
+                                                <Eye className="w-3 h-3" /> View
+                                              </Button>
                                             </div>
                                           </div>
                                         ))}
@@ -924,13 +931,16 @@ const AdminPortalPage = () => {
                                         {student.forumDetails.map((post) => (
                                           <div key={post.title} className="flex items-center justify-between bg-background rounded-lg border border-border/50 px-3 py-2">
                                             <span className="text-xs font-medium text-foreground truncate mr-2">{post.title}</span>
-                                            <div className="flex items-center gap-3 shrink-0">
+                                            <div className="flex items-center gap-2 shrink-0">
                                               <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                                 <MousePointerClick className="w-3 h-3" /> {post.clicks}
                                               </span>
                                               <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                                 <ArrowUpRight className="w-3 h-3" /> {post.responses}
                                               </span>
+                                              <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] gap-1" onClick={() => setViewDialog({ open: true, type: "forum", title: post.title, clicks: post.clicks, responses: post.responses })}>
+                                                <Eye className="w-3 h-3" /> View
+                                              </Button>
                                             </div>
                                           </div>
                                         ))}
@@ -1025,6 +1035,39 @@ const AdminPortalPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* View Project/Forum Dialog */}
+      <Dialog open={!!viewDialog?.open} onOpenChange={(open) => !open && setViewDialog(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              {viewDialog?.type === "project" ? <Presentation className="w-4 h-4" /> : <FileEdit className="w-4 h-4" />}
+              {viewDialog?.type === "project" ? "Project" : "Forum Post"}
+            </DialogTitle>
+            <DialogDescription className="text-sm">{viewDialog?.title}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col items-center p-4 rounded-lg border border-border/50 bg-muted/20">
+                <MousePointerClick className="w-5 h-5 text-muted-foreground mb-1.5" />
+                <span className="text-2xl font-bold text-foreground">{viewDialog?.clicks}</span>
+                <span className="text-xs text-muted-foreground">Total Clicks</span>
+              </div>
+              <div className="flex flex-col items-center p-4 rounded-lg border border-border/50 bg-muted/20">
+                <ArrowUpRight className="w-5 h-5 text-muted-foreground mb-1.5" />
+                <span className="text-2xl font-bold text-foreground">{viewDialog?.responses}</span>
+                <span className="text-xs text-muted-foreground">Responses</span>
+              </div>
+            </div>
+            {viewDialog?.type === "project" && (
+              <p className="text-xs text-muted-foreground">This project was posted by the student and is visible on the projects page.</p>
+            )}
+            {viewDialog?.type === "forum" && (
+              <p className="text-xs text-muted-foreground">This forum post is publicly visible and open for community discussion.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
