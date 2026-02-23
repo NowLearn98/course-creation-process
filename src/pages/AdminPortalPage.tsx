@@ -119,7 +119,7 @@ const AdminPortalPage = () => {
 
   // Support ticket filters
   const [ticketSearch, setTicketSearch] = useState("");
-  const [ticketPriorityFilter, setTicketPriorityFilter] = useState<string>("all");
+  
   const [ticketStatusFilter, setTicketStatusFilter] = useState<string>("all");
   const [ticketSortBy, setTicketSortBy] = useState<string>("date-desc");
 
@@ -1041,18 +1041,6 @@ const AdminPortalPage = () => {
                       className="pl-9 h-9 text-sm"
                     />
                   </div>
-                  <Select value={ticketPriorityFilter} onValueChange={setTicketPriorityFilter}>
-                    <SelectTrigger className="w-[130px] h-9 text-xs">
-                      <Filter className="w-3.5 h-3.5 mr-1" />
-                      <SelectValue placeholder="Priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Priorities</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <Select value={ticketStatusFilter} onValueChange={setTicketStatusFilter}>
                     <SelectTrigger className="w-[130px] h-9 text-xs">
                       <Filter className="w-3.5 h-3.5 mr-1" />
@@ -1073,8 +1061,6 @@ const AdminPortalPage = () => {
                     <SelectContent>
                       <SelectItem value="date-desc">Newest First</SelectItem>
                       <SelectItem value="date-asc">Oldest First</SelectItem>
-                      <SelectItem value="priority-desc">Priority: High→Low</SelectItem>
-                      <SelectItem value="priority-asc">Priority: Low→High</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1095,21 +1081,17 @@ const AdminPortalPage = () => {
               </TabsList>
 
               {(() => {
-                type Ticket = { id: string; subject: string; from: string; email: string; date: string; priority: string; status: string; category: string; message: string };
-                const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
+                type Ticket = { id: string; subject: string; from: string; email: string; date: string; status: string; category: string; message: string };
                 const filterAndSort = (tickets: Ticket[]) => {
                   return tickets
                     .filter(t => {
                       const matchesSearch = !ticketSearch || t.subject.toLowerCase().includes(ticketSearch.toLowerCase()) || t.from.toLowerCase().includes(ticketSearch.toLowerCase()) || t.id.toLowerCase().includes(ticketSearch.toLowerCase());
-                      const matchesPriority = ticketPriorityFilter === "all" || t.priority === ticketPriorityFilter;
                       const matchesStatus = ticketStatusFilter === "all" || t.status === ticketStatusFilter;
-                      return matchesSearch && matchesPriority && matchesStatus;
+                      return matchesSearch && matchesStatus;
                     })
                     .sort((a, b) => {
                       if (ticketSortBy === "date-desc") return b.date.localeCompare(a.date);
                       if (ticketSortBy === "date-asc") return a.date.localeCompare(b.date);
-                      if (ticketSortBy === "priority-desc") return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
-                      if (ticketSortBy === "priority-asc") return (priorityOrder[a.priority] || 0) - (priorityOrder[b.priority] || 0);
                       return 0;
                     });
                 };
@@ -1127,11 +1109,6 @@ const AdminPortalPage = () => {
                               <p className="text-xs text-muted-foreground">{ticket.from} · {ticket.date}</p>
                             </div>
                             <Badge variant="outline" className="text-[10px] shrink-0">{ticket.category}</Badge>
-                            <Badge variant="outline" className={`text-[10px] shrink-0 ${
-                              ticket.priority === "high" ? "border-destructive/50 text-destructive" :
-                              ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
-                              "border-border text-muted-foreground"
-                            }`}>{ticket.priority}</Badge>
                             <Badge className={`text-[10px] shrink-0 ${
                               ticket.status === "open" ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" :
                               ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20" :
@@ -1145,7 +1122,7 @@ const AdminPortalPage = () => {
                           </div>
                           {ticketDialog?.ticket?.id === ticket.id && (
                             <div className="border-t border-border/40 bg-background px-5 py-4 space-y-4">
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div className="space-y-1">
                                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Full Name</p>
                                   <p className="text-sm font-medium text-foreground">{ticket.from}</p>
@@ -1161,14 +1138,6 @@ const AdminPortalPage = () => {
                                 <div className="space-y-1">
                                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Date</p>
                                   <p className="text-sm text-foreground">{ticket.date}</p>
-                                </div>
-                                <div className="space-y-1">
-                                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Priority</p>
-                                  <Badge variant="outline" className={`text-xs ${
-                                    ticket.priority === "high" ? "border-destructive/50 text-destructive" :
-                                    ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
-                                    "border-border text-muted-foreground"
-                                  }`}>{ticket.priority}</Badge>
                                 </div>
                                 <div className="space-y-1">
                                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Status</p>
@@ -1207,13 +1176,13 @@ const AdminPortalPage = () => {
                         </CardHeader>
                         <CardContent>
                           {renderTickets([
-                            { id: "ST-001", subject: "Cannot access course materials", from: "Sarah Johnson", email: "sarah.johnson@example.com", date: "2026-02-22", priority: "high", status: "open", category: "Course Access", message: "Hi, I enrolled in the React Development Masterclass two days ago but I still cannot access any of the course materials. The page shows a blank screen when I try to open Module 1. I've tried clearing my cache and using a different browser but the issue persists. Please help resolve this as soon as possible." },
-                            { id: "ST-002", subject: "Payment not reflecting in account", from: "Mike Chen", email: "mike.chen@example.com", date: "2026-02-21", priority: "high", status: "open", category: "Billing", message: "I made a payment of $149 for the Web Development Bootcamp on February 19th but it hasn't reflected in my account yet. My bank statement shows the charge was processed. Transaction ID: TXN-8847291. Could you please verify and update my enrollment status?" },
-                            { id: "ST-003", subject: "Quiz score not saved properly", from: "Emma Williams", email: "emma.williams@example.com", date: "2026-02-21", priority: "medium", status: "in-progress", category: "Technical Issue", message: "I completed the Module 2 quiz for Data Science Fundamentals and scored 92%, but when I went back to check my progress, it shows as 0%. I have a screenshot of the completion page showing my score. This is the second time this has happened." },
-                            { id: "ST-004", subject: "Certificate not generated after completion", from: "James Brown", email: "james.brown@example.com", date: "2026-02-20", priority: "medium", status: "open", category: "Course Access", message: "I finished all modules and assignments for the Digital Marketing Fundamentals course. My progress shows 100% but no certificate has been generated. The 'Download Certificate' button is grayed out. I need this certificate for my job application deadline next week." },
-                            { id: "ST-005", subject: "Video playback issues on mobile", from: "Lisa Garcia", email: "lisa.garcia@example.com", date: "2026-02-20", priority: "low", status: "in-progress", category: "Technical Issue", message: "Videos in the UX Design Principles course buffer constantly on my iPhone 14 using Safari. The same videos play fine on my laptop. I've tried both WiFi and cellular data. My internet speed is 50 Mbps so bandwidth shouldn't be an issue." },
-                            { id: "ST-006", subject: "Request to change enrolled email", from: "David Miller", email: "david.miller@example.com", date: "2026-02-19", priority: "low", status: "resolved", category: "Account", message: "I'd like to change my enrolled email from david.miller@oldcompany.com to david.miller@example.com as I've switched employers. Please update all my course enrollments and certificates to reflect the new email address." },
-                            { id: "ST-007", subject: "Booking session not showing in calendar", from: "Anna Taylor", email: "anna.taylor@example.com", date: "2026-02-18", priority: "medium", status: "resolved", category: "Other", message: "I booked a one-on-one session with Dr. Sarah Chen for February 25th at 2:00 PM but it's not showing in my calendar view. I received a confirmation email so the booking went through. Could you check if there's a sync issue with the calendar?" },
+                            { id: "ST-001", subject: "Cannot access course materials", from: "Sarah Johnson", email: "sarah.johnson@example.com", date: "2026-02-22", status: "open", category: "Course Access", message: "Hi, I enrolled in the React Development Masterclass two days ago but I still cannot access any of the course materials. The page shows a blank screen when I try to open Module 1. I've tried clearing my cache and using a different browser but the issue persists. Please help resolve this as soon as possible." },
+                            { id: "ST-002", subject: "Payment not reflecting in account", from: "Mike Chen", email: "mike.chen@example.com", date: "2026-02-21", status: "open", category: "Billing", message: "I made a payment of $149 for the Web Development Bootcamp on February 19th but it hasn't reflected in my account yet. My bank statement shows the charge was processed. Transaction ID: TXN-8847291. Could you please verify and update my enrollment status?" },
+                            { id: "ST-003", subject: "Quiz score not saved properly", from: "Emma Williams", email: "emma.williams@example.com", date: "2026-02-21", status: "in-progress", category: "Technical Issue", message: "I completed the Module 2 quiz for Data Science Fundamentals and scored 92%, but when I went back to check my progress, it shows as 0%. I have a screenshot of the completion page showing my score. This is the second time this has happened." },
+                            { id: "ST-004", subject: "Certificate not generated after completion", from: "James Brown", email: "james.brown@example.com", date: "2026-02-20", status: "open", category: "Course Access", message: "I finished all modules and assignments for the Digital Marketing Fundamentals course. My progress shows 100% but no certificate has been generated. The 'Download Certificate' button is grayed out. I need this certificate for my job application deadline next week." },
+                            { id: "ST-005", subject: "Video playback issues on mobile", from: "Lisa Garcia", email: "lisa.garcia@example.com", date: "2026-02-20", status: "in-progress", category: "Technical Issue", message: "Videos in the UX Design Principles course buffer constantly on my iPhone 14 using Safari. The same videos play fine on my laptop. I've tried both WiFi and cellular data. My internet speed is 50 Mbps so bandwidth shouldn't be an issue." },
+                            { id: "ST-006", subject: "Request to change enrolled email", from: "David Miller", email: "david.miller@example.com", date: "2026-02-19", status: "resolved", category: "Account", message: "I'd like to change my enrolled email from david.miller@oldcompany.com to david.miller@example.com as I've switched employers. Please update all my course enrollments and certificates to reflect the new email address." },
+                            { id: "ST-007", subject: "Booking session not showing in calendar", from: "Anna Taylor", email: "anna.taylor@example.com", date: "2026-02-18", status: "resolved", category: "Other", message: "I booked a one-on-one session with Dr. Sarah Chen for February 25th at 2:00 PM but it's not showing in my calendar view. I received a confirmation email so the booking went through. Could you check if there's a sync issue with the calendar?" },
                           ])}
                         </CardContent>
                       </Card>
@@ -1226,11 +1195,11 @@ const AdminPortalPage = () => {
                         </CardHeader>
                         <CardContent>
                           {renderTickets([
-                            { id: "IT-001", subject: "Revenue payout delay for January", from: "Dr. Sarah Chen", email: "sarah.chen@university.edu", date: "2026-02-22", priority: "high", status: "open", category: "Revenue", message: "My January revenue payout of $4,200 hasn't been processed yet. Previous months were always paid by the 15th. Please investigate and process the payment as soon as possible." },
-                            { id: "IT-002", subject: "Course analytics not updating", from: "Prof. James Wilson", email: "j.wilson@techacademy.com", date: "2026-02-21", priority: "medium", status: "in-progress", category: "Technical", message: "The analytics dashboard for my React Masterclass hasn't updated since February 15th. Click and enrollment data appears frozen. Other instructors have reported similar issues." },
-                            { id: "IT-003", subject: "Need help with new course module layout", from: "Maria Garcia", email: "maria.garcia@designstudio.com", date: "2026-02-20", priority: "medium", status: "open", category: "Course Creation", message: "I'm having trouble with the new course builder layout. I can't find the option to add interactive lab components. Could you provide a guide or jump on a quick call?" },
-                            { id: "IT-004", subject: "Updating content for React 19", from: "Alex Thompson", email: "alex.t@cloudacademy.io", date: "2026-02-19", priority: "low", status: "in-progress", category: "Content Update", message: "I'm planning to update my React course for version 19. Are there any platform-specific guidelines for major content refreshes or can I just start swapping out videos?" },
-                            { id: "IT-005", subject: "Request for bulk upload feature", from: "Dr. Emily Park", email: "emily.park@cybersec.edu", date: "2026-02-18", priority: "low", status: "resolved", category: "Other", message: "I have 50+ lab exercises that I need to upload for my new Ethical Hacking course. Is there a bulk upload feature, or do I need to add them one by one? A CSV import would be very helpful." },
+                            { id: "IT-001", subject: "Revenue payout delay for January", from: "Dr. Sarah Chen", email: "sarah.chen@university.edu", date: "2026-02-22", status: "open", category: "Revenue", message: "My January revenue payout of $4,200 hasn't been processed yet. Previous months were always paid by the 15th. Please investigate and process the payment as soon as possible." },
+                            { id: "IT-002", subject: "Course analytics not updating", from: "Prof. James Wilson", email: "j.wilson@techacademy.com", date: "2026-02-21", status: "in-progress", category: "Technical", message: "The analytics dashboard for my React Masterclass hasn't updated since February 15th. Click and enrollment data appears frozen. Other instructors have reported similar issues." },
+                            { id: "IT-003", subject: "Need help with new course module layout", from: "Maria Garcia", email: "maria.garcia@designstudio.com", date: "2026-02-20", status: "open", category: "Course Creation", message: "I'm having trouble with the new course builder layout. I can't find the option to add interactive lab components. Could you provide a guide or jump on a quick call?" },
+                            { id: "IT-004", subject: "Updating content for React 19", from: "Alex Thompson", email: "alex.t@cloudacademy.io", date: "2026-02-19", status: "in-progress", category: "Content Update", message: "I'm planning to update my React course for version 19. Are there any platform-specific guidelines for major content refreshes or can I just start swapping out videos?" },
+                            { id: "IT-005", subject: "Request for bulk upload feature", from: "Dr. Emily Park", email: "emily.park@cybersec.edu", date: "2026-02-18", status: "resolved", category: "Other", message: "I have 50+ lab exercises that I need to upload for my new Ethical Hacking course. Is there a bulk upload feature, or do I need to add them one by one? A CSV import would be very helpful." },
                           ])}
                         </CardContent>
                       </Card>
@@ -1243,10 +1212,10 @@ const AdminPortalPage = () => {
                         </CardHeader>
                         <CardContent>
                           {renderTickets([
-                            { id: "IR-001", subject: "Q4 2025 financial report request", from: "Capital Ventures LLC", email: "relations@capitalventures.com", date: "2026-02-22", priority: "high", status: "open", category: "Financial Information", message: "Please share the Q4 2025 financial report including revenue breakdown by category, platform growth metrics, and profit margins. We need this for our quarterly portfolio review meeting scheduled for March 5th." },
-                            { id: "IR-002", subject: "Series B Investment Inquiry", from: "Horizon Partners", email: "invest@horizonpartners.com", date: "2026-02-20", priority: "high", status: "in-progress", category: "Investment Inquiry", message: "We've been tracking your platform's growth and are interested in discussing potential participation in your upcoming Series B round. We'd like to schedule a call with the founders." },
-                            { id: "IR-003", subject: "Partnership proposal - corporate training", from: "TechCorp Inc.", email: "partnerships@techcorp.com", date: "2026-02-18", priority: "medium", status: "open", category: "Partnership", message: "We're interested in a corporate training partnership to provide your platform's courses to our 5,000+ employees. We'd like to discuss volume licensing, custom course creation, and SSO integration options." },
-                            { id: "IR-004", subject: "Board meeting scheduling for March", from: "Angel Fund Group", email: "board@angelfund.com", date: "2026-02-17", priority: "medium", status: "resolved", category: "General Inquiry", message: "We need to schedule the Q1 board meeting for the second week of March. Please confirm availability of the founding team and prepare the standard board deck with updated KPIs." },
+                            { id: "IR-001", subject: "Q4 2025 financial report request", from: "Capital Ventures LLC", email: "relations@capitalventures.com", date: "2026-02-22", status: "open", category: "Financial Information", message: "Please share the Q4 2025 financial report including revenue breakdown by category, platform growth metrics, and profit margins. We need this for our quarterly portfolio review meeting scheduled for March 5th." },
+                            { id: "IR-002", subject: "Series B Investment Inquiry", from: "Horizon Partners", email: "invest@horizonpartners.com", date: "2026-02-20", status: "in-progress", category: "Investment Inquiry", message: "We've been tracking your platform's growth and are interested in discussing potential participation in your upcoming Series B round. We'd like to schedule a call with the founders." },
+                            { id: "IR-003", subject: "Partnership proposal - corporate training", from: "TechCorp Inc.", email: "partnerships@techcorp.com", date: "2026-02-18", status: "open", category: "Partnership", message: "We're interested in a corporate training partnership to provide your platform's courses to our 5,000+ employees. We'd like to discuss volume licensing, custom course creation, and SSO integration options." },
+                            { id: "IR-004", subject: "Board meeting scheduling for March", from: "Angel Fund Group", email: "board@angelfund.com", date: "2026-02-17", status: "resolved", category: "General Inquiry", message: "We need to schedule the Q1 board meeting for the second week of March. Please confirm availability of the founding team and prepare the standard board deck with updated KPIs." },
                           ])}
                         </CardContent>
                       </Card>
