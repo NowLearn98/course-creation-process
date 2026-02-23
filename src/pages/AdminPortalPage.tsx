@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Users, GraduationCap, BookOpen, DollarSign,
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
-  TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp, MousePointerClick, Presentation, FlaskConical, ExternalLink,
+  TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp,
+  MousePointerClick, Presentation, FlaskConical, ExternalLink, FileEdit,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -81,26 +82,31 @@ const AdminPortalPage = () => {
 
   const topInstructors = [
     { name: "Dr. Sarah Chen", initials: "SC", courses: 4, students: 520, revenue: 15600, rating: 4.9, courseDetails: [
-      { title: "Advanced Machine Learning", revenue: 5200, bookings: 42, clicks: 1800, rating: 4.9, students: 180, presentations: ["Intro to ML Algorithms", "Supervised Learning Deep Dive", "Model Evaluation Techniques"], labs: ["Build a Classifier", "Neural Network from Scratch"] },
-      { title: "Data Science Fundamentals", revenue: 4100, bookings: 35, clicks: 1500, rating: 4.8, students: 140, presentations: ["Data Wrangling Basics", "Statistical Analysis"], labs: ["Pandas Workshop", "Data Visualization Lab"] },
-      { title: "Python for AI", revenue: 3800, bookings: 28, clicks: 1200, rating: 4.9, students: 120, presentations: ["Python Refresher"], labs: [] },
-      { title: "Neural Networks Deep Dive", revenue: 2500, bookings: 18, clicks: 900, rating: 5.0, students: 80, presentations: [], labs: ["CNN Image Classifier"] },
+      { title: "Advanced Machine Learning", revenue: 5200, bookings: 42, clicks: 1800, rating: 4.9, students: 180, presentations: ["Intro to ML Algorithms", "Supervised Learning Deep Dive", "Model Evaluation Techniques"], labs: ["Build a Classifier", "Neural Network from Scratch"], status: "published" as const },
+      { title: "Data Science Fundamentals", revenue: 4100, bookings: 35, clicks: 1500, rating: 4.8, students: 140, presentations: ["Data Wrangling Basics", "Statistical Analysis"], labs: ["Pandas Workshop", "Data Visualization Lab"], status: "published" as const },
+      { title: "Python for AI", revenue: 3800, bookings: 28, clicks: 1200, rating: 4.9, students: 120, presentations: ["Python Refresher"], labs: [], status: "published" as const },
+      { title: "Neural Networks Deep Dive", revenue: 2500, bookings: 18, clicks: 900, rating: 5.0, students: 80, presentations: [], labs: ["CNN Image Classifier"], status: "published" as const },
+      { title: "Reinforcement Learning Intro", revenue: 0, bookings: 0, clicks: 0, rating: 0, students: 0, presentations: ["RL Basics"], labs: [], status: "draft" as const },
     ]},
     { name: "Prof. James Wilson", initials: "JW", courses: 3, students: 380, revenue: 11400, rating: 4.7, courseDetails: [
-      { title: "Web Development Bootcamp", revenue: 4800, bookings: 38, clicks: 1600, rating: 4.7, students: 160, presentations: ["HTML & CSS Foundations", "Responsive Design"], labs: ["Build a Portfolio Site", "CSS Grid Challenge"] },
-      { title: "React Masterclass", revenue: 3600, bookings: 30, clicks: 1300, rating: 4.8, students: 120, presentations: ["Component Architecture", "State Management"], labs: ["Todo App Lab"] },
-      { title: "JavaScript Essentials", revenue: 3000, bookings: 25, clicks: 1100, rating: 4.6, students: 100, presentations: ["ES6+ Features"], labs: [] },
+      { title: "Web Development Bootcamp", revenue: 4800, bookings: 38, clicks: 1600, rating: 4.7, students: 160, presentations: ["HTML & CSS Foundations", "Responsive Design"], labs: ["Build a Portfolio Site", "CSS Grid Challenge"], status: "published" as const },
+      { title: "React Masterclass", revenue: 3600, bookings: 30, clicks: 1300, rating: 4.8, students: 120, presentations: ["Component Architecture", "State Management"], labs: ["Todo App Lab"], status: "published" as const },
+      { title: "JavaScript Essentials", revenue: 3000, bookings: 25, clicks: 1100, rating: 4.6, students: 100, presentations: ["ES6+ Features"], labs: [], status: "published" as const },
+      { title: "TypeScript Advanced Patterns", revenue: 0, bookings: 0, clicks: 0, rating: 0, students: 0, presentations: [], labs: [], status: "draft" as const },
+      { title: "Next.js Full Stack Guide", revenue: 0, bookings: 0, clicks: 0, rating: 0, students: 0, presentations: ["App Router Overview"], labs: ["API Routes Lab"], status: "draft" as const },
     ]},
     { name: "Maria Garcia", initials: "MG", courses: 2, students: 210, revenue: 6300, rating: 4.8, courseDetails: [
-      { title: "UX Design Principles", revenue: 3500, bookings: 22, clicks: 950, rating: 4.9, students: 120, presentations: ["Design Thinking Workshop", "User Research Methods"], labs: ["Wireframing Lab"] },
-      { title: "Figma for Teams", revenue: 2800, bookings: 18, clicks: 800, rating: 4.7, students: 90, presentations: ["Figma Basics"], labs: ["Collaborative Design Lab"] },
+      { title: "UX Design Principles", revenue: 3500, bookings: 22, clicks: 950, rating: 4.9, students: 120, presentations: ["Design Thinking Workshop", "User Research Methods"], labs: ["Wireframing Lab"], status: "published" as const },
+      { title: "Figma for Teams", revenue: 2800, bookings: 18, clicks: 800, rating: 4.7, students: 90, presentations: ["Figma Basics"], labs: ["Collaborative Design Lab"], status: "published" as const },
+      { title: "Accessibility in Design", revenue: 0, bookings: 0, clicks: 0, rating: 0, students: 0, presentations: [], labs: [], status: "draft" as const },
     ]},
     { name: "Alex Thompson", initials: "AT", courses: 2, students: 180, revenue: 5400, rating: 4.6, courseDetails: [
-      { title: "Cloud Architecture", revenue: 3200, bookings: 20, clicks: 850, rating: 4.6, students: 100, presentations: ["Cloud Fundamentals", "Microservices Overview"], labs: ["Deploy to AWS Lab"] },
-      { title: "AWS Certified Prep", revenue: 2200, bookings: 15, clicks: 700, rating: 4.6, students: 80, presentations: ["Exam Strategy"], labs: [] },
+      { title: "Cloud Architecture", revenue: 3200, bookings: 20, clicks: 850, rating: 4.6, students: 100, presentations: ["Cloud Fundamentals", "Microservices Overview"], labs: ["Deploy to AWS Lab"], status: "published" as const },
+      { title: "AWS Certified Prep", revenue: 2200, bookings: 15, clicks: 700, rating: 4.6, students: 80, presentations: ["Exam Strategy"], labs: [], status: "published" as const },
     ]},
     { name: "Dr. Emily Park", initials: "EP", courses: 1, students: 95, revenue: 2850, rating: 4.5, courseDetails: [
-      { title: "Intro to Cybersecurity", revenue: 2850, bookings: 12, clicks: 600, rating: 4.5, students: 95, presentations: ["Threat Landscape Overview"], labs: ["Penetration Testing Basics"] },
+      { title: "Intro to Cybersecurity", revenue: 2850, bookings: 12, clicks: 600, rating: 4.5, students: 95, presentations: ["Threat Landscape Overview"], labs: ["Penetration Testing Basics"], status: "published" as const },
+      { title: "Ethical Hacking Fundamentals", revenue: 0, bookings: 0, clicks: 0, rating: 0, students: 0, presentations: ["Recon Techniques"], labs: ["Kali Linux Setup"], status: "draft" as const },
     ]},
   ];
 
@@ -371,95 +377,159 @@ const AdminPortalPage = () => {
                         </div>
 
                         {isExpanded && (
-                          <div className="border-t border-border/40 bg-background p-4 space-y-2">
-                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Published Courses</p>
-                            {inst.courseDetails.map((course) => (
-                              <div key={course.title} className="p-3 rounded-lg border border-border/30 bg-muted/10 hover:bg-muted/30 transition-colors space-y-3">
-                                <p className="text-sm font-medium">{course.title}</p>
-                                <div className="grid grid-cols-5 gap-3">
-                                  <div className="text-center">
-                                    <p className="text-[10px] text-muted-foreground">Revenue</p>
-                                    <p className="text-sm font-bold text-foreground">${course.revenue.toLocaleString()}</p>
-                                  </div>
-                                  <div className="text-center">
-                                    <p className="text-[10px] text-muted-foreground">Students</p>
-                                    <p className="text-sm font-bold text-foreground">{course.students}</p>
-                                  </div>
-                                  <div className="text-center">
-                                    <p className="text-[10px] text-muted-foreground">Bookings</p>
-                                    <p className="text-sm font-bold text-foreground">{course.bookings}</p>
-                                  </div>
-                                  <div className="text-center">
-                                    <p className="text-[10px] text-muted-foreground">Clicks</p>
-                                    <p className="text-sm font-bold text-foreground">{course.clicks.toLocaleString()}</p>
-                                  </div>
-                                  <div className="text-center">
-                                    <p className="text-[10px] text-muted-foreground">Rating</p>
-                                    <div className="flex items-center justify-center gap-0.5">
-                                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                                      <p className="text-sm font-bold text-foreground">{course.rating}</p>
+                          <div className="border-t border-border/40 bg-background p-4 space-y-4">
+                            {(() => {
+                              const published = inst.courseDetails.filter(c => c.status === "published");
+                              const drafts = inst.courseDetails.filter(c => c.status === "draft");
+                              return (
+                                <>
+                                  {published.length > 0 && (
+                                    <div className="space-y-2">
+                                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Published Courses ({published.length})</p>
+                                      {published.map((course) => (
+                                        <div key={course.title} className="p-3 rounded-lg border border-border/30 bg-muted/10 hover:bg-muted/30 transition-colors space-y-3">
+                                          <div className="flex items-center gap-2">
+                                            <p className="text-sm font-medium">{course.title}</p>
+                                            <Badge variant="default" className="text-[9px] px-1.5 py-0">Published</Badge>
+                                          </div>
+                                          <div className="grid grid-cols-5 gap-3">
+                                            <div className="text-center">
+                                              <p className="text-[10px] text-muted-foreground">Revenue</p>
+                                              <p className="text-sm font-bold text-foreground">${course.revenue.toLocaleString()}</p>
+                                            </div>
+                                            <div className="text-center">
+                                              <p className="text-[10px] text-muted-foreground">Students</p>
+                                              <p className="text-sm font-bold text-foreground">{course.students}</p>
+                                            </div>
+                                            <div className="text-center">
+                                              <p className="text-[10px] text-muted-foreground">Bookings</p>
+                                              <p className="text-sm font-bold text-foreground">{course.bookings}</p>
+                                            </div>
+                                            <div className="text-center">
+                                              <p className="text-[10px] text-muted-foreground">Clicks</p>
+                                              <p className="text-sm font-bold text-foreground">{course.clicks.toLocaleString()}</p>
+                                            </div>
+                                            <div className="text-center">
+                                              <p className="text-[10px] text-muted-foreground">Rating</p>
+                                              <div className="flex items-center justify-center gap-0.5">
+                                                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                                                <p className="text-sm font-bold text-foreground">{course.rating}</p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="flex items-center gap-2 pt-2 border-t border-border/30">
+                                            <DropdownMenu>
+                                              <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                                                  <Presentation className="w-3.5 h-3.5" />
+                                                  Presentations ({course.presentations.length})
+                                                  <ChevronDown className="w-3 h-3" />
+                                                </Button>
+                                              </DropdownMenuTrigger>
+                                              <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
+                                                <DropdownMenuLabel className="text-xs">Presentations</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                {course.presentations.length > 0 ? course.presentations.map((p) => (
+                                                  <DropdownMenuItem key={p} className="flex items-center justify-between gap-2 cursor-pointer">
+                                                    <span className="text-xs truncate">{p}</span>
+                                                    <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
+                                                  </DropdownMenuItem>
+                                                )) : (
+                                                  <DropdownMenuItem disabled className="text-xs italic text-muted-foreground">No presentations created</DropdownMenuItem>
+                                                )}
+                                              </DropdownMenuContent>
+                                            </DropdownMenu>
+                                            <DropdownMenu>
+                                              <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                                                  <FlaskConical className="w-3.5 h-3.5" />
+                                                  Labs ({course.labs.length})
+                                                  <ChevronDown className="w-3 h-3" />
+                                                </Button>
+                                              </DropdownMenuTrigger>
+                                              <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
+                                                <DropdownMenuLabel className="text-xs">Labs</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                {course.labs.length > 0 ? course.labs.map((l) => (
+                                                  <DropdownMenuItem key={l} className="flex items-center justify-between gap-2 cursor-pointer">
+                                                    <span className="text-xs truncate">{l}</span>
+                                                    <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
+                                                  </DropdownMenuItem>
+                                                )) : (
+                                                  <DropdownMenuItem disabled className="text-xs italic text-muted-foreground">No labs created</DropdownMenuItem>
+                                                )}
+                                              </DropdownMenuContent>
+                                            </DropdownMenu>
+                                          </div>
+                                        </div>
+                                      ))}
                                     </div>
-                                  </div>
-                                </div>
+                                  )}
 
-                                {/* Presentations & Labs Dropdowns */}
-                                <div className="flex items-center gap-2 pt-2 border-t border-border/30">
-                                  {/* Presentations Dropdown */}
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-                                        <Presentation className="w-3.5 h-3.5" />
-                                        Presentations ({course.presentations.length})
-                                        <ChevronDown className="w-3 h-3" />
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
-                                      <DropdownMenuLabel className="text-xs">Presentations</DropdownMenuLabel>
-                                      <DropdownMenuSeparator />
-                                      {course.presentations.length > 0 ? (
-                                        course.presentations.map((p) => (
-                                          <DropdownMenuItem key={p} className="flex items-center justify-between gap-2 cursor-pointer">
-                                            <span className="text-xs truncate">{p}</span>
-                                            <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
-                                          </DropdownMenuItem>
-                                        ))
-                                      ) : (
-                                        <DropdownMenuItem disabled className="text-xs italic text-muted-foreground">
-                                          No presentations created
-                                        </DropdownMenuItem>
-                                      )}
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-
-                                  {/* Labs Dropdown */}
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-                                        <FlaskConical className="w-3.5 h-3.5" />
-                                        Labs ({course.labs.length})
-                                        <ChevronDown className="w-3 h-3" />
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
-                                      <DropdownMenuLabel className="text-xs">Labs</DropdownMenuLabel>
-                                      <DropdownMenuSeparator />
-                                      {course.labs.length > 0 ? (
-                                        course.labs.map((l) => (
-                                          <DropdownMenuItem key={l} className="flex items-center justify-between gap-2 cursor-pointer">
-                                            <span className="text-xs truncate">{l}</span>
-                                            <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
-                                          </DropdownMenuItem>
-                                        ))
-                                      ) : (
-                                        <DropdownMenuItem disabled className="text-xs italic text-muted-foreground">
-                                          No labs created
-                                        </DropdownMenuItem>
-                                      )}
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </div>
-                              </div>
-                            ))}
+                                  {drafts.length > 0 && (
+                                    <div className="space-y-2">
+                                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Draft Courses ({drafts.length})</p>
+                                      {drafts.map((course) => (
+                                        <div key={course.title} className="p-3 rounded-lg border border-dashed border-border/50 bg-muted/5 hover:bg-muted/20 transition-colors space-y-3">
+                                          <div className="flex items-center gap-2">
+                                            <FileEdit className="w-3.5 h-3.5 text-muted-foreground" />
+                                            <p className="text-sm font-medium text-muted-foreground">{course.title}</p>
+                                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-amber-500/50 text-amber-600">Draft</Badge>
+                                          </div>
+                                          <p className="text-xs text-muted-foreground/70 italic">Not yet published — no metrics available</p>
+                                          {(course.presentations.length > 0 || course.labs.length > 0) && (
+                                            <div className="flex items-center gap-2 pt-2 border-t border-border/20">
+                                              {course.presentations.length > 0 && (
+                                                <DropdownMenu>
+                                                  <DropdownMenuTrigger asChild>
+                                                    <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                                                      <Presentation className="w-3.5 h-3.5" />
+                                                      Presentations ({course.presentations.length})
+                                                      <ChevronDown className="w-3 h-3" />
+                                                    </Button>
+                                                  </DropdownMenuTrigger>
+                                                  <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
+                                                    <DropdownMenuLabel className="text-xs">Presentations</DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    {course.presentations.map((p) => (
+                                                      <DropdownMenuItem key={p} className="flex items-center justify-between gap-2 cursor-pointer">
+                                                        <span className="text-xs truncate">{p}</span>
+                                                        <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
+                                                      </DropdownMenuItem>
+                                                    ))}
+                                                  </DropdownMenuContent>
+                                                </DropdownMenu>
+                                              )}
+                                              {course.labs.length > 0 && (
+                                                <DropdownMenu>
+                                                  <DropdownMenuTrigger asChild>
+                                                    <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                                                      <FlaskConical className="w-3.5 h-3.5" />
+                                                      Labs ({course.labs.length})
+                                                      <ChevronDown className="w-3 h-3" />
+                                                    </Button>
+                                                  </DropdownMenuTrigger>
+                                                  <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
+                                                    <DropdownMenuLabel className="text-xs">Labs</DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    {course.labs.map((l) => (
+                                                      <DropdownMenuItem key={l} className="flex items-center justify-between gap-2 cursor-pointer">
+                                                        <span className="text-xs truncate">{l}</span>
+                                                        <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
+                                                      </DropdownMenuItem>
+                                                    ))}
+                                                  </DropdownMenuContent>
+                                                </DropdownMenu>
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              );
+                            })()}
                           </div>
                         )}
                       </div>
