@@ -9,7 +9,7 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { Plus, BookOpen, Users, TrendingUp, Star, GraduationCap, MessageSquare } from "lucide-react";
+import { Plus, BookOpen, Users, TrendingUp, Star, GraduationCap, MessageSquare, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BookingModal } from "@/components/BookingModal";
 import { DraftsList } from "@/components/DraftsList";
@@ -121,6 +121,14 @@ const Index = () => {
               </Typography>
             </Box>
             <Box sx={{ display: "flex", gap: 2 }}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => navigate("/admin")}
+                startIcon={<ShieldCheck className="w-5 h-5" />}
+              >
+                Admin Portal
+              </Button>
               <Button
                 variant="outlined"
                 size="large"
