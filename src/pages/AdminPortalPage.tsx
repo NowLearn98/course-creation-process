@@ -1119,26 +1119,79 @@ const AdminPortalPage = () => {
                   return (
                     <div className="space-y-2">
                       {filtered.map((ticket) => (
-                        <div key={ticket.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
-                          <span className="text-xs font-mono text-muted-foreground shrink-0">{ticket.id}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{ticket.subject}</p>
-                            <p className="text-xs text-muted-foreground">{ticket.from} · {ticket.date}</p>
+                        <div key={ticket.id} className="rounded-lg border border-border/40 overflow-hidden">
+                          <div className="flex items-center gap-3 p-3 bg-muted/20 hover:bg-muted/40 transition-colors">
+                            <span className="text-xs font-mono text-muted-foreground shrink-0">{ticket.id}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{ticket.subject}</p>
+                              <p className="text-xs text-muted-foreground">{ticket.from} · {ticket.date}</p>
+                            </div>
+                            <Badge variant="outline" className="text-[10px] shrink-0">{ticket.category}</Badge>
+                            <Badge variant="outline" className={`text-[10px] shrink-0 ${
+                              ticket.priority === "high" ? "border-destructive/50 text-destructive" :
+                              ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
+                              "border-border text-muted-foreground"
+                            }`}>{ticket.priority}</Badge>
+                            <Badge className={`text-[10px] shrink-0 ${
+                              ticket.status === "open" ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" :
+                              ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20" :
+                              "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
+                            }`}>{ticket.status}</Badge>
+                            <Button variant="outline" size="sm" className="h-7 px-2.5 text-xs gap-1" onClick={() => setTicketDialog(ticketDialog?.ticket?.id === ticket.id ? null : { open: true, ticket })}>
+                              <Eye className="w-3 h-3" />
+                              {ticketDialog?.ticket?.id === ticket.id ? "Hide" : "View"}
+                              {ticketDialog?.ticket?.id === ticket.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                            </Button>
                           </div>
-                          <Badge variant="outline" className="text-[10px] shrink-0">{ticket.category}</Badge>
-                          <Badge variant="outline" className={`text-[10px] shrink-0 ${
-                            ticket.priority === "high" ? "border-destructive/50 text-destructive" :
-                            ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
-                            "border-border text-muted-foreground"
-                          }`}>{ticket.priority}</Badge>
-                          <Badge className={`text-[10px] shrink-0 ${
-                            ticket.status === "open" ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20" :
-                            ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20" :
-                            "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
-                          }`}>{ticket.status}</Badge>
-                          <Button variant="outline" size="sm" className="h-7 px-2.5 text-xs gap-1" onClick={() => setTicketDialog({ open: true, ticket })}>
-                            <Eye className="w-3 h-3" /> View
-                          </Button>
+                          {ticketDialog?.ticket?.id === ticket.id && (
+                            <div className="border-t border-border/40 bg-background px-5 py-4 space-y-4">
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Full Name</p>
+                                  <p className="text-sm font-medium text-foreground">{ticket.from}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Email</p>
+                                  <p className="text-sm text-foreground">{ticket.email}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Category</p>
+                                  <Badge variant="outline" className="text-xs">{ticket.category}</Badge>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Date</p>
+                                  <p className="text-sm text-foreground">{ticket.date}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Priority</p>
+                                  <Badge variant="outline" className={`text-xs ${
+                                    ticket.priority === "high" ? "border-destructive/50 text-destructive" :
+                                    ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
+                                    "border-border text-muted-foreground"
+                                  }`}>{ticket.priority}</Badge>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Status</p>
+                                  <Badge className={`text-xs ${
+                                    ticket.status === "open" ? "bg-blue-500/10 text-blue-600" :
+                                    ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600" :
+                                    "bg-emerald-500/10 text-emerald-600"
+                                  }`}>{ticket.status}</Badge>
+                                </div>
+                              </div>
+                              <Separator />
+                              <div className="space-y-1.5">
+                                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Subject</p>
+                                <p className="text-sm font-medium text-foreground">{ticket.subject}</p>
+                              </div>
+                              <div className="space-y-1.5">
+                                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Message</p>
+                                <div className="bg-muted/30 rounded-lg border border-border/50 p-3">
+                                  <p className="text-sm text-foreground leading-relaxed">{ticket.message}</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1256,68 +1309,6 @@ const AdminPortalPage = () => {
               <p className="text-xs text-muted-foreground">This forum post is publicly visible and open for community discussion.</p>
             )}
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Ticket Detail Dialog */}
-      <Dialog open={!!ticketDialog?.open} onOpenChange={(open) => !open && setTicketDialog(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-base">
-              <TicketCheck className="w-4 h-4" />
-              Ticket {ticketDialog?.ticket?.id}
-            </DialogTitle>
-            <DialogDescription>{ticketDialog?.ticket?.subject}</DialogDescription>
-          </DialogHeader>
-          {ticketDialog?.ticket && (
-            <div className="space-y-4 pt-2">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Full Name</p>
-                  <p className="text-sm font-medium text-foreground">{ticketDialog.ticket.from}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Email</p>
-                  <p className="text-sm text-foreground">{ticketDialog.ticket.email}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Category</p>
-                  <Badge variant="outline" className="text-xs">{ticketDialog.ticket.category}</Badge>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Date</p>
-                  <p className="text-sm text-foreground">{ticketDialog.ticket.date}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Priority</p>
-                  <Badge variant="outline" className={`text-xs ${
-                    ticketDialog.ticket.priority === "high" ? "border-destructive/50 text-destructive" :
-                    ticketDialog.ticket.priority === "medium" ? "border-amber-500/50 text-amber-600" :
-                    "border-border text-muted-foreground"
-                  }`}>{ticketDialog.ticket.priority}</Badge>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Status</p>
-                  <Badge className={`text-xs ${
-                    ticketDialog.ticket.status === "open" ? "bg-blue-500/10 text-blue-600" :
-                    ticketDialog.ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600" :
-                    "bg-emerald-500/10 text-emerald-600"
-                  }`}>{ticketDialog.ticket.status}</Badge>
-                </div>
-              </div>
-              <Separator />
-              <div className="space-y-1.5">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Subject</p>
-                <p className="text-sm font-medium text-foreground">{ticketDialog.ticket.subject}</p>
-              </div>
-              <div className="space-y-1.5">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Message</p>
-                <div className="bg-muted/30 rounded-lg border border-border/50 p-3">
-                  <p className="text-sm text-foreground leading-relaxed">{ticketDialog.ticket.message}</p>
-                </div>
-              </div>
-            </div>
-          )}
         </DialogContent>
       </Dialog>
     </div>
