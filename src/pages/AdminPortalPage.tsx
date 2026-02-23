@@ -35,28 +35,49 @@ interface StatCardProps {
   icon: React.ElementType;
   trend?: { value: string; positive: boolean };
   description?: string;
+  accent?: string;
 }
 
-const StatCard = ({ label, value, icon: Icon, trend, description }: StatCardProps) => (
-  <Card className="group hover:shadow-md transition-all duration-200 border-border/60">
-    <CardContent className="p-5">
-      <div className="flex items-start justify-between mb-3">
-        <div className="p-2 rounded-lg bg-primary/10">
-          <Icon className="w-4 h-4 text-primary" />
+const accentColors: Record<string, { bg: string; text: string; ring: string }> = {
+  blue: { bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-400", ring: "ring-blue-500/20" },
+  emerald: { bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", ring: "ring-emerald-500/20" },
+  violet: { bg: "bg-violet-500/10", text: "text-violet-600 dark:text-violet-400", ring: "ring-violet-500/20" },
+  amber: { bg: "bg-amber-500/10", text: "text-amber-600 dark:text-amber-400", ring: "ring-amber-500/20" },
+  rose: { bg: "bg-rose-500/10", text: "text-rose-600 dark:text-rose-400", ring: "ring-rose-500/20" },
+  cyan: { bg: "bg-cyan-500/10", text: "text-cyan-600 dark:text-cyan-400", ring: "ring-cyan-500/20" },
+  default: { bg: "bg-primary/10", text: "text-primary", ring: "ring-primary/20" },
+};
+
+const StatCard = ({ label, value, icon: Icon, trend, description, accent = "default" }: StatCardProps) => {
+  const colors = accentColors[accent] || accentColors.default;
+  return (
+    <Card className="group relative overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm">
+      <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${colors.bg}`} />
+      <CardContent className="relative p-5">
+        <div className="flex items-center gap-3 mb-3">
+          <div className={`p-2.5 rounded-xl ${colors.bg} ring-1 ${colors.ring}`}>
+            <Icon className={`w-4 h-4 ${colors.text}`} />
+          </div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
         </div>
-        {trend && (
-          <Badge variant={trend.positive ? "default" : "destructive"} className="text-[10px] px-1.5 py-0.5 font-medium">
-            {trend.positive ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
-            {trend.value}
-          </Badge>
-        )}
-      </div>
-      <p className="text-2xl font-bold text-foreground tracking-tight">{value}</p>
-      <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
-      {description && <p className="text-[10px] text-muted-foreground/70 mt-1">{description}</p>}
-    </CardContent>
-  </Card>
-);
+        <div className="flex items-end justify-between">
+          <p className="text-2xl font-bold text-foreground tracking-tight">{value}</p>
+          {trend && (
+            <span className={`inline-flex items-center gap-0.5 text-xs font-semibold px-2 py-1 rounded-full ${
+              trend.positive
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+            }`}>
+              {trend.positive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+              {trend.value}
+            </span>
+          )}
+        </div>
+        {description && <p className="text-[10px] text-muted-foreground/70 mt-1.5">{description}</p>}
+      </CardContent>
+    </Card>
+  );
+};
 
 const AdminPortalPage = () => {
   const navigate = useNavigate();
@@ -170,21 +191,21 @@ const AdminPortalPage = () => {
         </div>
 
         {/* Primary KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-          <StatCard label="Instructors" value={metrics.totalInstructors} icon={Users} trend={{ value: "+2", positive: true }} />
-          <StatCard label="Students" value={metrics.totalStudents.toLocaleString()} icon={GraduationCap} trend={{ value: "+15%", positive: true }} />
-          <StatCard label="Courses" value={metrics.totalCourses} icon={BookOpen} trend={{ value: "+3", positive: true }} />
-          <StatCard label="Revenue" value={`$${metrics.totalRevenue.toLocaleString()}`} icon={DollarSign} trend={{ value: "+8%", positive: true }} />
-          <StatCard label="Avg Rating" value={metrics.avgRating.toFixed(1)} icon={Star} description="Based on all reviews" />
-          <StatCard label="Platform Profit" value={`$${Math.round(metrics.totalRevenue * 0.15).toLocaleString()}`} icon={TrendingUp} trend={{ value: "+10%", positive: true }} />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+          <StatCard label="Instructors" value={metrics.totalInstructors} icon={Users} trend={{ value: "+2", positive: true }} accent="violet" />
+          <StatCard label="Students" value={metrics.totalStudents.toLocaleString()} icon={GraduationCap} trend={{ value: "+15%", positive: true }} accent="blue" />
+          <StatCard label="Courses" value={metrics.totalCourses} icon={BookOpen} trend={{ value: "+3", positive: true }} accent="cyan" />
+          <StatCard label="Revenue" value={`$${metrics.totalRevenue.toLocaleString()}`} icon={DollarSign} trend={{ value: "+8%", positive: true }} accent="emerald" />
+          <StatCard label="Avg Rating" value={metrics.avgRating.toFixed(1)} icon={Star} description="Based on all reviews" accent="amber" />
+          <StatCard label="Platform Profit" value={`$${Math.round(metrics.totalRevenue * 0.15).toLocaleString()}`} icon={TrendingUp} trend={{ value: "+10%", positive: true }} accent="emerald" />
         </div>
 
         {/* Secondary KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-          <StatCard label="Total Clicks" value={metrics.totalClicks.toLocaleString()} icon={Activity} />
-          <StatCard label="Total Bookings" value={metrics.totalBookings.toLocaleString()} icon={Clock} />
-          <StatCard label="Total Reviews" value={metrics.totalReviews.toLocaleString()} icon={Star} />
-          <StatCard label="Active Courses" value={metrics.activeCourses} icon={BarChart3} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <StatCard label="Total Clicks" value={metrics.totalClicks.toLocaleString()} icon={Activity} accent="blue" />
+          <StatCard label="Total Bookings" value={metrics.totalBookings.toLocaleString()} icon={Clock} accent="violet" />
+          <StatCard label="Total Reviews" value={metrics.totalReviews.toLocaleString()} icon={Star} accent="amber" />
+          <StatCard label="Active Courses" value={metrics.activeCourses} icon={BarChart3} accent="cyan" />
         </div>
 
         <Separator className="mb-8" />
