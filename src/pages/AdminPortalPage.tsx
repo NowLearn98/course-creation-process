@@ -364,73 +364,51 @@ const AdminPortalPage = () => {
                   {topInstructors.filter(inst => !removedUsers.has(inst.name)).map((inst, i) => {
                     const isExpanded = expandedInstructor === inst.name;
                     return (
-                      <div key={inst.name} className="rounded-lg border border-border/40 overflow-hidden">
-                        <div className="flex items-center gap-3 p-4 bg-muted/20 hover:bg-muted/40 transition-colors">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold">{inst.name}</p>
-                            <p className="text-xs text-muted-foreground">
+                      <div key={inst.name} className="rounded-xl border border-border/40 overflow-hidden">
+                        {/* Top row: Name + Actions */}
+                        <div className="flex items-center justify-between gap-3 px-5 py-3 bg-muted/30">
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-foreground">{inst.name}</p>
+                            <p className="text-[11px] text-muted-foreground">
                               {inst.courseDetails.filter(c => c.status === "published").length} published · {inst.courseDetails.filter(c => c.status === "draft").length} draft{inst.courseDetails.filter(c => c.status === "draft").length !== 1 ? "s" : ""}
                             </p>
                           </div>
-                          <div className="hidden sm:grid grid-cols-6 gap-4 text-center">
-                            <div>
-                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Students</p>
-                              <p className="text-sm font-bold text-foreground">{inst.students.toLocaleString()}</p>
-                            </div>
-                            <div>
-                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Revenue</p>
-                              <p className="text-sm font-bold text-foreground">${inst.revenue.toLocaleString()}</p>
-                            </div>
-                            <div>
-                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Platform Profit</p>
-                              <p className="text-sm font-bold text-emerald-600">${Math.round(inst.revenue * 0.3).toLocaleString()}</p>
-                            </div>
-                            <div>
-                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Bookings</p>
-                              <p className="text-sm font-bold text-foreground">{inst.courseDetails.filter(c => c.status === "published").reduce((sum, c) => sum + c.bookings, 0).toLocaleString()}</p>
-                            </div>
-                            <div>
-                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Clicks</p>
-                              <p className="text-sm font-bold text-foreground">{inst.courseDetails.filter(c => c.status === "published").reduce((sum, c) => sum + c.clicks, 0).toLocaleString()}</p>
-                            </div>
-                            <div>
-                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Rating</p>
-                              <div className="flex items-center justify-center gap-0.5">
-                                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                                <p className="text-sm font-bold text-foreground">{inst.rating}</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0 ml-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="gap-1.5"
-                              onClick={() => setExpandedInstructor(isExpanded ? null : inst.name)}
-                            >
-                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                              View Details
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <Button variant="outline" size="sm" className="gap-1 h-7 text-xs" onClick={() => setExpandedInstructor(isExpanded ? null : inst.name)}>
+                              {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                              Details
+                            </Button>
+                            <Button variant="outline" size="sm" className="gap-1 h-7 text-xs">
+                              <Eye className="w-3 h-3" /> Profile
                             </Button>
                             <Button
-                              variant="outline"
-                              size="sm"
-                              className="gap-1.5"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                              View Profile
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30"
+                              variant="outline" size="sm"
+                              className="gap-1 h-7 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30"
                               onClick={() => setRemoveDialog({ open: true, name: inst.name, type: "instructor" })}
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              Remove
+                              <Trash2 className="w-3 h-3" /> Remove
                             </Button>
                           </div>
                         </div>
-
+                        {/* Bottom row: Metrics */}
+                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-px bg-border/30">
+                          {[
+                            { label: "Students", value: inst.students.toLocaleString() },
+                            { label: "Revenue", value: `$${inst.revenue.toLocaleString()}` },
+                            { label: "Profit", value: `$${Math.round(inst.revenue * 0.3).toLocaleString()}`, highlight: true },
+                            { label: "Bookings", value: inst.courseDetails.filter(c => c.status === "published").reduce((s, c) => s + c.bookings, 0).toLocaleString() },
+                            { label: "Clicks", value: inst.courseDetails.filter(c => c.status === "published").reduce((s, c) => s + c.clicks, 0).toLocaleString() },
+                            { label: "Rating", value: inst.rating.toString(), icon: true },
+                          ].map((m) => (
+                            <div key={m.label} className="bg-background px-4 py-3 text-center">
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">{m.label}</p>
+                              <div className="flex items-center justify-center gap-1">
+                                {m.icon && <Star className="w-3 h-3 text-amber-500 fill-amber-500" />}
+                                <p className={`text-sm font-bold ${m.highlight ? "text-emerald-600 dark:text-emerald-400" : "text-foreground"}`}>{m.value}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                         {isExpanded && (
                           <div className="border-t border-border/40 bg-background p-4 space-y-4">
                             {(() => {
