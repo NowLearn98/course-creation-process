@@ -5,10 +5,12 @@ import {
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
   TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp,
   MousePointerClick, Presentation, FlaskConical, ExternalLink, FileEdit,
-  Trash2,
+  Trash2, Settings, Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -111,6 +113,25 @@ const AdminPortalPage = () => {
   const handleRemove = () => {
     setRemovedUsers(prev => new Set(prev).add(removeDialog.name));
     setRemoveDialog({ open: false, name: "", type: "student" });
+  };
+
+  // Admin credentials (localStorage-based)
+  const storedCreds = JSON.parse(localStorage.getItem("admin_credentials") || '{"username":"admin","password":"admin123"}');
+  const [adminUsername, setAdminUsername] = useState(storedCreds.username);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminPasswordConfirm, setAdminPasswordConfirm] = useState("");
+  const [settingsSaved, setSettingsSaved] = useState(false);
+
+  const handleSaveSettings = () => {
+    const creds: any = { username: adminUsername, password: storedCreds.password };
+    if (adminPassword && adminPassword === adminPasswordConfirm) {
+      creds.password = adminPassword;
+    }
+    localStorage.setItem("admin_credentials", JSON.stringify(creds));
+    setAdminPassword("");
+    setAdminPasswordConfirm("");
+    setSettingsSaved(true);
+    setTimeout(() => setSettingsSaved(false), 2000);
   };
 
   const topInstructors = [
@@ -233,6 +254,9 @@ const AdminPortalPage = () => {
             </TabsTrigger>
             <TabsTrigger value="students" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <GraduationCap className="w-4 h-4 mr-1.5" /> Students
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Settings className="w-4 h-4 mr-1.5" /> Settings
             </TabsTrigger>
           </TabsList>
 
@@ -729,6 +753,58 @@ const AdminPortalPage = () => {
                     </tbody>
                   </table>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ===== SETTINGS ===== */}
+          <TabsContent value="settings" className="space-y-6">
+            <Card className="border-border/60 max-w-lg">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-semibold">Admin Login Credentials</CardTitle>
+                <CardDescription>Update your username and password for admin portal access</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="admin-username">Username</Label>
+                  <Input
+                    id="admin-username"
+                    value={adminUsername}
+                    onChange={(e) => setAdminUsername(e.target.value)}
+                    placeholder="Enter username"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="admin-password">New Password</Label>
+                  <Input
+                    id="admin-password"
+                    type="password"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    placeholder="Leave blank to keep current"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="admin-password-confirm">Confirm New Password</Label>
+                  <Input
+                    id="admin-password-confirm"
+                    type="password"
+                    value={adminPasswordConfirm}
+                    onChange={(e) => setAdminPasswordConfirm(e.target.value)}
+                    placeholder="Re-enter new password"
+                  />
+                  {adminPassword && adminPasswordConfirm && adminPassword !== adminPasswordConfirm && (
+                    <p className="text-xs text-destructive">Passwords do not match</p>
+                  )}
+                </div>
+                <Button
+                  onClick={handleSaveSettings}
+                  disabled={!adminUsername.trim() || (!!adminPassword && adminPassword !== adminPasswordConfirm)}
+                  className="gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  {settingsSaved ? "Saved!" : "Save Changes"}
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
