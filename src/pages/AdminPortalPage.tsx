@@ -124,12 +124,14 @@ const AdminPortalPage = () => {
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [courses]);
 
-  const revenuePerCourse = useMemo(() =>
-    courses.map(c => ({
-      name: c.title.length > 18 ? c.title.slice(0, 18) + "…" : c.title,
-      revenue: (c.enrollments || 0) * (c.price || 0),
-    })), [courses]
-  );
+  const revenuePerCategory = useMemo(() => {
+    const map = courses.reduce((acc, c) => {
+      const cat = c.category || "Uncategorized";
+      acc[cat] = (acc[cat] || 0) + (c.enrollments || 0) * (c.price || 0);
+      return acc;
+    }, {} as Record<string, number>);
+    return Object.entries(map).map(([name, revenue]) => ({ name, revenue }));
+  }, [courses]);
 
   const monthlyGrowth = [
     { month: "Jan", students: 120, instructors: 3, revenue: 3600 },
@@ -232,12 +234,12 @@ const AdminPortalPage = () => {
 
               <Card className="border-border/60">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold">Revenue per Course</CardTitle>
-                  <CardDescription>Lifetime revenue breakdown</CardDescription>
+                  <CardTitle className="text-base font-semibold">Revenue per Category</CardTitle>
+                  <CardDescription>Lifetime revenue by course category</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={280}>
-                    <BarChart data={revenuePerCourse} barSize={32}>
+                    <BarChart data={revenuePerCategory} barSize={32}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" />
                       <XAxis dataKey="name" tick={{ fontSize: 10 }} className="text-muted-foreground" />
                       <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
