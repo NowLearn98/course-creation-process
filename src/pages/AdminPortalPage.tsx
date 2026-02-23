@@ -13,6 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
@@ -101,6 +105,13 @@ const AdminPortalPage = () => {
   }, [courses]);
 
   const [expandedInstructor, setExpandedInstructor] = useState<string | null>(null);
+  const [removeDialog, setRemoveDialog] = useState<{ open: boolean; name: string; type: "instructor" | "student" }>({ open: false, name: "", type: "student" });
+  const [removedUsers, setRemovedUsers] = useState<Set<string>>(new Set());
+
+  const handleRemove = () => {
+    setRemovedUsers(prev => new Set(prev).add(removeDialog.name));
+    setRemoveDialog({ open: false, name: "", type: "student" });
+  };
 
   const topInstructors = [
     { name: "Dr. Sarah Chen", initials: "SC", courses: 4, students: 520, revenue: 15600, rating: 4.9, courseDetails: [
@@ -350,7 +361,7 @@ const AdminPortalPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {topInstructors.map((inst, i) => {
+                  {topInstructors.filter(inst => !removedUsers.has(inst.name)).map((inst, i) => {
                     const isExpanded = expandedInstructor === inst.name;
                     return (
                       <div key={inst.name} className="rounded-lg border border-border/40 overflow-hidden">
@@ -424,11 +435,7 @@ const AdminPortalPage = () => {
                               variant="outline"
                               size="sm"
                               className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30"
-                              onClick={() => {
-                                if (confirm(`Remove ${inst.name} from the platform?`)) {
-                                  console.log("Removing instructor:", inst.name);
-                                }
-                              }}
+                              onClick={() => setRemoveDialog({ open: true, name: inst.name, type: "instructor" })}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                               Remove
@@ -724,7 +731,7 @@ const AdminPortalPage = () => {
                         { name: "Chris Lee", email: "chris.lee@example.com", bookings: 4, presentations: 7, quizzes: 9, labs: 3 },
                         { name: "Anna Taylor", email: "anna.taylor@example.com", bookings: 9, presentations: 15, quizzes: 19, labs: 8 },
                         { name: "Ryan Martinez", email: "ryan.martinez@example.com", bookings: 11, presentations: 17, quizzes: 21, labs: 10 },
-                      ].map((student) => (
+                      ].filter(s => !removedUsers.has(s.name)).map((student) => (
                         <tr key={student.email} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
                           <td className="py-3 px-3 font-medium text-foreground">{student.name}</td>
                           <td className="py-3 px-3 text-muted-foreground">{student.email}</td>
@@ -745,11 +752,7 @@ const AdminPortalPage = () => {
                               variant="outline"
                               size="sm"
                               className="gap-1 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 text-xs"
-                              onClick={() => {
-                                if (confirm(`Remove ${student.name} from the platform?`)) {
-                                  console.log("Removing student:", student.name);
-                                }
-                              }}
+                              onClick={() => setRemoveDialog({ open: true, name: student.name, type: "student" })}
                             >
                               <Trash2 className="w-3 h-3" />
                               Remove
@@ -765,6 +768,26 @@ const AdminPortalPage = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AlertDialog open={removeDialog.open} onOpenChange={(open) => !open && setRemoveDialog({ ...removeDialog, open: false })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove {removeDialog.type === "instructor" ? "Instructor" : "Student"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove <span className="font-semibold text-foreground">{removeDialog.name}</span> from the platform? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleRemove}
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
