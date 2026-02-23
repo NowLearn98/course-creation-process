@@ -116,6 +116,7 @@ const AdminPortalPage = () => {
   const [removedUsers, setRemovedUsers] = useState<Set<string>>(new Set());
   const [viewDialog, setViewDialog] = useState<{ open: boolean; type: "project" | "forum"; title: string; clicks: number; responses: number } | null>(null);
   const [ticketDialog, setTicketDialog] = useState<{ open: boolean; ticket: any } | null>(null);
+  const [ticketStatusOverrides, setTicketStatusOverrides] = useState<Record<string, string>>({});
   const [ticketChats, setTicketChats] = useState<Record<string, { from: string; message: string; date: string }[]>>({});
   const [ticketReplyText, setTicketReplyText] = useState<string>("");
 
@@ -1098,7 +1099,8 @@ const AdminPortalPage = () => {
                     });
                 };
                 const renderTickets = (tickets: Ticket[]) => {
-                  const filtered = filterAndSort(tickets);
+                  const withOverrides = tickets.map(t => ({ ...t, status: ticketStatusOverrides[t.id] || t.status }));
+                  const filtered = filterAndSort(withOverrides);
                   if (filtered.length === 0) return <p className="text-sm text-muted-foreground text-center py-8">No tickets match your filters</p>;
                   return (
                     <div className="space-y-2">
@@ -1143,11 +1145,16 @@ const AdminPortalPage = () => {
                                 </div>
                                 <div className="space-y-1">
                                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Status</p>
-                                  <Badge className={`text-xs ${
-                                    ticket.status === "open" ? "bg-blue-500/10 text-blue-600" :
-                                    ticket.status === "in-progress" ? "bg-amber-500/10 text-amber-600" :
-                                    "bg-emerald-500/10 text-emerald-600"
-                                  }`}>{ticket.status}</Badge>
+                                  <Select value={ticket.status} onValueChange={(val) => setTicketStatusOverrides(prev => ({ ...prev, [ticket.id]: val }))}>
+                                    <SelectTrigger className="h-7 w-[130px] text-xs">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="open">Open</SelectItem>
+                                      <SelectItem value="in-progress">In Progress</SelectItem>
+                                      <SelectItem value="resolved">Resolved</SelectItem>
+                                    </SelectContent>
+                                  </Select>
                                 </div>
                               </div>
                               <Separator />
