@@ -12,6 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
+  DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getPublishedCourses } from "@/utils/publishedStorage";
 import { PublishedCourse } from "@/types/published";
 import {
@@ -398,51 +402,61 @@ const AdminPortalPage = () => {
                                   </div>
                                 </div>
 
-                                {/* Presentations & Labs */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border/30">
-                                  {/* Presentations */}
-                                  <div>
-                                    <div className="flex items-center gap-1.5 mb-1.5">
-                                      <Presentation className="w-3.5 h-3.5 text-primary" />
-                                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Presentations ({course.presentations.length})</p>
-                                    </div>
-                                    {course.presentations.length > 0 ? (
-                                      <div className="space-y-1">
-                                        {course.presentations.map((p) => (
-                                          <div key={p} className="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-background border border-border/30">
-                                            <p className="text-xs text-foreground truncate">{p}</p>
-                                            <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] gap-1 shrink-0">
-                                              <ExternalLink className="w-3 h-3" /> View
-                                            </Button>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <p className="text-xs text-muted-foreground/60 italic px-2">No presentations</p>
-                                    )}
-                                  </div>
+                                {/* Presentations & Labs Dropdowns */}
+                                <div className="flex items-center gap-2 pt-2 border-t border-border/30">
+                                  {/* Presentations Dropdown */}
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                                        <Presentation className="w-3.5 h-3.5" />
+                                        Presentations ({course.presentations.length})
+                                        <ChevronDown className="w-3 h-3" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
+                                      <DropdownMenuLabel className="text-xs">Presentations</DropdownMenuLabel>
+                                      <DropdownMenuSeparator />
+                                      {course.presentations.length > 0 ? (
+                                        course.presentations.map((p) => (
+                                          <DropdownMenuItem key={p} className="flex items-center justify-between gap-2 cursor-pointer">
+                                            <span className="text-xs truncate">{p}</span>
+                                            <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
+                                          </DropdownMenuItem>
+                                        ))
+                                      ) : (
+                                        <DropdownMenuItem disabled className="text-xs italic text-muted-foreground">
+                                          No presentations created
+                                        </DropdownMenuItem>
+                                      )}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
 
-                                  {/* Labs */}
-                                  <div>
-                                    <div className="flex items-center gap-1.5 mb-1.5">
-                                      <FlaskConical className="w-3.5 h-3.5 text-primary" />
-                                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Labs ({course.labs.length})</p>
-                                    </div>
-                                    {course.labs.length > 0 ? (
-                                      <div className="space-y-1">
-                                        {course.labs.map((l) => (
-                                          <div key={l} className="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-background border border-border/30">
-                                            <p className="text-xs text-foreground truncate">{l}</p>
-                                            <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] gap-1 shrink-0">
-                                              <ExternalLink className="w-3 h-3" /> View
-                                            </Button>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <p className="text-xs text-muted-foreground/60 italic px-2">No labs</p>
-                                    )}
-                                  </div>
+                                  {/* Labs Dropdown */}
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                                        <FlaskConical className="w-3.5 h-3.5" />
+                                        Labs ({course.labs.length})
+                                        <ChevronDown className="w-3 h-3" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start" className="w-64 bg-popover z-50">
+                                      <DropdownMenuLabel className="text-xs">Labs</DropdownMenuLabel>
+                                      <DropdownMenuSeparator />
+                                      {course.labs.length > 0 ? (
+                                        course.labs.map((l) => (
+                                          <DropdownMenuItem key={l} className="flex items-center justify-between gap-2 cursor-pointer">
+                                            <span className="text-xs truncate">{l}</span>
+                                            <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
+                                          </DropdownMenuItem>
+                                        ))
+                                      ) : (
+                                        <DropdownMenuItem disabled className="text-xs italic text-muted-foreground">
+                                          No labs created
+                                        </DropdownMenuItem>
+                                      )}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                 </div>
                               </div>
                             ))}
