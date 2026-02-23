@@ -107,6 +107,7 @@ const AdminPortalPage = () => {
   }, [courses]);
 
   const [expandedInstructor, setExpandedInstructor] = useState<string | null>(null);
+  const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [removeDialog, setRemoveDialog] = useState<{ open: boolean; name: string; type: "instructor" | "student" }>({ open: false, name: "", type: "student" });
   const [removedUsers, setRemovedUsers] = useState<Set<string>>(new Set());
 
@@ -703,7 +704,7 @@ const AdminPortalPage = () => {
                         <th className="text-left py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Name</th>
                         <th className="text-left py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email</th>
                         <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Bookings</th>
-                        <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Presentations</th>
+                        <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Projects</th>
                         <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Quizzes</th>
                         <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Labs</th>
                         <th className="text-center py-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
@@ -711,44 +712,212 @@ const AdminPortalPage = () => {
                     </thead>
                     <tbody>
                       {[
-                        { name: "Sarah Johnson", email: "sarah.johnson@example.com", bookings: 8, presentations: 12, quizzes: 15, labs: 6 },
-                        { name: "Mike Chen", email: "mike.chen@example.com", bookings: 5, presentations: 9, quizzes: 11, labs: 4 },
-                        { name: "Emma Williams", email: "emma.williams@example.com", bookings: 12, presentations: 18, quizzes: 22, labs: 9 },
-                        { name: "James Brown", email: "james.brown@example.com", bookings: 3, presentations: 6, quizzes: 8, labs: 3 },
-                        { name: "Lisa Garcia", email: "lisa.garcia@example.com", bookings: 7, presentations: 14, quizzes: 17, labs: 7 },
-                        { name: "David Miller", email: "david.miller@example.com", bookings: 10, presentations: 16, quizzes: 20, labs: 8 },
-                        { name: "Sofia Rodriguez", email: "sofia.rodriguez@example.com", bookings: 6, presentations: 10, quizzes: 13, labs: 5 },
-                        { name: "Chris Lee", email: "chris.lee@example.com", bookings: 4, presentations: 7, quizzes: 9, labs: 3 },
-                        { name: "Anna Taylor", email: "anna.taylor@example.com", bookings: 9, presentations: 15, quizzes: 19, labs: 8 },
-                        { name: "Ryan Martinez", email: "ryan.martinez@example.com", bookings: 11, presentations: 17, quizzes: 21, labs: 10 },
+                        { name: "Sarah Johnson", email: "sarah.johnson@example.com", bookings: 8, projects: 3, quizzes: 15, labs: 6, forumPosts: 5,
+                          projectDetails: [
+                            { title: "E-commerce Dashboard", clicks: 142, responses: 18 },
+                            { title: "Weather App Redesign", clicks: 98, responses: 12 },
+                            { title: "Portfolio Website", clicks: 67, responses: 8 },
+                          ],
+                          forumDetails: [
+                            { title: "Best practices for React state management?", clicks: 230, responses: 24 },
+                            { title: "How to optimize API calls in useEffect?", clicks: 180, responses: 19 },
+                            { title: "CSS Grid vs Flexbox for layouts", clicks: 156, responses: 15 },
+                            { title: "TypeScript generics explained", clicks: 120, responses: 11 },
+                            { title: "Deploying to Vercel tips", clicks: 95, responses: 7 },
+                          ]
+                        },
+                        { name: "Mike Chen", email: "mike.chen@example.com", bookings: 5, projects: 1, quizzes: 11, labs: 4, forumPosts: 2,
+                          projectDetails: [{ title: "Chat Application", clicks: 85, responses: 9 }],
+                          forumDetails: [
+                            { title: "WebSocket vs SSE for real-time?", clicks: 112, responses: 14 },
+                            { title: "MongoDB aggregation pipeline help", clicks: 78, responses: 6 },
+                          ]
+                        },
+                        { name: "Emma Williams", email: "emma.williams@example.com", bookings: 12, projects: 5, quizzes: 22, labs: 9, forumPosts: 8,
+                          projectDetails: [
+                            { title: "Task Management Tool", clicks: 210, responses: 25 },
+                            { title: "Recipe Sharing Platform", clicks: 175, responses: 20 },
+                            { title: "Fitness Tracker App", clicks: 130, responses: 14 },
+                            { title: "Blog CMS", clicks: 95, responses: 10 },
+                            { title: "Budget Calculator", clicks: 60, responses: 5 },
+                          ],
+                          forumDetails: [
+                            { title: "Next.js 14 app router confusion", clicks: 340, responses: 32 },
+                            { title: "Tailwind CSS dark mode setup", clicks: 210, responses: 18 },
+                            { title: "How to structure a monorepo?", clicks: 185, responses: 16 },
+                            { title: "Testing React components best approach?", clicks: 150, responses: 13 },
+                            { title: "Prisma vs Drizzle ORM", clicks: 120, responses: 11 },
+                            { title: "Docker for beginners tips", clicks: 95, responses: 8 },
+                            { title: "CI/CD pipeline setup guide", clicks: 80, responses: 6 },
+                            { title: "Responsive design patterns", clicks: 70, responses: 5 },
+                          ]
+                        },
+                        { name: "James Brown", email: "james.brown@example.com", bookings: 3, projects: 0, quizzes: 8, labs: 3, forumPosts: 1,
+                          projectDetails: [],
+                          forumDetails: [{ title: "Getting started with Git?", clicks: 45, responses: 4 }]
+                        },
+                        { name: "Lisa Garcia", email: "lisa.garcia@example.com", bookings: 7, projects: 2, quizzes: 17, labs: 7, forumPosts: 3,
+                          projectDetails: [
+                            { title: "Social Media Dashboard", clicks: 155, responses: 16 },
+                            { title: "Inventory System", clicks: 110, responses: 12 },
+                          ],
+                          forumDetails: [
+                            { title: "Authentication patterns in React", clicks: 190, responses: 20 },
+                            { title: "Supabase RLS policies help", clicks: 140, responses: 15 },
+                            { title: "Best UI libraries for 2025", clicks: 105, responses: 9 },
+                          ]
+                        },
+                        { name: "David Miller", email: "david.miller@example.com", bookings: 10, projects: 4, quizzes: 20, labs: 8, forumPosts: 6,
+                          projectDetails: [
+                            { title: "AI Image Generator", clicks: 280, responses: 30 },
+                            { title: "Music Player App", clicks: 165, responses: 18 },
+                            { title: "Real-time Collaboration Tool", clicks: 140, responses: 15 },
+                            { title: "API Gateway Service", clicks: 95, responses: 8 },
+                          ],
+                          forumDetails: [
+                            { title: "OpenAI API integration tips", clicks: 420, responses: 38 },
+                            { title: "Streaming responses in Node.js", clicks: 250, responses: 22 },
+                            { title: "Edge functions vs serverless", clicks: 180, responses: 16 },
+                            { title: "Rate limiting strategies", clicks: 130, responses: 11 },
+                            { title: "GraphQL vs REST in 2025", clicks: 110, responses: 9 },
+                            { title: "Caching strategies for APIs", clicks: 90, responses: 7 },
+                          ]
+                        },
+                        { name: "Sofia Rodriguez", email: "sofia.rodriguez@example.com", bookings: 6, projects: 1, quizzes: 13, labs: 5, forumPosts: 0,
+                          projectDetails: [{ title: "Language Learning App", clicks: 120, responses: 13 }],
+                          forumDetails: []
+                        },
+                        { name: "Chris Lee", email: "chris.lee@example.com", bookings: 4, projects: 0, quizzes: 9, labs: 3, forumPosts: 0,
+                          projectDetails: [],
+                          forumDetails: []
+                        },
+                        { name: "Anna Taylor", email: "anna.taylor@example.com", bookings: 9, projects: 3, quizzes: 19, labs: 8, forumPosts: 4,
+                          projectDetails: [
+                            { title: "Event Planning Platform", clicks: 190, responses: 22 },
+                            { title: "Study Group Finder", clicks: 145, responses: 16 },
+                            { title: "Habit Tracker", clicks: 88, responses: 7 },
+                          ],
+                          forumDetails: [
+                            { title: "React Native vs Flutter?", clicks: 310, responses: 28 },
+                            { title: "Best practices for form validation", clicks: 175, responses: 15 },
+                            { title: "Zustand vs Redux Toolkit", clicks: 140, responses: 12 },
+                            { title: "Accessibility checklist for web apps", clicks: 110, responses: 9 },
+                          ]
+                        },
+                        { name: "Ryan Martinez", email: "ryan.martinez@example.com", bookings: 11, projects: 2, quizzes: 21, labs: 10, forumPosts: 7,
+                          projectDetails: [
+                            { title: "DevOps Dashboard", clicks: 230, responses: 26 },
+                            { title: "Kubernetes Visualizer", clicks: 185, responses: 20 },
+                          ],
+                          forumDetails: [
+                            { title: "Kubernetes vs Docker Swarm", clicks: 280, responses: 25 },
+                            { title: "Terraform best practices", clicks: 210, responses: 19 },
+                            { title: "AWS Lambda cold start optimization", clicks: 175, responses: 15 },
+                            { title: "GitOps workflow setup", clicks: 140, responses: 12 },
+                            { title: "Monitoring with Prometheus", clicks: 120, responses: 10 },
+                            { title: "Service mesh explained", clicks: 95, responses: 8 },
+                            { title: "Infrastructure as Code tips", clicks: 80, responses: 6 },
+                          ]
+                        },
                       ].filter(s => !removedUsers.has(s.name)).map((student) => (
-                        <tr key={student.email} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
-                          <td className="py-3 px-3 font-medium text-foreground">{student.name}</td>
-                          <td className="py-3 px-3 text-muted-foreground">{student.email}</td>
-                          <td className="py-3 px-3 text-center">
-                            <Badge variant="outline" className="text-[10px] font-semibold">{student.bookings}</Badge>
-                          </td>
-                          <td className="py-3 px-3 text-center">
-                            <Badge variant="outline" className="text-[10px] font-semibold">{student.presentations}</Badge>
-                          </td>
-                          <td className="py-3 px-3 text-center">
-                            <Badge variant="outline" className="text-[10px] font-semibold">{student.quizzes}</Badge>
-                          </td>
-                          <td className="py-3 px-3 text-center">
-                            <Badge variant="outline" className="text-[10px] font-semibold">{student.labs}</Badge>
-                          </td>
-                          <td className="py-3 px-3 text-center">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="gap-1 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 text-xs"
-                              onClick={() => setRemoveDialog({ open: true, name: student.name, type: "student" })}
-                            >
-                              <Trash2 className="w-3 h-3" />
-                              Remove
-                            </Button>
-                          </td>
-                        </tr>
+                        <React.Fragment key={student.email}>
+                          <tr className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                            <td className="py-3 px-3 font-medium text-foreground">{student.name}</td>
+                            <td className="py-3 px-3 text-muted-foreground">{student.email}</td>
+                            <td className="py-3 px-3 text-center">
+                              <Badge variant="outline" className="text-[10px] font-semibold">{student.bookings}</Badge>
+                            </td>
+                            <td className="py-3 px-3 text-center">
+                              <Badge variant="outline" className="text-[10px] font-semibold">{student.projects}</Badge>
+                            </td>
+                            <td className="py-3 px-3 text-center">
+                              <Badge variant="outline" className="text-[10px] font-semibold">{student.quizzes}</Badge>
+                            </td>
+                            <td className="py-3 px-3 text-center">
+                              <Badge variant="outline" className="text-[10px] font-semibold">{student.labs}</Badge>
+                            </td>
+                            <td className="py-3 px-3 text-center flex items-center justify-center gap-1.5">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-1 text-xs"
+                                onClick={() => setExpandedStudent(expandedStudent === student.name ? null : student.name)}
+                              >
+                                <Eye className="w-3 h-3" />
+                                Details
+                                {expandedStudent === student.name ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-1 text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 text-xs"
+                                onClick={() => setRemoveDialog({ open: true, name: student.name, type: "student" })}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </td>
+                          </tr>
+                          {expandedStudent === student.name && (
+                            <tr>
+                              <td colSpan={7} className="p-0">
+                                <div className="bg-muted/20 border-b border-border/30 px-6 py-4 space-y-4">
+                                  {/* Projects Section */}
+                                  <div>
+                                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                      <Presentation className="w-3.5 h-3.5" />
+                                      Projects Posted ({student.projects})
+                                    </h4>
+                                    {student.projectDetails.length > 0 ? (
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                        {student.projectDetails.map((proj) => (
+                                          <div key={proj.title} className="flex items-center justify-between bg-background rounded-lg border border-border/50 px-3 py-2">
+                                            <span className="text-xs font-medium text-foreground truncate mr-2">{proj.title}</span>
+                                            <div className="flex items-center gap-3 shrink-0">
+                                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                <MousePointerClick className="w-3 h-3" /> {proj.clicks}
+                                              </span>
+                                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                <ArrowUpRight className="w-3 h-3" /> {proj.responses}
+                                              </span>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-xs text-muted-foreground italic">No projects posted yet</p>
+                                    )}
+                                  </div>
+                                  {/* Forum Posts Section */}
+                                  <div>
+                                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                      <FileEdit className="w-3.5 h-3.5" />
+                                      Forum Posts ({student.forumPosts})
+                                    </h4>
+                                    {student.forumDetails.length > 0 ? (
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                        {student.forumDetails.map((post) => (
+                                          <div key={post.title} className="flex items-center justify-between bg-background rounded-lg border border-border/50 px-3 py-2">
+                                            <span className="text-xs font-medium text-foreground truncate mr-2">{post.title}</span>
+                                            <div className="flex items-center gap-3 shrink-0">
+                                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                <MousePointerClick className="w-3 h-3" /> {post.clicks}
+                                              </span>
+                                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                <ArrowUpRight className="w-3 h-3" /> {post.responses}
+                                              </span>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-xs text-muted-foreground italic">No forum posts yet</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>
