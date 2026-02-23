@@ -365,19 +365,7 @@ const AdminPortalPage = () => {
                     const isExpanded = expandedInstructor === inst.name;
                     return (
                       <div key={inst.name} className="rounded-lg border border-border/40 overflow-hidden">
-                        <div className="flex items-center gap-4 p-4 bg-muted/20 hover:bg-muted/40 transition-colors">
-                          <div className="relative shrink-0">
-                            <Avatar className="w-10 h-10">
-                              <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                                {inst.initials}
-                              </AvatarFallback>
-                            </Avatar>
-                            {i < 3 && (
-                              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-[9px] font-bold text-white flex items-center justify-center">
-                                {i + 1}
-                              </span>
-                            )}
-                          </div>
+                        <div className="flex items-center gap-3 p-4 bg-muted/20 hover:bg-muted/40 transition-colors">
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold">{inst.name}</p>
                             <p className="text-xs text-muted-foreground">
