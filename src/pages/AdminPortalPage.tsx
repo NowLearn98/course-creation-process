@@ -176,7 +176,7 @@ const AdminPortalPage = () => {
           <StatCard label="Courses" value={metrics.totalCourses} icon={BookOpen} trend={{ value: "+3", positive: true }} />
           <StatCard label="Revenue" value={`$${metrics.totalRevenue.toLocaleString()}`} icon={DollarSign} trend={{ value: "+8%", positive: true }} />
           <StatCard label="Avg Rating" value={metrics.avgRating.toFixed(1)} icon={Star} description="Based on all reviews" />
-          <StatCard label="Completion" value="72%" icon={CheckCircle} trend={{ value: "+5%", positive: true }} />
+          <StatCard label="Platform Profit" value={`$${Math.round(metrics.totalRevenue * 0.15).toLocaleString()}`} icon={TrendingUp} trend={{ value: "+10%", positive: true }} />
         </div>
 
         {/* Secondary KPIs */}
