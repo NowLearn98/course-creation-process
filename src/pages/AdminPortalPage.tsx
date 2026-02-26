@@ -163,6 +163,7 @@ const AdminPortalPage = () => {
   const [newCourseSubcats, setNewCourseSubcats] = useState<Record<string, string>>({});
   const [newExploreCat, setNewExploreCat] = useState("");
   const [newExploreSubcats, setNewExploreSubcats] = useState<Record<string, string>>({});
+  const [catDeleteConfirm, setCatDeleteConfirm] = useState<{ open: boolean; label: string; onConfirm: () => void }>({ open: false, label: "", onConfirm: () => {} });
 
   const saveCourseCategories = (updated: Record<string, string[]>) => {
     setCourseCategories(updated);
@@ -1099,9 +1100,11 @@ const AdminPortalPage = () => {
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-semibold text-foreground">{cat}</h4>
                       <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => {
-                        const updated = { ...courseCategories };
-                        delete updated[cat];
-                        saveCourseCategories(updated);
+                        setCatDeleteConfirm({ open: true, label: `category "${cat}"`, onConfirm: () => {
+                          const updated = { ...courseCategories };
+                          delete updated[cat];
+                          saveCourseCategories(updated);
+                        }});
                       }}>
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
@@ -1111,8 +1114,10 @@ const AdminPortalPage = () => {
                         <Badge key={sub} variant="secondary" className="gap-1 pr-1">
                           {sub}
                           <button className="ml-1 hover:text-destructive transition-colors" onClick={() => {
-                            const updated = { ...courseCategories, [cat]: subs.filter(s => s !== sub) };
-                            saveCourseCategories(updated);
+                            setCatDeleteConfirm({ open: true, label: `subcategory "${sub}"`, onConfirm: () => {
+                              const updated = { ...courseCategories, [cat]: subs.filter(s => s !== sub) };
+                              saveCourseCategories(updated);
+                            }});
                           }}>
                             <X className="w-3 h-3" />
                           </button>
@@ -1181,9 +1186,11 @@ const AdminPortalPage = () => {
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-semibold text-foreground">{cat}</h4>
                       <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => {
-                        const updated = { ...exploreCategories };
-                        delete updated[cat];
-                        saveExploreCategories(updated);
+                        setCatDeleteConfirm({ open: true, label: `category "${cat}"`, onConfirm: () => {
+                          const updated = { ...exploreCategories };
+                          delete updated[cat];
+                          saveExploreCategories(updated);
+                        }});
                       }}>
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
@@ -1193,8 +1200,10 @@ const AdminPortalPage = () => {
                         <Badge key={sub} variant="secondary" className="gap-1 pr-1">
                           {sub}
                           <button className="ml-1 hover:text-destructive transition-colors" onClick={() => {
-                            const updated = { ...exploreCategories, [cat]: subs.filter(s => s !== sub) };
-                            saveExploreCategories(updated);
+                            setCatDeleteConfirm({ open: true, label: `subcategory "${sub}"`, onConfirm: () => {
+                              const updated = { ...exploreCategories, [cat]: subs.filter(s => s !== sub) };
+                              saveExploreCategories(updated);
+                            }});
                           }}>
                             <X className="w-3 h-3" />
                           </button>
@@ -1251,6 +1260,24 @@ const AdminPortalPage = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Category Delete Confirmation */}
+          <AlertDialog open={catDeleteConfirm.open} onOpenChange={(open) => !open && setCatDeleteConfirm(prev => ({ ...prev, open: false }))}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Remove {catDeleteConfirm.label}?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to remove this {catDeleteConfirm.label.split('"')[0].trim()}? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { catDeleteConfirm.onConfirm(); setCatDeleteConfirm(prev => ({ ...prev, open: false })); }}>
+                  Remove
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {/* ===== SUPPORT TICKETS ===== */}
           <TabsContent value="support" className="space-y-6">
