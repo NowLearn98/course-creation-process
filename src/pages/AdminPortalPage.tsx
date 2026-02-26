@@ -138,6 +138,45 @@ const AdminPortalPage = () => {
   const [adminPasswordConfirm, setAdminPasswordConfirm] = useState("");
   const [settingsSaved, setSettingsSaved] = useState(false);
 
+  // Commission tiers
+  const defaultCommissionTiers = [
+    { minHours: 0, maxHours: 20, rate: 30 },
+    { minHours: 21, maxHours: 50, rate: 25 },
+    { minHours: 51, maxHours: 200, rate: 22 },
+    { minHours: 201, maxHours: null as number | null, rate: 19 },
+  ];
+  const [commissionTiers, setCommissionTiers] = useState<{ minHours: number; maxHours: number | null; rate: number }[]>(() =>
+    JSON.parse(localStorage.getItem("admin_commission_tiers") || JSON.stringify(defaultCommissionTiers))
+  );
+  const [commissionSaved, setCommissionSaved] = useState(false);
+
+  const updateCommissionTier = (index: number, field: 'minHours' | 'maxHours' | 'rate', value: string) => {
+    setCommissionTiers(prev => prev.map((tier, i) => {
+      if (i !== index) return tier;
+      if (field === 'maxHours' && (value === '' || value === '∞')) return { ...tier, maxHours: null };
+      const num = parseInt(value) || 0;
+      return { ...tier, [field]: num };
+    }));
+  };
+
+  const saveCommissionTiers = () => {
+    localStorage.setItem("admin_commission_tiers", JSON.stringify(commissionTiers));
+    setCommissionSaved(true);
+    setTimeout(() => setCommissionSaved(false), 2000);
+  };
+
+  const addCommissionTier = () => {
+    const last = commissionTiers[commissionTiers.length - 1];
+    const newMin = last?.maxHours ? last.maxHours + 1 : (last?.minHours || 0) + 1;
+    setCommissionTiers(prev => [...prev, { minHours: newMin, maxHours: null, rate: 15 }]);
+  };
+
+  const removeCommissionTier = (index: number) => {
+    setCatDeleteConfirm({ open: true, label: `commission tier`, onConfirm: () => {
+      setCommissionTiers(prev => prev.filter((_, i) => i !== index));
+    }});
+  };
+
   // Category management
   const defaultCourseCategories: Record<string, string[]> = {
     "Technology": ["Web Development", "Mobile Development", "Data Science", "Cloud Computing", "Cybersecurity"],
@@ -1060,7 +1099,8 @@ const AdminPortalPage = () => {
 
           {/* ===== SETTINGS ===== */}
           <TabsContent value="settings" className="space-y-6">
-            <Card className="border-border/60 max-w-lg">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="border-border/60">
               <CardHeader className="pb-4">
                 <CardTitle className="text-base font-semibold">Admin Login Credentials</CardTitle>
                 <CardDescription>Update your username and password for admin portal access</CardDescription>
@@ -1087,6 +1127,68 @@ const AdminPortalPage = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Commission Split */}
+            <Card className="border-border/60">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-semibold">Platform Commission Split</CardTitle>
+                <CardDescription>Configure TutrX commission rates based on instructor completed hours</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {commissionTiers.map((tier, index) => (
+                    <div key={index} className="flex items-center gap-2 p-3 border border-border/50 rounded-lg bg-muted/30">
+                      <div className="flex-1 grid grid-cols-3 gap-2 items-center">
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Min Hours</Label>
+                          <Input
+                            type="number"
+                            value={tier.minHours}
+                            onChange={(e) => updateCommissionTier(index, 'minHours', e.target.value)}
+                            className="h-8 text-sm"
+                            min={0}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Max Hours</Label>
+                          <Input
+                            type="text"
+                            value={tier.maxHours === null ? '∞' : tier.maxHours}
+                            onChange={(e) => updateCommissionTier(index, 'maxHours', e.target.value)}
+                            className="h-8 text-sm"
+                            placeholder="∞"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-muted-foreground">Rate (%)</Label>
+                          <Input
+                            type="number"
+                            value={tier.rate}
+                            onChange={(e) => updateCommissionTier(index, 'rate', e.target.value)}
+                            className="h-8 text-sm"
+                            min={0}
+                            max={100}
+                          />
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 mt-5 text-muted-foreground hover:text-destructive" onClick={() => removeCommissionTier(index)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="gap-1.5" onClick={addCommissionTier}>
+                    <Plus className="w-3.5 h-3.5" /> Add Tier
+                  </Button>
+                  <Button size="sm" className="gap-1.5" onClick={saveCommissionTiers}>
+                    <Save className="w-3.5 h-3.5" />
+                    {commissionSaved ? "Saved!" : "Save Commission Rates"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            </div>
 
             {/* Course Creation Categories */}
             <Card className="border-border/60">
