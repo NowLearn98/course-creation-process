@@ -9,7 +9,7 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { Plus, BookOpen, Users, TrendingUp, Star, GraduationCap, MessageSquare, ShieldCheck } from "lucide-react";
+import { Plus, BookOpen, Users, TrendingUp, Star, GraduationCap, MessageSquare, ShieldCheck, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BookingModal } from "@/components/BookingModal";
 import { DraftsList } from "@/components/DraftsList";
@@ -17,6 +17,8 @@ import CourseMetricsOverview from "@/components/CourseMetricsOverview";
 import { DraftCourse } from "@/types/draft";
 import { PublishedCourse } from "@/types/published";
 import { createSamplePublishedCourses } from "@/utils/sampleData";
+import { InstructorSurveyDialog } from "@/components/InstructorSurveyDialog";
+import { StudentSurveyDialog } from "@/components/StudentSurveyDialog";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -45,6 +47,8 @@ const Index = () => {
   const [editingDraft, setEditingDraft] = useState<DraftCourse | null>(null);
   const [editingPublished, setEditingPublished] = useState<PublishedCourse | null>(null);
   const [tabValue, setTabValue] = useState(0);
+  const [instructorSurveyOpen, setInstructorSurveyOpen] = useState(false);
+  const [studentSurveyOpen, setStudentSurveyOpen] = useState(false);
 
   useEffect(() => {
     createSamplePublishedCourses();
@@ -120,7 +124,7 @@ const Index = () => {
                 Build and launch your courses with ease
               </Typography>
             </Box>
-            <Box sx={{ display: "flex", gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
               <Button
                 variant="outlined"
                 size="large"
@@ -128,6 +132,22 @@ const Index = () => {
                 startIcon={<ShieldCheck className="w-5 h-5" />}
               >
                 Admin Portal
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => setInstructorSurveyOpen(true)}
+                startIcon={<ClipboardList className="w-5 h-5" />}
+              >
+                Instructor Survey
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => setStudentSurveyOpen(true)}
+                startIcon={<ClipboardList className="w-5 h-5" />}
+              >
+                Student Survey
               </Button>
               <Button
                 variant="outlined"
@@ -471,6 +491,8 @@ const Index = () => {
           editingDraft={editingDraft}
           editingPublished={editingPublished}
         />
+        <InstructorSurveyDialog open={instructorSurveyOpen} onClose={() => setInstructorSurveyOpen(false)} />
+        <StudentSurveyDialog open={studentSurveyOpen} onClose={() => setStudentSurveyOpen(false)} />
       </Container>
     </Box>
   );
