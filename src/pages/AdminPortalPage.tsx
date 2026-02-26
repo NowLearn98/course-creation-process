@@ -5,7 +5,7 @@ import {
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
   TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp,
   MousePointerClick, Presentation, FlaskConical, ExternalLink, FileEdit,
-  Trash2, Settings, Save, Sparkles, Bot, Zap, TicketCheck, MessageSquare, Briefcase, Search, ArrowDownAZ, ArrowUpAZ, Filter, Send,
+  Trash2, Settings, Save, Sparkles, Bot, Zap, TicketCheck, MessageSquare, Briefcase, Search, ArrowDownAZ, ArrowUpAZ, Filter, Send, Plus, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -137,6 +137,41 @@ const AdminPortalPage = () => {
   const [adminPassword, setAdminPassword] = useState("");
   const [adminPasswordConfirm, setAdminPasswordConfirm] = useState("");
   const [settingsSaved, setSettingsSaved] = useState(false);
+
+  // Category management
+  const defaultCourseCategories: Record<string, string[]> = {
+    "Technology": ["Web Development", "Mobile Development", "Data Science", "Cloud Computing", "Cybersecurity"],
+    "Marketing": ["Digital Marketing", "SEO", "Content Marketing", "Social Media"],
+    "Design": ["UX Design", "Graphic Design", "UI Design", "Motion Graphics"],
+    "Business": ["Entrepreneurship", "Finance", "Management", "Strategy"],
+    "Health & Fitness": ["Personal Training", "Nutrition", "Yoga", "Mental Health"],
+  };
+  const defaultExploreCategories: Record<string, string[]> = {
+    "Technology": ["All Tech", "Programming", "DevOps", "AI & ML"],
+    "Creative": ["Photography", "Video", "Music", "Writing"],
+    "Business": ["Startups", "Marketing", "Finance", "Leadership"],
+    "Lifestyle": ["Fitness", "Cooking", "Travel", "Personal Development"],
+  };
+
+  const [courseCategories, setCourseCategories] = useState<Record<string, string[]>>(() =>
+    JSON.parse(localStorage.getItem("admin_course_categories") || JSON.stringify(defaultCourseCategories))
+  );
+  const [exploreCategories, setExploreCategories] = useState<Record<string, string[]>>(() =>
+    JSON.parse(localStorage.getItem("admin_explore_categories") || JSON.stringify(defaultExploreCategories))
+  );
+  const [newCourseCat, setNewCourseCat] = useState("");
+  const [newCourseSubcats, setNewCourseSubcats] = useState<Record<string, string>>({});
+  const [newExploreCat, setNewExploreCat] = useState("");
+  const [newExploreSubcats, setNewExploreSubcats] = useState<Record<string, string>>({});
+
+  const saveCourseCategories = (updated: Record<string, string[]>) => {
+    setCourseCategories(updated);
+    localStorage.setItem("admin_course_categories", JSON.stringify(updated));
+  };
+  const saveExploreCategories = (updated: Record<string, string[]>) => {
+    setExploreCategories(updated);
+    localStorage.setItem("admin_explore_categories", JSON.stringify(updated));
+  };
 
   const handleSaveSettings = () => {
     const creds: any = { username: adminUsername, password: storedCreds.password };
@@ -1008,44 +1043,187 @@ const AdminPortalPage = () => {
               <CardContent className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="admin-username">Username</Label>
-                  <Input
-                    id="admin-username"
-                    value={adminUsername}
-                    onChange={(e) => setAdminUsername(e.target.value)}
-                    placeholder="Enter username"
-                  />
+                  <Input id="admin-username" value={adminUsername} onChange={(e) => setAdminUsername(e.target.value)} placeholder="Enter username" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="admin-password">New Password</Label>
-                  <Input
-                    id="admin-password"
-                    type="password"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    placeholder="Leave blank to keep current"
-                  />
+                  <Input id="admin-password" type="password" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} placeholder="Leave blank to keep current" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="admin-password-confirm">Confirm New Password</Label>
-                  <Input
-                    id="admin-password-confirm"
-                    type="password"
-                    value={adminPasswordConfirm}
-                    onChange={(e) => setAdminPasswordConfirm(e.target.value)}
-                    placeholder="Re-enter new password"
-                  />
+                  <Input id="admin-password-confirm" type="password" value={adminPasswordConfirm} onChange={(e) => setAdminPasswordConfirm(e.target.value)} placeholder="Re-enter new password" />
                   {adminPassword && adminPasswordConfirm && adminPassword !== adminPasswordConfirm && (
                     <p className="text-xs text-destructive">Passwords do not match</p>
                   )}
                 </div>
-                <Button
-                  onClick={handleSaveSettings}
-                  disabled={!adminUsername.trim() || (!!adminPassword && adminPassword !== adminPasswordConfirm)}
-                  className="gap-2"
-                >
+                <Button onClick={handleSaveSettings} disabled={!adminUsername.trim() || (!!adminPassword && adminPassword !== adminPasswordConfirm)} className="gap-2">
                   <Save className="w-4 h-4" />
                   {settingsSaved ? "Saved!" : "Save Changes"}
                 </Button>
+              </CardContent>
+            </Card>
+
+            {/* Course Creation Categories */}
+            <Card className="border-border/60">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-semibold">Course Creation Categories</CardTitle>
+                <CardDescription>Manage categories and subcategories available during course creation</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {Object.entries(courseCategories).map(([cat, subs]) => (
+                  <div key={cat} className="border border-border/50 rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-foreground">{cat}</h4>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => {
+                        const updated = { ...courseCategories };
+                        delete updated[cat];
+                        saveCourseCategories(updated);
+                      }}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {subs.map((sub) => (
+                        <Badge key={sub} variant="secondary" className="gap-1 pr-1">
+                          {sub}
+                          <button className="ml-1 hover:text-destructive transition-colors" onClick={() => {
+                            const updated = { ...courseCategories, [cat]: subs.filter(s => s !== sub) };
+                            saveCourseCategories(updated);
+                          }}>
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="New subcategory..."
+                        value={newCourseSubcats[cat] || ""}
+                        onChange={(e) => setNewCourseSubcats(prev => ({ ...prev, [cat]: e.target.value }))}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && newCourseSubcats[cat]?.trim()) {
+                            saveCourseCategories({ ...courseCategories, [cat]: [...subs, newCourseSubcats[cat].trim()] });
+                            setNewCourseSubcats(prev => ({ ...prev, [cat]: "" }));
+                          }
+                        }}
+                        className="h-8 text-sm flex-1"
+                      />
+                      <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => {
+                        if (newCourseSubcats[cat]?.trim()) {
+                          saveCourseCategories({ ...courseCategories, [cat]: [...subs, newCourseSubcats[cat].trim()] });
+                          setNewCourseSubcats(prev => ({ ...prev, [cat]: "" }));
+                        }
+                      }}>
+                        <Plus className="w-3.5 h-3.5" /> Add
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                <Separator />
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="New category name..."
+                    value={newCourseCat}
+                    onChange={(e) => setNewCourseCat(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && newCourseCat.trim() && !courseCategories[newCourseCat.trim()]) {
+                        saveCourseCategories({ ...courseCategories, [newCourseCat.trim()]: [] });
+                        setNewCourseCat("");
+                      }
+                    }}
+                    className="h-9 text-sm flex-1 max-w-xs"
+                  />
+                  <Button variant="outline" className="h-9 gap-1.5" onClick={() => {
+                    if (newCourseCat.trim() && !courseCategories[newCourseCat.trim()]) {
+                      saveCourseCategories({ ...courseCategories, [newCourseCat.trim()]: [] });
+                      setNewCourseCat("");
+                    }
+                  }}>
+                    <Plus className="w-4 h-4" /> Add Category
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Explore Page Categories */}
+            <Card className="border-border/60">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-semibold">Explore Page Categories</CardTitle>
+                <CardDescription>Manage categories and subcategories displayed on the explore page</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {Object.entries(exploreCategories).map(([cat, subs]) => (
+                  <div key={cat} className="border border-border/50 rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-foreground">{cat}</h4>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => {
+                        const updated = { ...exploreCategories };
+                        delete updated[cat];
+                        saveExploreCategories(updated);
+                      }}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {subs.map((sub) => (
+                        <Badge key={sub} variant="secondary" className="gap-1 pr-1">
+                          {sub}
+                          <button className="ml-1 hover:text-destructive transition-colors" onClick={() => {
+                            const updated = { ...exploreCategories, [cat]: subs.filter(s => s !== sub) };
+                            saveExploreCategories(updated);
+                          }}>
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="New subcategory..."
+                        value={newExploreSubcats[cat] || ""}
+                        onChange={(e) => setNewExploreSubcats(prev => ({ ...prev, [cat]: e.target.value }))}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && newExploreSubcats[cat]?.trim()) {
+                            saveExploreCategories({ ...exploreCategories, [cat]: [...subs, newExploreSubcats[cat].trim()] });
+                            setNewExploreSubcats(prev => ({ ...prev, [cat]: "" }));
+                          }
+                        }}
+                        className="h-8 text-sm flex-1"
+                      />
+                      <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => {
+                        if (newExploreSubcats[cat]?.trim()) {
+                          saveExploreCategories({ ...exploreCategories, [cat]: [...subs, newExploreSubcats[cat].trim()] });
+                          setNewExploreSubcats(prev => ({ ...prev, [cat]: "" }));
+                        }
+                      }}>
+                        <Plus className="w-3.5 h-3.5" /> Add
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                <Separator />
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="New category name..."
+                    value={newExploreCat}
+                    onChange={(e) => setNewExploreCat(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && newExploreCat.trim() && !exploreCategories[newExploreCat.trim()]) {
+                        saveExploreCategories({ ...exploreCategories, [newExploreCat.trim()]: [] });
+                        setNewExploreCat("");
+                      }
+                    }}
+                    className="h-9 text-sm flex-1 max-w-xs"
+                  />
+                  <Button variant="outline" className="h-9 gap-1.5" onClick={() => {
+                    if (newExploreCat.trim() && !exploreCategories[newExploreCat.trim()]) {
+                      saveExploreCategories({ ...exploreCategories, [newExploreCat.trim()]: [] });
+                      setNewExploreCat("");
+                    }
+                  }}>
+                    <Plus className="w-4 h-4" /> Add Category
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
