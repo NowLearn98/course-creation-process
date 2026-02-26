@@ -5,7 +5,7 @@ import {
   Star, Clock, CheckCircle, BarChart3, Activity, TrendingUp,
   TrendingDown, ArrowUpRight, Crown, Eye, ChevronDown, ChevronUp,
   MousePointerClick, Presentation, FlaskConical, ExternalLink, FileEdit,
-  Trash2, Settings, Save, Sparkles, Bot, Zap, TicketCheck, MessageSquare, Briefcase, Search, ArrowDownAZ, ArrowUpAZ, Filter, Send, Plus, X,
+  Trash2, Settings, Save, Sparkles, Bot, Zap, TicketCheck, MessageSquare, Briefcase, Search, ArrowDownAZ, ArrowUpAZ, Filter, Send, Plus, X, ClipboardList, User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -203,6 +203,7 @@ const AdminPortalPage = () => {
   const [newExploreCat, setNewExploreCat] = useState("");
   const [newExploreSubcats, setNewExploreSubcats] = useState<Record<string, string>>({});
   const [catDeleteConfirm, setCatDeleteConfirm] = useState<{ open: boolean; label: string; onConfirm: () => void }>({ open: false, label: "", onConfirm: () => {} });
+  const [surveyProfileDialog, setSurveyProfileDialog] = useState<any>(null);
 
   const saveCourseCategories = (updated: Record<string, string[]>) => {
     setCourseCategories(updated);
@@ -372,6 +373,9 @@ const AdminPortalPage = () => {
             </TabsTrigger>
             <TabsTrigger value="support" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <TicketCheck className="w-4 h-4 mr-1.5" /> Support
+            </TabsTrigger>
+            <TabsTrigger value="survey" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <ClipboardList className="w-4 h-4 mr-1.5" /> Survey
             </TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <Settings className="w-4 h-4 mr-1.5" /> Settings
@@ -1095,6 +1099,180 @@ const AdminPortalPage = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* ===== SURVEY ===== */}
+          <TabsContent value="survey" className="space-y-6">
+            {(() => {
+              const instructorSurveys = [
+                { id: 1, name: "Sarah Johnson", email: "sarah.j@example.com", role: "Instructor", rating: 5, feedback: "Amazing platform! Course creation was seamless and intuitive. The tools provided made it easy to structure my content.", date: "2026-02-20", coursesCreated: 4, totalHours: 62 },
+                { id: 2, name: "Michael Chen", email: "m.chen@example.com", role: "Instructor", rating: 4, feedback: "Great experience overall. Would love to see more template options for lab exercises.", date: "2026-02-18", coursesCreated: 2, totalHours: 28 },
+                { id: 3, name: "Emily Rodriguez", email: "e.rodriguez@example.com", role: "Instructor", rating: 5, feedback: "The analytics dashboard is fantastic. Really helps me understand how students engage with my content.", date: "2026-02-15", coursesCreated: 6, totalHours: 105 },
+                { id: 4, name: "James Wilson", email: "j.wilson@example.com", role: "Instructor", rating: 3, feedback: "Good platform but the upload process for large video files could be faster.", date: "2026-02-12", coursesCreated: 1, totalHours: 12 },
+                { id: 5, name: "Priya Patel", email: "p.patel@example.com", role: "Instructor", rating: 4, feedback: "Love the collaborative features. Easy to get feedback from peers before publishing.", date: "2026-02-10", coursesCreated: 3, totalHours: 45 },
+              ];
+              const studentSurveys = [
+                { id: 1, name: "Alex Turner", email: "a.turner@example.com", role: "Student", rating: 5, feedback: "My first session was incredible! The instructor was engaging and the material was well-structured.", date: "2026-02-22", coursesEnrolled: 3, completionRate: 85 },
+                { id: 2, name: "Lisa Wang", email: "l.wang@example.com", role: "Student", rating: 4, feedback: "Really enjoyed the hands-on labs. The platform made it easy to follow along and practice.", date: "2026-02-21", coursesEnrolled: 2, completionRate: 70 },
+                { id: 3, name: "David Kim", email: "d.kim@example.com", role: "Student", rating: 5, feedback: "Best online learning experience I've had. The interactive elements kept me engaged throughout.", date: "2026-02-19", coursesEnrolled: 5, completionRate: 92 },
+                { id: 4, name: "Maria Santos", email: "m.santos@example.com", role: "Student", rating: 3, feedback: "Content was good but I had some issues with video buffering during my session.", date: "2026-02-17", coursesEnrolled: 1, completionRate: 45 },
+                { id: 5, name: "Tom Baker", email: "t.baker@example.com", role: "Student", rating: 4, feedback: "Great first impression. The course structure is clear and the pace was perfect for beginners.", date: "2026-02-14", coursesEnrolled: 2, completionRate: 60 },
+                { id: 6, name: "Nina Alvarez", email: "n.alvarez@example.com", role: "Student", rating: 5, feedback: "Absolutely loved it! Already signed up for two more courses after my first session.", date: "2026-02-11", coursesEnrolled: 4, completionRate: 78 },
+              ];
+
+
+              const renderStars = (rating: number) => (
+                <div className="flex gap-0.5">
+                  {[1,2,3,4,5].map(i => (
+                    <Star key={i} className={`w-4 h-4 ${i <= rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`} />
+                  ))}
+                </div>
+              );
+
+              const SurveyCard = ({ survey }: { survey: any }) => (
+                <Card className="border-border/50 hover:shadow-md transition-all duration-200">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar className="h-10 w-10 shrink-0">
+                          <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                            {survey.name.split(" ").map((n: string) => n[0]).join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-sm text-foreground truncate">{survey.name}</p>
+                          <p className="text-xs text-muted-foreground">{survey.date}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {renderStars(survey.rating)}
+                        <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setSurveyProfileDialog(survey)}>
+                          <User className="w-3.5 h-3.5 mr-1" /> View Profile
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{survey.feedback}</p>
+                  </CardContent>
+                </Card>
+              );
+
+              const avgInstructor = (instructorSurveys.reduce((s, r) => s + r.rating, 0) / instructorSurveys.length).toFixed(1);
+              const avgStudent = (studentSurveys.reduce((s, r) => s + r.rating, 0) / studentSurveys.length).toFixed(1);
+
+              return (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <StatCard label="Total Responses" value={instructorSurveys.length + studentSurveys.length} icon={ClipboardList} accent="blue" />
+                    <StatCard label="Avg Instructor Rating" value={`${avgInstructor} / 5`} icon={Star} accent="amber" />
+                    <StatCard label="Avg Student Rating" value={`${avgStudent} / 5`} icon={Star} accent="emerald" />
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Instructor Survey Section */}
+                    <Card className="border-border/60">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-lg bg-blue-500/10">
+                            <Users className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold">Instructor Feedback</CardTitle>
+                            <CardDescription className="text-xs">Course creation & platform experience</CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3 max-h-[500px] overflow-y-auto">
+                        {instructorSurveys.map(s => <SurveyCard key={s.id} survey={s} />)}
+                      </CardContent>
+                    </Card>
+
+                    {/* Student Survey Section */}
+                    <Card className="border-border/60">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-lg bg-emerald-500/10">
+                            <GraduationCap className="w-4 h-4 text-emerald-600" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-semibold">Student Feedback</CardTitle>
+                            <CardDescription className="text-xs">Experience after first session</CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3 max-h-[500px] overflow-y-auto">
+                        {studentSurveys.map(s => <SurveyCard key={s.id} survey={s} />)}
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Profile Detail Dialog */}
+                  <Dialog open={!!surveyProfileDialog} onOpenChange={(o) => { if (!o) setSurveyProfileDialog(null); }}>
+                    <DialogContent className="max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>User Profile</DialogTitle>
+                        <DialogDescription>Detailed profile information</DialogDescription>
+                      </DialogHeader>
+                      {surveyProfileDialog && (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-4">
+                            <Avatar className="h-14 w-14">
+                              <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold">
+                                {surveyProfileDialog.name.split(" ").map((n: string) => n[0]).join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-bold text-foreground text-lg">{surveyProfileDialog.name}</p>
+                              <p className="text-sm text-muted-foreground">{surveyProfileDialog.email}</p>
+                              <Badge variant="secondary" className="mt-1">{surveyProfileDialog.role}</Badge>
+                            </div>
+                          </div>
+                          <Separator />
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">Rating Given</span>
+                              <div className="flex items-center gap-2">{renderStars(surveyProfileDialog.rating)} <span className="text-sm font-semibold">{surveyProfileDialog.rating}/5</span></div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">Survey Date</span>
+                              <span className="text-sm font-medium">{surveyProfileDialog.date}</span>
+                            </div>
+                            {surveyProfileDialog.coursesCreated !== undefined && (
+                              <>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm text-muted-foreground">Courses Created</span>
+                                  <span className="text-sm font-medium">{surveyProfileDialog.coursesCreated}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm text-muted-foreground">Total Teaching Hours</span>
+                                  <span className="text-sm font-medium">{surveyProfileDialog.totalHours}h</span>
+                                </div>
+                              </>
+                            )}
+                            {surveyProfileDialog.coursesEnrolled !== undefined && (
+                              <>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm text-muted-foreground">Courses Enrolled</span>
+                                  <span className="text-sm font-medium">{surveyProfileDialog.coursesEnrolled}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm text-muted-foreground">Completion Rate</span>
+                                  <span className="text-sm font-medium">{surveyProfileDialog.completionRate}%</span>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                          <Separator />
+                          <div>
+                            <p className="text-sm font-medium text-foreground mb-1">Feedback</p>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{surveyProfileDialog.feedback}</p>
+                          </div>
+                        </div>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                </>
+              );
+            })()}
           </TabsContent>
 
           {/* ===== SETTINGS ===== */}
