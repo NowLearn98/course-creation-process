@@ -215,10 +215,18 @@ const AdminPortalPage = () => {
     ]},
   ];
 
-  const topCourses = useMemo(() =>
-    [...courses].sort((a, b) => (b.enrollments || 0) - (a.enrollments || 0)).slice(0, 5),
-    [courses]
-  );
+  const topCourses = useMemo(() => {
+    const sorted = [...courses].sort((a, b) => (b.enrollments || 0) - (a.enrollments || 0)).slice(0, 5);
+    if (sorted.length > 0) return sorted;
+    // Fallback sample data
+    return [
+      { id: "sample-1", title: "React Development Masterclass", enrollments: 520, price: 149, rating: 4.9 },
+      { id: "sample-2", title: "Digital Marketing Fundamentals", enrollments: 380, price: 99, rating: 4.7 },
+      { id: "sample-3", title: "UX Design Principles", enrollments: 310, price: 129, rating: 4.8 },
+      { id: "sample-4", title: "Cloud Architecture", enrollments: 240, price: 119, rating: 4.6 },
+      { id: "sample-5", title: "Personal Fitness Coaching", enrollments: 195, price: 75, rating: 4.5 },
+    ] as any[];
+  }, [courses]);
 
   const categoryData = useMemo(() => {
     const map = courses.reduce((acc, c) => {
@@ -226,7 +234,15 @@ const AdminPortalPage = () => {
       acc[cat] = (acc[cat] || 0) + (c.enrollments || 0);
       return acc;
     }, {} as Record<string, number>);
-    return Object.entries(map).map(([name, value]) => ({ name, value }));
+    const result = Object.entries(map).map(([name, value]) => ({ name, value }));
+    if (result.length > 0) return result;
+    return [
+      { name: "Technology", value: 1420 },
+      { name: "Marketing", value: 860 },
+      { name: "Design", value: 640 },
+      { name: "Health & Fitness", value: 480 },
+      { name: "Business", value: 350 },
+    ];
   }, [courses]);
 
   const revenuePerCategory = useMemo(() => {
@@ -235,7 +251,15 @@ const AdminPortalPage = () => {
       acc[cat] = (acc[cat] || 0) + (c.enrollments || 0) * (c.price || 0);
       return acc;
     }, {} as Record<string, number>);
-    return Object.entries(map).map(([name, revenue]) => ({ name, revenue }));
+    const result = Object.entries(map).map(([name, revenue]) => ({ name, revenue }));
+    if (result.length > 0) return result;
+    return [
+      { name: "Technology", revenue: 85400 },
+      { name: "Marketing", revenue: 42300 },
+      { name: "Design", revenue: 38700 },
+      { name: "Health & Fitness", revenue: 21500 },
+      { name: "Business", revenue: 18200 },
+    ];
   }, [courses]);
 
   const monthlyGrowth = [
