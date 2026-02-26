@@ -383,6 +383,33 @@ const AdminPortalPage = () => {
 
               <Card className="border-border/60">
                 <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-semibold">Forum Posts & Responses by Category</CardTitle>
+                  <CardDescription>Number of forum posts and responses per category</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={[
+                      { category: "Technology", posts: 320, responses: 1450 },
+                      { category: "Marketing", posts: 185, responses: 820 },
+                      { category: "Design", posts: 240, responses: 1080 },
+                      { category: "Data Science", posts: 155, responses: 690 },
+                      { category: "Business", posts: 130, responses: 510 },
+                      { category: "Health", posts: 95, responses: 380 },
+                    ]} barSize={20}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" />
+                      <XAxis dataKey="category" tick={{ fontSize: 10 }} className="text-muted-foreground" />
+                      <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
+                      <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid hsl(var(--border))", fontSize: 12 }} />
+                      <Legend wrapperStyle={{ fontSize: 12 }} />
+                      <Bar dataKey="posts" fill="hsl(40, 90%, 55%)" radius={[6, 6, 0, 0]} name="Forum Posts" />
+                      <Bar dataKey="responses" fill="hsl(220, 90%, 56%)" radius={[6, 6, 0, 0]} name="Responses" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/60">
+                <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="text-base font-semibold">Top Courses</CardTitle>
