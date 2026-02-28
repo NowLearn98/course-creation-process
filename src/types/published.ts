@@ -28,6 +28,7 @@ export interface PublishedCourse {
   language: string;
   category: string;
   subcategory: string;
+  cancellationPolicy?: string;
   modules: Module[];
   format: string;
   sessionTypes: string[];
