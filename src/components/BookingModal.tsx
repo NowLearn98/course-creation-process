@@ -78,6 +78,7 @@ interface FormData {
   language: string;
   category: string;
   subcategory: string;
+  cancellationPolicy: string;
   
   // Course Content
   modules: Module[];
@@ -102,6 +103,12 @@ const steps = [
 ];
 
 const courseLevels = ['Beginner', 'Intermediate', 'Expert'];
+const cancellationPolicies = [
+  { value: 'flexible', label: 'Flexible', description: 'Full refund up to 24 hours before the session' },
+  { value: 'moderate', label: 'Moderate', description: 'Full refund up to 7 days before the session, 50% refund after' },
+  { value: 'strict', label: 'Strict', description: 'Full refund up to 14 days before the session, no refund after' },
+  { value: 'non-refundable', label: 'Non-Refundable', description: 'No refunds once enrolled' },
+];
 const languages = ['English', 'Spanish', 'French', 'German', 'Portuguese', 'Italian', 'Chinese', 'Japanese'];
 const categories = ['Technology', 'Business', 'Design', 'Marketing', 'Personal Development', 'Health & Fitness'];
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -155,6 +162,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
     language: '',
     category: '',
     subcategory: '',
+    cancellationPolicy: '',
     modules: [{ title: '', subsections: [] }],
     format: '',
     sessionTypes: [],
@@ -181,7 +189,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
   // Load draft or published course data when editing
   useEffect(() => {
     if (editingDraft && open) {
-      setFormData(editingDraft);
+      setFormData({ ...editingDraft, cancellationPolicy: editingDraft.cancellationPolicy || '' });
       setIsEditingDraft(true);
       setIsEditingPublished(false);
       setCurrentDraftId(editingDraft.id);
@@ -191,7 +199,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
       // Convert published course to form data format
       const publishedAsFormData = {
         ...editingPublished,
-        // Remove published-specific fields that aren't in FormData
+        cancellationPolicy: editingPublished.cancellationPolicy || '',
       };
       setFormData(publishedAsFormData);
       setIsEditingDraft(false);
@@ -1117,6 +1125,42 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-3">
+              <Label>Cancellation Policy *</Label>
+              <p className="text-sm text-muted-foreground">Choose a cancellation policy for your course</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {cancellationPolicies.map((policy) => (
+                  <Card
+                    key={policy.value}
+                    className={`p-4 cursor-pointer transition-all duration-200 hover:shadow-md ${
+                      formData.cancellationPolicy === policy.value
+                        ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                        : 'border-border hover:border-primary/40'
+                    }`}
+                    onClick={() => updateFormData('cancellationPolicy', policy.value)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-0.5 h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                        formData.cancellationPolicy === policy.value
+                          ? 'border-primary bg-primary'
+                          : 'border-muted-foreground/40'
+                      }`}>
+                        {formData.cancellationPolicy === policy.value && (
+                          <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">{policy.label}</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">{policy.description}</p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
               </div>
             </div>
           </div>
@@ -2093,6 +2137,7 @@ export function BookingModal({ open, onOpenChange, editingDraft = null, editingP
                   <p><span className="font-medium">Level:</span> {formData.level || 'Not specified'}</p>
                   <p><span className="font-medium">Language:</span> {formData.language || 'Not specified'}</p>
                   <p><span className="font-medium">Category:</span> {formData.category || 'Not specified'}</p>
+                  <p><span className="font-medium">Cancellation Policy:</span> {cancellationPolicies.find(p => p.value === formData.cancellationPolicy)?.label || 'Not specified'}</p>
                 </div>
               </div>
 
