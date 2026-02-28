@@ -19,7 +19,7 @@ import {
   IconButton,
   Rating,
 } from "@mui/material";
-import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye, GraduationCap, Sparkles, Presentation, FlaskConical, ChevronDown, Layers, MessageSquarePlus, X } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calendar, MapPin, Users, Star, CheckCircle, Eye, GraduationCap, Sparkles, Presentation, FlaskConical, ChevronDown, Layers, MessageSquarePlus, X, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
@@ -393,6 +393,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
   const navigate = useNavigate();
   const [detailOpen, setDetailOpen] = useState(false);
   const [presAnchor, setPresAnchor] = useState<null | HTMLElement>(null);
+  const [quizAnchor, setQuizAnchor] = useState<null | HTMLElement>(null);
   const [labsAnchor, setLabsAnchor] = useState<null | HTMLElement>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState<number | null>(null);
@@ -408,6 +409,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
   const modulesWithPresentations = course.modules
     .map((mod, idx) => ({ mod, idx }))
     .filter(({ mod }) => mod.subsections.some((s) => s.type === "lecture"));
+
+  const modulesWithQuizzes = course.modules
+    .map((mod, idx) => ({ mod, idx }))
+    .filter(({ mod }) => mod.subsections.some((s) => s.type === "quiz"));
 
   const modulesWithLabs = course.modules
     .map((mod, idx) => ({ mod, idx }))
@@ -564,6 +569,71 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, type, isPast = false })
                     <MenuItem disabled sx={{ py: 1.5 }}>
                       <Typography variant="body2" color="text.secondary">
                         No presentations available
+                      </Typography>
+                    </MenuItem>
+                  )}
+                </Menu>
+
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<ClipboardList className="w-4 h-4" />}
+                  endIcon={<ChevronDown className="w-3.5 h-3.5" />}
+                  onClick={(e) => setQuizAnchor(e.currentTarget)}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    px: 2.5,
+                    borderColor: "hsl(30, 90%, 50%)",
+                    color: "hsl(30, 90%, 40%)",
+                    "&:hover": {
+                      borderColor: "hsl(30, 90%, 40%)",
+                      bgcolor: "hsl(30, 90%, 97%)",
+                    },
+                  }}
+                >
+                  Quizzes
+                </Button>
+                <Menu
+                  anchorEl={quizAnchor}
+                  open={Boolean(quizAnchor)}
+                  onClose={() => setQuizAnchor(null)}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: 2,
+                      boxShadow: "0 8px 24px hsla(0,0%,0%,0.12)",
+                      minWidth: 220,
+                      bgcolor: "background.paper",
+                      mt: 0.5,
+                    },
+                  }}
+                >
+                  {modulesWithQuizzes.length > 0 ? (
+                    modulesWithQuizzes.map(({ mod, idx }) => (
+                      <MenuItem
+                        key={idx}
+                        onClick={() => {
+                          setQuizAnchor(null);
+                          navigate(`/student/course/${course.id}/module/${idx}?type=quiz`);
+                        }}
+                        sx={{ borderRadius: 1, mx: 0.5, py: 1 }}
+                      >
+                        <ListItemIcon sx={{ color: "hsl(30, 90%, 45%)" }}>
+                          <Layers className="w-4 h-4" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={mod.title}
+                          secondary={`Module ${idx + 1}`}
+                          primaryTypographyProps={{ variant: "body2", fontWeight: 600 }}
+                          secondaryTypographyProps={{ variant: "caption" }}
+                        />
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled sx={{ py: 1.5 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        No quizzes available
                       </Typography>
                     </MenuItem>
                   )}

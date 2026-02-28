@@ -9,7 +9,7 @@ import {
   CardContent,
   Chip,
 } from "@mui/material";
-import { ArrowLeft, Presentation, FlaskConical, FileText, Clock } from "lucide-react";
+import { ArrowLeft, Presentation, FlaskConical, FileText, Clock, ClipboardList } from "lucide-react";
 import { PublishedCourse } from "@/types/published";
 import { getPublishedCourses } from "@/utils/publishedStorage";
 
@@ -17,7 +17,7 @@ const StudentCourseMaterialPage = () => {
   const { courseId, moduleIndex } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const materialType = searchParams.get("type") || "lecture"; // "lecture" for presentations, "lab" for labs
+  const materialType = searchParams.get("type") || "lecture";
 
   const courses = getPublishedCourses();
   const course = courses.find((c) => c.id === courseId);
@@ -25,14 +25,17 @@ const StudentCourseMaterialPage = () => {
   const module = course?.modules?.[modIdx];
 
   const isPresentations = materialType === "lecture";
+  const isQuiz = materialType === "quiz";
   const icon = isPresentations ? (
     <Presentation className="w-6 h-6" />
+  ) : isQuiz ? (
+    <ClipboardList className="w-6 h-6" />
   ) : (
     <FlaskConical className="w-6 h-6" />
   );
-  const color = isPresentations ? "hsl(260, 70%, 55%)" : "hsl(142, 60%, 40%)";
-  const bgColor = isPresentations ? "hsl(260, 70%, 96%)" : "hsl(142, 60%, 96%)";
-  const label = isPresentations ? "Presentation" : "Lab";
+  const color = isPresentations ? "hsl(260, 70%, 55%)" : isQuiz ? "hsl(30, 90%, 50%)" : "hsl(142, 60%, 40%)";
+  const bgColor = isPresentations ? "hsl(260, 70%, 96%)" : isQuiz ? "hsl(30, 90%, 96%)" : "hsl(142, 60%, 96%)";
+  const label = isPresentations ? "Presentation" : isQuiz ? "Quiz" : "Lab";
 
   if (!course || !module) {
     return (
